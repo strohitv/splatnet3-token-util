@@ -50,7 +50,6 @@
 #    - Use: "wait_ms [NUMBER]" to wait for [NUMBER] ms. If no number is given, it will wait for 5000 ms (= 5 seconds).
 #    - Example: "wait_ms 500" to wait 500 ms (0.5 seconds)
 
-echo
 echo Close NSO app
 tap -x 845 -y 2330
 wait_s 2

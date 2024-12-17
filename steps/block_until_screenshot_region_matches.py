@@ -37,9 +37,13 @@ class BlockUntilScreenshotRegionMatches:
 			time.sleep(int(parsed_args.duration) / 1000.0)
 
 			print(f'Comparing screenshot "{parsed_args.actual_screenshot_path}" to base screenshot "{parsed_args.filename}".')
-			subprocess.run(f'{self.config.adb_path} exec-out screencap -p > {parsed_args.actual_screenshot_path}', shell=True)
+			subprocess.run(f'{self.config.adb_path} exec-out screencap -p > {parsed_args.actual_screenshot_path}',
+						   shell=True,
+						   stdout=subprocess.PIPE,
+						   stderr=subprocess.PIPE)
 
-			found = self.compare(parsed_args.filename, parsed_args.actual_screenshot_path, parsed_args.x1, parsed_args.y1, parsed_args.x2, parsed_args.y2, self.config.debug)
+			found = self.compare(parsed_args.filename, parsed_args.actual_screenshot_path, parsed_args.x1, parsed_args.y1, parsed_args.x2, parsed_args.y2,
+								 self.config.debug)
 
 		time.sleep(int(parsed_args.duration) / 1000.0)
 		print('Found.')
@@ -74,5 +78,3 @@ class BlockUntilScreenshotRegionMatches:
 
 		hash_diff = hash0 - hash1
 		return hash_diff < cutoff
-
-

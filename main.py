@@ -4,21 +4,17 @@ import io
 import json
 import os
 import shutil
-import string
 import subprocess
 import sys
 import time
 from subprocess import Popen
 
-from pkg_resources import non_empty_lines
-
 from data.config import Config
 from data.s3s_config import S3sConfig
 from steps import all_steps
 
+
 def read_in_chunks(file_object, chunk_size=10 * 1024 * 1024):
-	"""Lazy function (generator) to read a file piece by piece.
-	Default chunk size: 1k."""
 	while True:
 		data = file_object.read(chunk_size)
 		if not data:
@@ -137,11 +133,16 @@ if __name__ == '__main__':
 	bullet_token = None
 	session_token = None
 
-	for index in range(config.max_attempts):
+	attempt = 0
+	for attempt in range(config.max_attempts):
 		# run emulator
-		print(f'Attempt {index + 1} / {config.max_attempts}')
+		print(f'### Attempt {attempt + 1} / {config.max_attempts} ###')
+		print()
 		print('Booting emulator...')
-		emulator_proc = Popen(f'{config.emulator_path} -avd {config.avd_name}{' -no-window' if not config.show_window else ''}', shell=True, stdout=subprocess.PIPE)
+		emulator_proc = Popen(f'{config.emulator_path} -avd {config.avd_name}{' -no-window' if not config.show_window else ''}',
+							  shell=True,
+							  stdout=subprocess.PIPE,
+							  stderr=subprocess.PIPE)
 
 		for line in io.TextIOWrapper(emulator_proc.stdout, encoding="utf-8"):
 			if config.debug:
@@ -154,13 +155,11 @@ if __name__ == '__main__':
 			if line.startswith('INFO') and 'Boot completed in' in line:
 				break
 
-		time.sleep(15.0)
+		time.sleep(20.0)
 		print('Emulator booted successfully!')
+		print()
 
-		# open boot script
-		# append snapshot generation code
-		# open and append cleanup script
-		print('Executing boot script...\n')
+		print('Executing boot script...')
 		with open(config.boot_script_path, 'r') as boot_script:
 			while True:
 				line = boot_script.readline()
@@ -181,9 +180,13 @@ if __name__ == '__main__':
 					step = all_available_steps[command]
 					step.execute(line)
 
+		print()
 		print(f'Creating snapshot...')
 		# get emulator name
-		emulator_devies_proc = Popen(f'{config.adb_path} devices', shell=True, stdout=subprocess.PIPE)
+		emulator_devies_proc = Popen(f'{config.adb_path} devices',
+									 shell=True,
+									 stdout=subprocess.PIPE,
+									 stderr=subprocess.PIPE)
 
 		emulator_name = 'emulator-5554'
 		for line in io.TextIOWrapper(emulator_devies_proc.stdout, encoding="utf-8"):
@@ -199,8 +202,12 @@ if __name__ == '__main__':
 				break
 
 		# do snapshot
-		subprocess.run(f'{config.adb_path} -s {emulator_name} emu avd snapshot save {config.snapshot_name}', shell=True)
-		print(f'Snapshot created!\n')
+		subprocess.run(f'{config.adb_path} -s {emulator_name} emu avd snapshot save {config.snapshot_name}',
+									 shell=True,
+									 stdout=subprocess.PIPE,
+									 stderr=subprocess.PIPE)
+		print(f'Snapshot created!')
+		print()
 
 		print(f'Executing cleanup script...')
 		with open(config.cleanup_script_path, 'r') as cleanup_script:
@@ -219,6 +226,7 @@ if __name__ == '__main__':
 					step.execute(line)
 
 		# wait for emulator process to exit
+		print()
 		print(f'Waiting for emulator to shut down...')
 
 		result = None
@@ -230,6 +238,7 @@ if __name__ == '__main__':
 		snapshot_path = os.path.expanduser(os.path.join(config.snapshot_dir, config.snapshot_name, 'ram.bin'))
 
 		# analyse snapshot and find values
+		print()
 		print(f'Searching for tokens...')
 		with open(snapshot_path, 'rb') as f:
 			for piece in read_in_chunks(f):
@@ -245,6 +254,7 @@ if __name__ == '__main__':
 						index += 1
 
 					if len(gtoken) < 850:
+						# TODO jwt validation
 						gtoken = None
 
 				# bullet_token search
@@ -281,37 +291,40 @@ if __name__ == '__main__':
 						index += 1
 
 					if len(session_token) < 260:
+						# TODO jwt validation
 						session_token = None
 
 				if config.debug:
 					print('next chunk done')
 
-		print(f'gtoken: {gtoken}')
-		print(f'bullet token: {bullet_token}')
-		print(f'Session token: {session_token}')
+		print('- SUCCESS\tgToken' if gtoken is not None else '- FAIL\t\tgToken')
+		print('- SUCCESS\tbulletToken' if bullet_token is not None else '- FAIL\t\tbulletToken')
+		print('- SUCCESS\tsessionToken' if session_token is not None else '- FAIL\t\tsessionToken')
 
 		# delete snapshot file
 		shutil.rmtree(os.path.expanduser(os.path.join(config.snapshot_dir, config.snapshot_name)))
 
 		if gtoken is None or bullet_token is None or session_token is None:
-			print(f'Could not find all three tokens, retrying...')
+			print(f'Could not find all three tokens.')
+			print()
 		else:
 			break
 
 	# export tokens to target file
 	if gtoken is not None and bullet_token is not None and session_token is not None:
+		print()
 		print(f'Reading the template file...')
 		with open(config.template_path, 'r') as template:
+			print(f'Creating target file content from template...')
 			final_file = template.read()
 			final_file = final_file.replace('{GTOKEN}', gtoken)
 			final_file = final_file.replace('{BULLETTOKEN}', bullet_token)
 			final_file = final_file.replace('{SESSIONTOKEN}', session_token)
 
 			print(f'Creating the target file...')
-
 			with open(config.target_path, 'w') as target_file:
+				print(f'Writing content...')
 				target_file.write(final_file)
+				print(f'Done after {attempt + 1} attempts. Application will exit now. Bye!')
 	else:
 		print(f'Could not find all three tokens in {config.max_attempts} attempts, application will stop now.\nPlease try again.\nBye!')
-
-
