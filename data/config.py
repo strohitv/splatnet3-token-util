@@ -12,7 +12,7 @@ class Config:
 				 snapshot_name='splatnet3-emu-token-util',
 				 show_window=False,
 				 template_path='./config/template.txt',
-				 target_path='./generated.txt',
+				 target_path='./config.txt',
 				 boot_script_path='./config/boot.txt',
 				 cleanup_script_path='./config/cleanup.txt',
 				 max_attempts=5,

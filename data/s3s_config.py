@@ -9,7 +9,7 @@ class S3sConfig:
 				 bullettoken='{BULLETTOKEN}',
 				 session_token='{SESSIONTOKEN}',
 				 api_key='INSERT_STAT_INK_API_KEY_HERE',
-				 acc_loc='en-US|DE',
+				 acc_loc='en-US|US',
 				 f_gen='https://api.imink.app/f'):
 		self.gtoken = gtoken
 		self.bullettoken = bullettoken

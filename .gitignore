@@ -1,6 +1,9 @@
 /generated.json
+/config.txt
+
 /config
+/screenshots
 __pycache__
+
 .idea
 *.iml
-/screenshots
