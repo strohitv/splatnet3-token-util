@@ -2,13 +2,13 @@ import argparse
 import shlex
 import time
 
-from data.config import Config
+from data.app_config import AppConfig
 
 
 class WaitS:
-	def __init__(self, command_name, config: Config):
+	def __init__(self, command_name, app_config: AppConfig):
 		self.command_name = command_name
-		self.config = config
+		self.app_config = app_config
 
 	def execute(self, args):
 		only_args = shlex.split(args)[1:]

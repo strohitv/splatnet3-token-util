@@ -10,8 +10,8 @@ def read_in_chunks(file_object, chunk_size=10 * 1024 * 1024):
 		yield data
 
 
-def search_for_tokens(config):
-	snapshot_path = os.path.expanduser(os.path.join(config.snapshot_dir, config.snapshot_name, 'ram.bin'))
+def search_for_tokens(app_config):
+	snapshot_path = os.path.expanduser(os.path.join(app_config.snapshot_dir, app_config.snapshot_name, 'ram.bin'))
 
 	gtoken = None
 	bullet_token = None
@@ -73,7 +73,7 @@ def search_for_tokens(config):
 					# TODO jwt validation
 					session_token = None
 
-			if config.debug:
+			if app_config.debug:
 				print('next chunk done')
 
 	print('- SUCCESS\tgToken' if gtoken is not None else '- FAIL\t\tgToken')

@@ -17,11 +17,11 @@ if __name__ == '__main__':
 						action='store_true')
 	args = parser.parse_args()
 
-	regenerated, config = load_config(args)
-	all_available_steps = all_steps.get_steps(config)
+	regenerated, app_config = load_config(args)
+	all_available_steps = all_steps.get_steps(app_config)
 
-	regenerated |= ensure_scripts_exist(args, config, all_available_steps)
-	regenerated |= ensure_template_exists(args, config)
+	regenerated |= ensure_scripts_exist(args, app_config, all_available_steps)
+	regenerated |= ensure_template_exists(args, app_config)
 
 	if regenerated:
 		print('Configs were regenerated, application will exit. Bye!')
@@ -32,29 +32,29 @@ if __name__ == '__main__':
 	session_token = None
 
 	attempt = 0
-	for attempt in range(config.max_attempts):
-		print(f'### Attempt {attempt + 1} / {config.max_attempts} ###')
+	for attempt in range(app_config.max_attempts):
+		print(f'### Attempt {attempt + 1} / {app_config.max_attempts} ###')
 		print()
 
 		# run emulator and create RAM dump
-		emulator_proc = boot_emulator(config)
+		emulator_proc = boot_emulator(app_config)
 
-		execute_script(all_available_steps, config.boot_script_path, 'boot', config.debug)
-		create_snapshot(config)
-		execute_script(all_available_steps, config.cleanup_script_path, 'cleanup', config.debug)
+		execute_script(all_available_steps, app_config.boot_script_path, 'boot', app_config.debug)
+		create_snapshot(app_config)
+		execute_script(all_available_steps, app_config.cleanup_script_path, 'cleanup', app_config.debug)
 
 		wait_for_shutdown(emulator_proc)
 
 		# extract tokens from RAM dump
-		g_token, bullet_token, session_token = search_for_tokens(config)
-		delete_snapshot(config)
+		g_token, bullet_token, session_token = search_for_tokens(app_config)
+		delete_snapshot(app_config)
 
 		if g_token is not None and bullet_token is not None and session_token is not None:
 			break
 
 	# export tokens to target file
 	if g_token is not None and bullet_token is not None and session_token is not None:
-		create_target_file(config, g_token, bullet_token, session_token)
+		create_target_file(app_config, g_token, bullet_token, session_token)
 		print(f'Done after {attempt + 1} attempts. Application will exit now. Bye!')
 	else:
-		print(f'Could not find all three tokens in {config.max_attempts} attempts, application will stop now.\nPlease try again.\nBye!')
+		print(f'Could not find all three tokens in {app_config.max_attempts} attempts, application will stop now.\nPlease try again.\nBye!')

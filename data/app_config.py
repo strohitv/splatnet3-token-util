@@ -1,7 +1,7 @@
 import json
 
 
-class Config:
+class AppConfig:
 	"""Config class for json serialization of configuration values"""
 
 	def __init__(self,

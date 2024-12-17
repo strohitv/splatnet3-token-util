@@ -7,13 +7,13 @@ import time
 from PIL import Image
 import imagehash
 
-from data.config import Config
+from data.app_config import AppConfig
 
 
 class BlockUntilScreenshotRegionMatches:
-	def __init__(self, command_name, config: Config):
+	def __init__(self, command_name, app_config: AppConfig):
 		self.command_name = command_name
-		self.config = config
+		self.app_config = app_config
 
 	def execute(self, args):
 		only_args = shlex.split(args)[1:]
@@ -37,13 +37,13 @@ class BlockUntilScreenshotRegionMatches:
 			time.sleep(int(parsed_args.duration) / 1000.0)
 
 			print(f'Comparing screenshot "{parsed_args.actual_screenshot_path}" to base screenshot "{parsed_args.filename}".')
-			subprocess.run(f'{self.config.adb_path} exec-out screencap -p > {parsed_args.actual_screenshot_path}',
+			subprocess.run(f'{self.app_config.adb_path} exec-out screencap -p > {parsed_args.actual_screenshot_path}',
 						   shell=True,
 						   stdout=subprocess.PIPE,
 						   stderr=subprocess.PIPE)
 
 			found = self.compare(parsed_args.filename, parsed_args.actual_screenshot_path, parsed_args.x1, parsed_args.y1, parsed_args.x2, parsed_args.y2,
-								 self.config.debug)
+								 self.app_config.debug)
 
 		time.sleep(int(parsed_args.duration) / 1000.0)
 		print('Found.')

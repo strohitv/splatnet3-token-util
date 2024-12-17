@@ -2,13 +2,13 @@ import argparse
 import shlex
 import subprocess
 
-from data.config import Config
+from data.app_config import AppConfig
 
 
 class Swipe:
-	def __init__(self, command_name, config: Config):
+	def __init__(self, command_name, app_config: AppConfig):
 		self.command_name = command_name
-		self.config = config
+		self.app_config = app_config
 
 	def execute(self, args):
 		only_args = shlex.split(args)[1:]
@@ -22,10 +22,10 @@ class Swipe:
 		parsed_args = parser.parse_args(only_args)
 
 		print(f'Swiping from position ({parsed_args.x1}, {parsed_args.y1}) to ({parsed_args.x2}, {parsed_args.y2}) in {parsed_args.duration} milliseconds.')
-		subprocess.run(f'{self.config.adb_path} shell input swipe {parsed_args.x1} {parsed_args.y1} {parsed_args.x2} {parsed_args.y2} {parsed_args.duration}',
-						   shell=True,
-						   stdout=subprocess.PIPE,
-						   stderr=subprocess.PIPE)
+		subprocess.run(f'{self.app_config.adb_path} shell input swipe {parsed_args.x1} {parsed_args.y1} {parsed_args.x2} {parsed_args.y2} {parsed_args.duration}',
+					   shell=True,
+					   stdout=subprocess.PIPE,
+					   stderr=subprocess.PIPE)
 
 	def description(self):
 		return ('swipes from a given position to another given position on the screen.'

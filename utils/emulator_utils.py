@@ -6,15 +6,15 @@ import time
 from subprocess import Popen
 
 
-def boot_emulator(config):
+def boot_emulator(app_config):
 	print('Booting emulator...')
-	emulator_proc = Popen(f'{config.emulator_path} -avd {config.avd_name}{' -no-window' if not config.show_window else ''}',
+	emulator_proc = Popen(f'{app_config.emulator_path} -avd {app_config.avd_name}{' -no-window' if not app_config.show_window else ''}',
 						  shell=True,
 						  stdout=subprocess.PIPE,
 						  stderr=subprocess.PIPE)
 
 	for line in io.TextIOWrapper(emulator_proc.stdout, encoding="utf-8"):
-		if config.debug:
+		if app_config.debug:
 			print(line.strip())
 
 		if not line:
@@ -31,17 +31,17 @@ def boot_emulator(config):
 	return emulator_proc
 
 
-def create_snapshot(config):
+def create_snapshot(app_config):
 	print(f'Creating snapshot...')
 	# get emulator name
-	emulator_devices_proc = Popen(f'{config.adb_path} devices',
+	emulator_devices_proc = Popen(f'{app_config.adb_path} devices',
 								  shell=True,
 								  stdout=subprocess.PIPE,
 								  stderr=subprocess.PIPE)
 
 	emulator_name = 'emulator-5554'
 	for line in io.TextIOWrapper(emulator_devices_proc.stdout, encoding="utf-8"):
-		if config.debug:
+		if app_config.debug:
 			print(line.strip())
 
 		if not line:
@@ -53,15 +53,15 @@ def create_snapshot(config):
 			break
 
 	# do snapshot
-	subprocess.run(f'{config.adb_path} -s {emulator_name} emu avd snapshot save {config.snapshot_name}',
+	subprocess.run(f'{app_config.adb_path} -s {emulator_name} emu avd snapshot save {app_config.snapshot_name}',
 				   shell=True,
 				   stdout=subprocess.PIPE,
 				   stderr=subprocess.PIPE)
 	print(f'Snapshot created!')
 	print()
 
-def delete_snapshot(config):
-	shutil.rmtree(os.path.expanduser(os.path.join(config.snapshot_dir, config.snapshot_name)))
+def delete_snapshot(app_config):
+	shutil.rmtree(os.path.expanduser(os.path.join(app_config.snapshot_dir, app_config.snapshot_name)))
 
 def wait_for_shutdown(emulator_proc):
 	print(f'Waiting for emulator to shut down...')
