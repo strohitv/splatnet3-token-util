@@ -1,0 +1,5 @@
+/generated.json
+/config
+__pycache__
+.idea
+*.iml
