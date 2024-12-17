@@ -20,42 +20,35 @@
 #        - [REGION_Y2]: Y coordinate of the bottom right corner of the region to be compared.
 #        - [DURATION_MS]: Optional duration in ms to wait before attempting again. It will wait for 1000 ms if no value is provided.
 #        - [ACTUAL_SCREENSHOT_PATH]: Optional path in which the screenshot will be saved. It will save to './screenshot.png' if no value is provided.
-#    - Example 1: "block_until_screenshot_region_matches ./base.png 100 200 300 400 2000 ./compare.png" to compare the rectangle from (100, 200) to (300, 400) of base.png and compare.png. If not found, wait for 2 seconds.
-#    - Example 2: "block_until_screenshot_region_matches -f ./base.png -x1 100 -y1 200 -x2 300 -y2 400 -d 2000 -asp ./compare.png" to compare the rectangle from (100, 200) to (300, 400) of base.png and compare.png. If not found, wait for 2 seconds.
-#    - Example 3: "block_until_screenshot_region_matches --filename ./base.png --x1 100 --y1 200 --x2 300 --y2 400 --duration 2000 --actual_screenshot_path ./compare.png" to compare the rectangle from (100, 200) to (300, 400) of base.png and compare.png. If not found, wait for 2 seconds.
-# 
+#    - Example 1: "block_until_screenshot_region_matches -f ./base.png -x1 100 -y1 200 -x2 300 -y2 400 -d 2000 -asp ./compare.png" to compare the rectangle from (100, 200) to (300, 400) of base.png and compare.png. If not found, wait for 2 seconds.
+#    - Example 2: "block_until_screenshot_region_matches --filename ./base.png --x1 100 --y1 200 --x2 300 --y2 400 --duration 2000 --actual_screenshot_path ./compare.png" to compare the rectangle from (100, 200) to (300, 400) of base.png and compare.png. If not found, wait for 2 seconds.
+#
 # - echo: prints a given text to the command line.
 #    - Use: "echo [TEXT]" to print [TEXT]. If no text is given, it will print a new line.
 #    - Example 1: "echo hello, this is a test" to print "hello, this is a test"
 #    - Example 2: "echo" to print a new line
-# 
+#
 # - long_press_power_button: presses the power button for a long time.
 #    - Use: "long_press_power_button" to press the power button for a long time.
-# 
-# - swipe: taps a given position on the screen.
+#
+# - swipe: swipes from a given position to another given position on the screen.
 #    - Use: "swipe [X1] [Y1] [X2] [Y2] [DURATION_MS]" to swipe from position (X1, Y1) to (X2, Y2) on the screen for [DURATION_MS] milliseconds.
 #          If no duration is given, the swipe will last for 500 ms.
-#    - Example 1: "swipe 100 200 300 400 500" to swipe from position (100, 200) to (300, 400) on the screen for 500 ms.
-#    - Example 2: "swipe -x1 100 -y1 200 -x2 300 -y2 400 -d 500" to swipe from position (100, 200) to (300, 400) on the screen for 500 ms.
-#    - Example 3: "swipe --x1 100 --y1 200 --x2 300 --y2 400 --duration 500" to swipe from position (100, 200) to (300, 400) on the screen for 500 ms.
-# 
+#    - Example 1: "swipe -x1 100 -y1 200 -x2 300 -y2 400 -d 500" to swipe from position (100, 200) to (300, 400) on the screen for 500 ms.
+#    - Example 2: "swipe --x1 100 --y1 200 --x2 300 --y2 400 --duration 500" to swipe from position (100, 200) to (300, 400) on the screen for 500 ms.
+#
 # - tap: taps a given position on the screen.
 #    - Use: "tap [X] [Y]" to tap the position (X, Y) on the screen.
-#    - Example 1: "tap 100 200" to tap the position (100, 200) on the screen.
-#    - Example 2: "tap -x 100 -y 200" to tap the position (100, 200) on the screen.
-#    - Example 3: "tap --x 100 --y 200" to tap the position (100, 200) on the screen.
-# 
+#    - Example 1: "tap -x 100 -y 200" to tap the position (100, 200) on the screen.
+#    - Example 2: "tap --x 100 --y 200" to tap the position (100, 200) on the screen.
+#
 # - wait_s: waits for a given amount of seconds.
 #    - Use: "wait_s [NUMBER]" to wait for [NUMBER] seconds. If no number is given, it will wait for 5 seconds.
-#    - Example 1: "wait_s 10" to wait 10 seconds
-#    - Example 2: "wait_s -s 10" to wait 10 seconds
-#    - Example 3: "wait_s --seconds 10" to wait 10 seconds
-# 
+#    - Example: "wait_s 10" to wait 10 seconds
+#
 # - wait_ms: waits for a given amount of milliseconds.
 #    - Use: "wait_ms [NUMBER]" to wait for [NUMBER] ms. If no number is given, it will wait for 5000 ms (= 5 seconds).
-#    - Example 1: "wait_ms 500" to wait 500 ms (0.5 seconds)
-#    - Example 2: "wait_ms -ms 500" to wait 500 ms (0.5 seconds)
-#    - Example 3: "wait_ms --milliseconds 500" to wait 500 ms (0.5 seconds)
+#    - Example: "wait_ms 500" to wait 500 ms (0.5 seconds)
 
 echo
 echo Close NSO app
