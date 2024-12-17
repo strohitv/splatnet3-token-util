@@ -8,19 +8,19 @@ from data.s3s_config import S3sConfig
 def load_config(args):
 	regenerated = False
 
-	if args.reinitialize_configs or not os.path.exists(args.app_config):
-		print(f'Attempting to generate config file at "{args.app_config}"')
+	if args.reinitialize_configs or not os.path.exists(args.config):
+		print(f'Attempting to generate config file at "{args.config}"')
 		default_config = AppConfig()
-		os.makedirs(os.path.dirname(args.app_config), exist_ok=True)
+		os.makedirs(os.path.dirname(args.config), exist_ok=True)
 
-		with open(args.app_config, 'w') as f:
+		with open(args.config, 'w') as f:
 			f.write(default_config.to_json())
 
-		print(f'Successfully generated config file at "{args.app_config}", please fill it with correct values and run the application again')
+		print(f'Successfully generated config file at "{args.config}", please fill it with correct values and run the application again')
 		regenerated = True
 
 	# read config
-	with open(args.app_config, 'r') as f:
+	with open(args.config, 'r') as f:
 		app_config = AppConfig.from_json(json.loads(f.read()))
 
 	return regenerated, app_config

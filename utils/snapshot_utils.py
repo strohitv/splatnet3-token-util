@@ -76,6 +76,7 @@ def search_for_tokens(app_config):
 			if app_config.debug:
 				print('next chunk done')
 
+	print('Result:')
 	print('- SUCCESS\tgToken' if gtoken is not None else '- FAIL\t\tgToken')
 	print('- SUCCESS\tbulletToken' if bullet_token is not None else '- FAIL\t\tbulletToken')
 	print('- SUCCESS\tsessionToken' if session_token is not None else '- FAIL\t\tsessionToken')
