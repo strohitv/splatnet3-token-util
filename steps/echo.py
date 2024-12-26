@@ -8,6 +8,10 @@ class Echo:
 
 	def execute(self, args):
 		text = args.strip().replace(self.command_name, "", 1).strip()
+
+		if text.startswith('\'') and text.endswith('\'') or text.startswith('"') and text.endswith('"'):
+			text = text[1:-1]
+
 		print(text)
 
 	def description(self):
