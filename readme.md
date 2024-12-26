@@ -3,7 +3,7 @@ First, install Android Studio + emulator. Then do the [initial steps](## Initial
 
 You need to install miniconda first. Afterwards, install the required libs using this command:
 ```shell
-conda create --name <env> --file conda-reqirements.txt
+conda create --name <env> --file conda-requirements.txt
 ```
 
 # Usage

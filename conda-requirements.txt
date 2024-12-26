@@ -8,7 +8,7 @@ bzip2=1.0.8=h5eee18b_6
 ca-certificates=2024.11.26=h06a4308_0
 expat=2.6.4=h6a678d5_0
 freetype=2.12.1=h4a9f257_0
-imagehash=4.3.1=pyhd8ed1ab_0
+conda-forge::imagehash=4.3.1=pyhd8ed1ab_0
 jpeg=9e=h5eee18b_3
 lcms2=2.12=h3be6417_0
 ld_impl_linux-64=2.40=h12ee557_0
