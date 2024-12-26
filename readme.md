@@ -43,7 +43,8 @@ Note: The name of the example Emulator used in this tutorial is `NSO_Pixel_7_API
 12. Head to Settings App
 13. Go to your Android build number (usually in the About menu down at the end) and tap the build number ~7 times, until a message appears telling you you're a developer now
 14. Go to Settings -> System -> Developer Mode and activate USB debugging as well as Show Taps and Show Pointer Location to get detailed information about where your tap is located. This allows for an easier tap position evaluation later for automation
-15. Go to Play Store -> Profile -> Manage apps & device -> Manage tab -> Tap on NSO app -> Tap on the three dots on the top right corner -> check "Enable Auto Update"
+15. Disable Developer Mode again
+16. Go to Play Store -> Profile -> Manage apps & device -> Manage tab -> Tap on NSO app -> Tap on the three dots on the top right corner -> check "Enable Auto Update"
 16. Close Play Store 
 17. Close the emulator
 18. Head to the config.ini file of the emulator (for example: `C:\Users\<USER>\.android\avd\NSO_Pixel_7_API_33.avd\config.ini`) and edit it
