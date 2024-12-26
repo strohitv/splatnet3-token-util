@@ -18,7 +18,7 @@ class WaitMS:
 		parsed_args = parser.parse_args(only_args)
 
 		print(f'Waiting for {parsed_args.milliseconds} milliseconds.')
-		time.sleep(parsed_args.seconds / 1000.0)
+		time.sleep(int(parsed_args.milliseconds) / 1000.0)
 
 	def description(self):
 		return ('waits for a given amount of milliseconds.'
