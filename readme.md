@@ -26,7 +26,7 @@ python main.py -c [CONFIG]
 # Steps required to set up token extraction
 There's initial steps required to do once. Once the emu is set up, it needs to be brought to a state where you can extract the tokens from RAM, then a snapshot needs to be done. Finally, the RAM dump needs to be analysed.
 
-Note: The name of the example Emulator used in this tutorial is `NSO_Pixel_7_API_33`, so everywhere this name appears it's the name of the emulated device.
+Note: The name of the example Emulator used in this tutorial is `NSO_SplatNet3_Pixel_8_API_34`, so everywhere this name appears it's the name of the emulated device.
 
 ## Initial steps
 1. Install Android Studio (only possible with an x64 architecture)
@@ -47,7 +47,7 @@ Note: The name of the example Emulator used in this tutorial is `NSO_Pixel_7_API
 16. Go to Play Store -> Profile -> Manage apps & device -> Manage tab -> Tap on NSO app -> Tap on the three dots on the top right corner -> check "Enable Auto Update"
 16. Close Play Store 
 17. Close the emulator
-18. Head to the config.ini file of the emulator (for example: `C:\Users\<USER>\.android\avd\NSO_Pixel_7_API_33.avd\config.ini`) and edit it
+18. Head to the config.ini file of the emulator (for example: `C:\Users\<USER>\.android\avd\NSO_SplatNet3_Pixel_8_API_34.avd\config.ini`) and edit it
 19. Set these options as follows: `fastboot.forceChosenSnapshotBoot=no` and `fastboot.forceColdBoot=yes` and `fastboot.forceFastBoot=no` and `hw.gpu.enabled=no` and `hw.gpu.mode=off`. Both `hw.gpu` settings are required to allow the emulator to run in headless (no-window) mode, which is better for automation.
 20. Save the file and close it again
 21. Start the emulator again: Slowly simulate the Clicks required to open the NSO app + SplatNet 3 main menu by slowly doing taps and write down the screen positions (X and Y) at the top screen everytime you do a tap (write down start and end positions for swipes). Also pay attention to how long each screen loads (should I just wait for a default time instead of doing some kind of screen capture) - that wait time should be doubled or more. Ideally, it should only be three taps if the NSO app is located on the default main screen.
@@ -58,12 +58,12 @@ This should be everything required. Next up is the automation
 
 ## Automation - Commands
 - list emulators: `C:\Users\<USER>\AppData\Local\Android\Sdk\emulator\emulator.exe -list-avds`
-- start emulator: `C:\Users\<USER>\AppData\Local\Android\Sdk\emulator\emulator.exe -avd NSO_Pixel_7_API_33 -no-window` without opening a window of the emulator - wait for the `INFO    | Boot completed in 27392 ms` message and then wait some more seconds (maybe 5) because that message comes a bit early.
+- start emulator: `C:\Users\<USER>\AppData\Local\Android\Sdk\emulator\emulator.exe -avd NSO_SplatNet3_Pixel_8_API_34 -no-window` without opening a window of the emulator - wait for the `INFO    | Boot completed in 27392 ms` message and then wait some more seconds (maybe 5) because that message comes a bit early.
 - do a tap on the emulator: `C:\Users\<USER>\AppData\Local\Android\Sdk\platform-tools\adb.exe shell input tap X Y`
 - do a swipe on the emulator: `C:\Users\<USER>\AppData\Local\Android\Sdk\platform-tools\adb.exe shell input swipe X1 Y1 X2 Y2 [duration(ms)]`
 - list all devices + ports: `C:\Users\<USER>\AppData\Local\Android\Sdk\platform-tools\adb.exe devices`
 - save a screenshot: `cmd /C "C:\Users\<USER>\AppData\Local\Android\Sdk\platform-tools\adb.exe exec-out screencap -p > FILENAME.png"` - this needs to be done using CMD cause Powereshell messes up the filename. FILENAME can freely be chosen
-- save a snapshot: `C:\Users\marco.lenovo-laptop\AppData\Local\Android\Sdk\platform-tools\adb.exe -s EMULATOR_NAME emu avd snapshot save SNAPSHOT_NAME` where EMULATOR_NAME comes from the list all devices + ports command and SNAPSHOT_NAME can be chosen as the user pleases. Snapshots will be saved to `C:\Users\<USER>\.android\avd\NSO_Pixel_7_API_33.avd\snapshots`, RAM dump is in the `ram.bin` file
+- save a snapshot: `C:\Users\marco.lenovo-laptop\AppData\Local\Android\Sdk\platform-tools\adb.exe -s EMULATOR_NAME emu avd snapshot save SNAPSHOT_NAME` where EMULATOR_NAME comes from the list all devices + ports command and SNAPSHOT_NAME can be chosen as the user pleases. Snapshots will be saved to `C:\Users\<USER>\.android\avd\NSO_SplatNet3_Pixel_8_API_34.avd\snapshots`, RAM dump is in the `ram.bin` file
 - shutdown the emulator: `C:\Users\<USER>\AppData\Local\Android\Sdk\platform-tools\adb.exe -s emulator-5554 emu kill`
 - **IMPORTANT**: not all tokens are always in the RAM, I have the best success when doing the snapshot very shortly after the homepage has been loaded. Especially Bullettoken and sometimes SessionToken get garbage collected very quickly, so don't wait too long! For BulletToken, it's a time window of maybe 3 seconds before the garbage collection starts deleting the RAM fragments which allow finding the SAFE bulletToken (`Bearer ` strings are available much longer so a fallback is possible).
 - **IMPORTANT 2**: to ensure it's always reloading the app from scratch, it needs to be closed before the emulator gets shut down!
