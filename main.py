@@ -58,3 +58,4 @@ if __name__ == '__main__':
 		print(f'Done after {attempt + 1} attempts. Application will exit now. Bye!')
 	else:
 		print(f'Could not find all three tokens in {app_config.max_attempts} attempts, application will stop now.\nPlease try again.\nBye!')
+		sys.exit(1)
