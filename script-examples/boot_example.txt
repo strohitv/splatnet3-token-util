@@ -50,7 +50,13 @@
 #    - Use: "wait_ms [NUMBER]" to wait for [NUMBER] ms. If no number is given, it will wait for 5000 ms (= 5 seconds).
 #    - Example: "wait_ms 500" to wait 500 ms (0.5 seconds)
 
+# additional wait time for emulator to get ready
+wait_s 10
+
+echo
 echo Open NSO app
+echo
+
 tap -x 150 -y 630
 wait_s 1
 tap -x 150 -y 630
@@ -60,6 +66,8 @@ block_until_screenshot_region_matches -f ./screenshots/template-nso-opened.png -
 
 echo
 echo Open SplatNet3
+echo
+
 tap -x 275 -y 1075
 wait_s 1
 tap -x 275 -y 1075

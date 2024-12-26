@@ -50,7 +50,10 @@
 #    - Use: "wait_ms [NUMBER]" to wait for [NUMBER] ms. If no number is given, it will wait for 5000 ms (= 5 seconds).
 #    - Example: "wait_ms 500" to wait 500 ms (0.5 seconds)
 
+echo
 echo Close NSO app
+echo
+
 tap -x 845 -y 2330
 wait_s 2
 swipe -x1 540 -y1 1890 -x2 540 -y2 0 -d 200
@@ -58,5 +61,7 @@ wait_s 2
 
 echo
 echo Shutdown emulator
+echo
+
 long_press_power_button
 tap -x 690 -y 975

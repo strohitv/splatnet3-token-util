@@ -23,8 +23,8 @@ def boot_emulator(app_config):
 		line = line.strip()
 		if line.startswith('INFO') and 'Boot completed in' in line:
 			break
-
-	time.sleep(20.0)
+	# don't wait here cause the required time depends on HW. Should be part of boot script
+	# time.sleep(20.0)
 	print('Emulator booted successfully!')
 	print()
 
