@@ -8,14 +8,14 @@ class AppConfig:
 				 emulator_path='~/Android/Sdk/emulator/emulator',
 				 adb_path='~/Android/Sdk/platform-tools/adb',
 				 avd_name='SplatNet3',
-				 snapshot_dir='~/.android/avd/Pixel_8_API_34.avd/snapshots/',
+				 snapshot_dir='~/.android/avd/SplatNet3.avd/snapshots/',
 				 snapshot_name='splatnet3-emu-token-util',
-				 show_window=False,
+				 show_window=True,
 				 template_path='./config/template.txt',
 				 target_path='./config.txt',
 				 boot_script_path='./config/boot.txt',
 				 cleanup_script_path='./config/cleanup.txt',
-				 max_attempts=5,
+				 max_attempts=10,
 				 debug=False):
 		self.emulator_path = emulator_path
 		self.adb_path = adb_path
