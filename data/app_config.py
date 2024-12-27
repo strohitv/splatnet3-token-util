@@ -16,6 +16,8 @@ class AppConfig:
 				 boot_script_path='./config/boot.txt',
 				 cleanup_script_path='./config/cleanup.txt',
 				 max_attempts=10,
+				 log_stats_csv=False,
+				 stats_csv_path='./stats.csv',
 				 debug=False):
 		self.emulator_path = emulator_path
 		self.adb_path = adb_path
@@ -28,6 +30,8 @@ class AppConfig:
 		self.boot_script_path = boot_script_path
 		self.cleanup_script_path = cleanup_script_path
 		self.max_attempts = max_attempts
+		self.log_stats_csv = log_stats_csv
+		self.stats_csv_path = stats_csv_path
 		self.debug = debug
 
 	def to_json(self):

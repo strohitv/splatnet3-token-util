@@ -1,11 +1,14 @@
 import argparse
 import sys
+import time
+import datetime
 
 from steps import all_steps
 from utils.config_utils import load_config, ensure_scripts_exist, ensure_template_exists
 from utils.emulator_utils import boot_emulator, wait_for_shutdown, create_snapshot, delete_snapshot
 from utils.script_utils import execute_script
 from utils.snapshot_utils import search_for_tokens
+from utils.stats_utils import prepare_stats, write_stats
 from utils.template_utils import create_target_file
 
 if __name__ == '__main__':
@@ -26,6 +29,10 @@ if __name__ == '__main__':
 	if regenerated:
 		print('Configs were regenerated, application will exit. Bye!')
 		sys.exit(0)
+
+	started_at = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+	start = time.time()
+	prepare_stats(app_config.log_stats_csv, app_config.stats_csv_path)
 
 	g_token = None
 	bullet_token = None
@@ -53,7 +60,13 @@ if __name__ == '__main__':
 			break
 
 	# export tokens to target file
-	if g_token is not None and bullet_token is not None and session_token is not None:
+	finished_successful = g_token is not None and bullet_token is not None and session_token is not None
+	end = time.time()
+	elapsed = end - start
+
+	write_stats(app_config.log_stats_csv, app_config.stats_csv_path, started_at, finished_successful, attempt + 1, elapsed)
+
+	if finished_successful:
 		create_target_file(app_config, g_token, bullet_token, session_token)
 		print(f'Done after {attempt + 1} attempts. Application will exit now. Bye!')
 	else:

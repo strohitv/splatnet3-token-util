@@ -1,5 +1,8 @@
 /generated.json
 /config.txt
+/run-and-upload-to-server.sh
+/stats.csv
+/cron-log.log
 
 /config
 /screenshots
@@ -7,5 +10,3 @@ __pycache__
 
 .idea
 *.iml
-
-run-and-upload-to-server.sh
