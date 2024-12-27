@@ -7,3 +7,5 @@ __pycache__
 
 .idea
 *.iml
+
+run-and-upload-to-server.sh

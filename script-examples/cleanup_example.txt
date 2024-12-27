@@ -1,3 +1,7 @@
+#####
+# EXECUTE ON PIXEL 8 / ANDROID 34 EMULATOR
+#####
+
 ############################
 # STEPS FILE DOCUMENTATION #
 ############################
@@ -32,6 +36,19 @@
 #    - Example 1: "echo hello, this is a test" to print "hello, this is a test"
 #    - Example 2: "echo" to print a new line
 #
+# - execute_command_as_long_as_screenshot_region_matches: executes a given command as long as a region in a screenshot matches the template provided. It will wait for [DURATION] milliseconds every time the region matches.
+#    - Use: "execute_command_as_long_as_screenshot_region_matches [TEMPLATE_SCREENSHOT] [REGION_X1] [REGION_Y1] [REGION_X2] [REGION_Y2] [COMMAND] [DURATION_MS] [ACTUAL_SCREENSHOT_PATH]" to do the comparison.
+#        - [TEMPLATE_SCREENSHOT]: a file path to a screenshot which will be used as the base for comparison.
+#        - [REGION_X1]: X coordinate of the top left corner of the region to be compared.
+#        - [REGION_Y1]: Y coordinate of the top left corner of the region to be compared.
+#        - [REGION_X2]: X coordinate of the bottom right corner of the region to be compared.
+#        - [REGION_Y2]: Y coordinate of the bottom right corner of the region to be compared.
+#        - [COMMAND]: The command which should be executed.
+#        - [DURATION_MS]: Optional duration in ms to wait before attempting again. It will wait for 1000 ms if no value is provided.
+#        - [ACTUAL_SCREENSHOT_PATH]: Optional path in which the screenshot will be saved. It will save to './screenshot.png' if no value is provided.
+#    - Example 1: "execute_command_as_long_as_screenshot_region_matches -f ./base.png -x1 100 -y1 200 -x2 300 -y2 400 -c "wait_s 5" -d 2000 -asp ./compare.png" to execute a wait command of 5 seconds and compare the rectangle from (100, 200) to (300, 400) of base.png and compare.png. If still found, wait for 2 seconds and try again.
+#    - Example 2: "execute_command_as_long_as_screenshot_region_matches --filename ./base.png --x1 100 --y1 200 --x2 300 --y2 400 --command "wait_s 5" --duration 2000 --actual_screenshot_path ./compare.png" to execute a wait command of 5 seconds and compare the rectangle from (100, 200) to (300, 400) of base.png and compare.png. If still found, wait for 2 seconds and try again.
+#
 # - long_press_power_button: presses the power button for a long time.
 #    - Use: "long_press_power_button" to press the power button for a long time.
 #
@@ -58,35 +75,16 @@
 
 echo
 echo Close NSO app
-echo #############
+echo '#############'
 echo
 
-tap -x 850 -y 2350
-wait_ms 300
-swipe -x1 500 -y1 1900 -x2 500 -y2 0 -d 200
-wait_ms 500
-tap -x 540 -y 2350
-wait_ms 500
-
-tap -x 850 -y 2350
-wait_ms 300
-swipe -x1 500 -y1 1900 -x2 500 -y2 0 -d 200
-wait_ms 500
-tap -x 540 -y 2350
-wait_ms 500
+execute_command_as_long_as_screenshot_region_matches -f ./screenshots/template-splatnet3-opened.png -x1 975 -y1 170 -x2 1050 -y2 220 -d 300 -asp ./screenshots/actual-splatnet3-opened.png -c "tap -x 850 -y 2350"
+execute_command_as_long_as_screenshot_region_matches -f ./screenshots/template-task-manager.png -x1 770 -y1 170 -x2 880 -y2 250 -d 300 -asp ./screenshots/actual-task-manager.png -c "swipe -x1 500 -y1 1900 -x2 500 -y2 0 -d 200"
 
 echo
 echo Shutdown emulator
-echo #################
+echo '#################'
 echo
 
-long_press_power_button
-wait_ms 200
-tap -x 700 -y 980
-wait_ms 200
-tap -x 540 -y 2350
-wait_ms 500
-
-long_press_power_button
-wait_ms 200
-tap -x 700 -y 980
+execute_command_as_long_as_screenshot_region_matches -f ./screenshots/template-emulator-main-menu.png -x1 315 -y1 900 -x2 445 -y2 1030 -d 400 -asp ./screenshots/actual-main-menu.png -c "long_press_power_button"
+execute_command_as_long_as_screenshot_region_matches -f ./screenshots/template-power-menu.png -x1 315 -y1 900 -x2 445 -y2 1030 -d 400 -asp ./screenshots/actual-power-menu.png -c "tap -x 700 -y 980"

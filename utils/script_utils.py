@@ -1,6 +1,3 @@
-from io import StringIO
-
-
 def execute(line, all_available_steps):
 	# split line into different statements
 	commands = ['']
