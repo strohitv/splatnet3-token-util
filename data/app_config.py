@@ -18,10 +18,11 @@ class AppConfig:
 				 max_attempts=10,
 				 extract_g_token = True,
 				 extract_bullet_token = True,
-				 extract_session_token = True,
+				 extract_session_token = False,
 				 validate_g_token = True,
 				 validate_bullet_token = True,
-				 validate_session_token = True,
+				 validate_session_token = False,
+				 validate_target_file_as_json = True,
 				 log_stats_csv=False,
 				 stats_csv_path='./stats.csv',
 				 debug=False):
@@ -42,6 +43,7 @@ class AppConfig:
 		self.validate_g_token = validate_g_token
 		self.validate_bullet_token = validate_bullet_token
 		self.validate_session_token = validate_session_token
+		self.validate_target_file_as_json = validate_target_file_as_json
 		self.log_stats_csv = log_stats_csv
 		self.stats_csv_path = stats_csv_path
 		self.debug = debug

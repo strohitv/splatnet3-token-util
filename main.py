@@ -2,16 +2,44 @@ import argparse
 import sys
 import time
 import datetime
+from subprocess import Popen
 
 from steps import all_steps
 from utils.config_utils import load_config, ensure_scripts_exist, ensure_template_exists
-from utils.emulator_utils import boot_emulator, wait_for_shutdown, create_snapshot, delete_snapshot
+from utils.emulator_utils import boot_emulator, wait_for_shutdown, create_snapshot, delete_snapshot, request_emulator_shutdown
 from utils.script_utils import execute_script
 from utils.snapshot_utils import search_for_tokens
 from utils.stats_utils import prepare_stats, write_stats
 from utils.template_utils import create_target_file
 
-if __name__ == '__main__':
+
+def run_token_extraction(app_config, all_available_steps, start, started_at, attempt):
+	# run emulator and create RAM dump
+	global emulator_proc
+	emulator_proc = boot_emulator(app_config)
+
+	execute_script(all_available_steps, app_config.boot_script_path, 'boot', app_config.debug)
+	create_snapshot(app_config)
+	execute_script(all_available_steps, app_config.cleanup_script_path, 'cleanup', app_config.debug)
+	wait_for_shutdown(emulator_proc)
+
+	# extract tokens from RAM dump
+	g_token, bullet_token, session_token = search_for_tokens(app_config)
+	delete_snapshot(app_config)
+
+	if g_token is not None and bullet_token is not None and session_token is not None:
+		# export tokens to target file
+		end = time.time()
+		elapsed = end - start
+
+		create_target_file(app_config, g_token, bullet_token, session_token)
+		write_stats(app_config.log_stats_csv, app_config.stats_csv_path, started_at, True, attempt + 1, elapsed)
+		print(f'Done after {attempt + 1} attempts. Application will exit now. Bye!')
+
+		sys.exit(0)
+
+
+def main():
 	parser = argparse.ArgumentParser(prog='splatnet3-emu-token-util',
 									 description='SplatNet3 Emulator Token Utility application to extract NSO SplatNet3 tokens from a controlled Android Studio emulator process')
 	parser.add_argument('-c', '--config', required=False, help='Path to configuration file', default='./config/config.json')
@@ -30,45 +58,53 @@ if __name__ == '__main__':
 		print('Configs were regenerated, application will exit. Bye!')
 		sys.exit(0)
 
-	started_at = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-	start = time.time()
+	start_datetime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+	start_time = time.time()
 	prepare_stats(app_config.log_stats_csv, app_config.stats_csv_path)
-
-	g_token = None
-	bullet_token = None
-	session_token = None
 
 	attempt = 0
 	for attempt in range(app_config.max_attempts):
 		print(f'### Attempt {attempt + 1} / {app_config.max_attempts} ###')
 		print()
 
-		# run emulator and create RAM dump
-		emulator_proc = boot_emulator(app_config)
+		try:
+			run_token_extraction(app_config, all_available_steps, start_time, start_datetime, attempt)
+		except Exception as e:
+			print(f'### Exception ###')
+			print(e)
+			print()
 
-		execute_script(all_available_steps, app_config.boot_script_path, 'boot', app_config.debug)
-		create_snapshot(app_config)
-		execute_script(all_available_steps, app_config.cleanup_script_path, 'cleanup', app_config.debug)
+			# ensure a potentially created snapshot has been deleted.
+			delete_snapshot(app_config)
+			request_emulator_shutdown(app_config)
 
-		wait_for_shutdown(emulator_proc)
+			global emulator_proc
+			if emulator_proc is not None and emulator_proc.poll() is None:
+				for i in range(5):
+					print('Emulator is still alive, killing its process...')
+					try:
+						emulator_proc.kill()
+					except Exception as e:
+						print(f'### Exception during emulator kill ###')
+						print(e)
 
-		# extract tokens from RAM dump
-		g_token, bullet_token, session_token = search_for_tokens(app_config)
-		delete_snapshot(app_config)
+					if emulator_proc.poll() is not None:
+						break
 
-		if g_token is not None and bullet_token is not None and session_token is not None:
-			break
+				if emulator_proc.poll() is not None:
+					print('### FATAL ERROR: Emulator process could not be exited ###')
+					print('The emulator could not be reset after an Exception happened. This application is now in an instable state and will exit.')
+					sys.exit(3)
 
-	# export tokens to target file
-	finished_successful = g_token is not None and bullet_token is not None and session_token is not None
-	end = time.time()
-	elapsed = end - start
 
-	write_stats(app_config.log_stats_csv, app_config.stats_csv_path, started_at, finished_successful, attempt + 1, elapsed)
+	ended = time.time()
+	elapsed = ended - start_time
 
-	if finished_successful:
-		create_target_file(app_config, g_token, bullet_token, session_token)
-		print(f'Done after {attempt + 1} attempts. Application will exit now. Bye!')
-	else:
-		print(f'Could not find all three tokens in {app_config.max_attempts} attempts, application will stop now.\nPlease try again.\nBye!')
-		sys.exit(1)
+	write_stats(app_config.log_stats_csv, app_config.stats_csv_path, start_datetime, False, attempt + 1, elapsed)
+	print(f'Could not find all three tokens in {app_config.max_attempts} attempts, application will stop now.\nPlease try again.\nBye!')
+	sys.exit(1)
+
+
+if __name__ == '__main__':
+	emulator_proc: Popen
+	main()
