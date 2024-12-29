@@ -2,8 +2,11 @@
 
 # This script demonstrates how to run the script and upload the config.txt file to another server using ssh with pubkey auth afterwards
 
+cd /home/stroh/code/python/splatnet3-token-util
+
 # 1. activate conda environment (installation of libs has to be prepared beforehand)
 source /home/stroh/miniconda3/etc/profile.d/conda.sh # ~/miniconda3/etc/profile.d/conda.sh # Or path to where your conda is
+conda init
 conda activate splatnet3-token-util
 
 # 2. run splatnet3-token-util and check result
