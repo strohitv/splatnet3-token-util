@@ -36,8 +36,8 @@ def run_token_extraction(app_config, all_available_steps, start, started_at, att
 		elapsed = end - start
 
 		create_target_file(app_config, g_token, bullet_token, session_token)
-		write_stats(app_config.log_stats_csv, app_config.stats_csv_path, started_at, True, attempt + 1, elapsed)
-		print(f'Done after {attempt + 1} attempts and {elapsed:0.1f} seconds total. Application will exit now. Bye!')
+		write_stats(app_config.log_stats_csv, app_config.stats_csv_path, started_at, True, attempt, elapsed)
+		print(f'Done after {attempt} attempts and {elapsed:0.1f} seconds total. Application will exit now. Bye!')
 
 		sys.exit(0)
 
@@ -65,11 +65,14 @@ def main():
 	start_time = time.time()
 	prepare_stats(app_config.log_stats_csv, app_config.stats_csv_path)
 
+	last_allowed_attempt_start_time = start_time + app_config.max_run_duration_minutes * 60
 	attempt = 0
-	for attempt in range(app_config.max_attempts):
-		print(f'### Attempt {attempt + 1} / {app_config.max_attempts} ###')
+	while time.time() < last_allowed_attempt_start_time:
+		attempt += 1
+
+		print(f'### Attempt {attempt} ###')
 		print()
-		print(f'Expecting this attempt to end after {app_config.max_duration_seconds_per_attempt} seconds at worst.')
+		print(f'Expecting this attempt to take {app_config.max_attempt_duration_seconds} seconds at worst.')
 		print()
 
 		extraction_process = None
@@ -79,12 +82,12 @@ def main():
 														 args=(app_config, all_available_steps, start_time, start_datetime, attempt, emulator_pid))
 			extraction_process.start()
 
-			targeted_end_time = time.time() + app_config.max_duration_seconds_per_attempt
+			targeted_end_time = time.time() + app_config.max_attempt_duration_seconds
 			while time.time() < targeted_end_time and extraction_process.is_alive():
 				time.sleep(1)
 
 			if extraction_process.is_alive():
-				raise Exception(f'Extraction did not finish in time ({app_config.max_duration_seconds_per_attempt} seconds), forcing restart...')
+				raise Exception(f'Extraction did not finish in time ({app_config.max_attempt_duration_seconds} seconds), forcing restart...')
 			elif extraction_process.exitcode is not None and extraction_process.exitcode == 0:
 				sys.exit(0)
 
@@ -116,8 +119,8 @@ def main():
 	ended = time.time()
 	elapsed = ended - start_time
 
-	write_stats(app_config.log_stats_csv, app_config.stats_csv_path, start_datetime, False, attempt + 1, elapsed)
-	print(f'Could not find all three tokens in {app_config.max_attempts} attempts, application will stop now.\nPlease try again.\nBye!')
+	write_stats(app_config.log_stats_csv, app_config.stats_csv_path, start_datetime, False, attempt, elapsed)
+	print(f'Could not find all three tokens in {attempt} attempts, application will stop now.\nPlease try again.\nBye!')
 	sys.exit(1)
 
 
