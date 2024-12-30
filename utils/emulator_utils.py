@@ -68,7 +68,9 @@ def create_snapshot(app_config):
 
 
 def delete_snapshot(app_config):
-	shutil.rmtree(os.path.expanduser(os.path.join(app_config.snapshot_dir, app_config.snapshot_name)))
+	full_path = os.path.join(app_config.snapshot_dir, app_config.snapshot_name)
+	if os.path.exists(full_path):
+		shutil.rmtree(full_path)
 
 
 def request_emulator_shutdown(app_config):

@@ -16,6 +16,7 @@ class AppConfig:
 				 boot_script_path='./config/boot.txt',
 				 cleanup_script_path='./config/cleanup.txt',
 				 max_attempts=10,
+				 max_duration_seconds_per_attempt=120,
 				 extract_g_token = True,
 				 extract_bullet_token = True,
 				 extract_session_token = False,
@@ -37,6 +38,7 @@ class AppConfig:
 		self.boot_script_path = boot_script_path
 		self.cleanup_script_path = cleanup_script_path
 		self.max_attempts = max_attempts
+		self.max_duration_seconds_per_attempt = max_duration_seconds_per_attempt
 		self.extract_g_token = extract_g_token
 		self.extract_bullet_token = extract_bullet_token
 		self.extract_session_token = extract_session_token

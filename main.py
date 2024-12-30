@@ -1,8 +1,10 @@
 import argparse
+import multiprocessing
+import os
+import signal
 import sys
 import time
 import datetime
-from subprocess import Popen
 
 from steps import all_steps
 from utils.config_utils import load_config, ensure_scripts_exist, ensure_template_exists
@@ -13,15 +15,16 @@ from utils.stats_utils import prepare_stats, write_stats
 from utils.template_utils import create_target_file
 
 
-def run_token_extraction(app_config, all_available_steps, start, started_at, attempt):
+def run_token_extraction(app_config, all_available_steps, start, started_at, attempt, emulator_pid):
 	# run emulator and create RAM dump
-	global emulator_proc
 	emulator_proc = boot_emulator(app_config)
+	emulator_pid.value = emulator_proc.pid
 
 	execute_script(all_available_steps, app_config.boot_script_path, 'boot', app_config.debug)
 	create_snapshot(app_config)
 	execute_script(all_available_steps, app_config.cleanup_script_path, 'cleanup', app_config.debug)
 	wait_for_shutdown(emulator_proc)
+	emulator_pid.value = 0
 
 	# extract tokens from RAM dump
 	g_token, bullet_token, session_token = search_for_tokens(app_config)
@@ -34,7 +37,7 @@ def run_token_extraction(app_config, all_available_steps, start, started_at, att
 
 		create_target_file(app_config, g_token, bullet_token, session_token)
 		write_stats(app_config.log_stats_csv, app_config.stats_csv_path, started_at, True, attempt + 1, elapsed)
-		print(f'Done after {attempt + 1} attempts. Application will exit now. Bye!')
+		print(f'Done after {attempt + 1} attempts and {elapsed:0.1f} seconds total. Application will exit now. Bye!')
 
 		sys.exit(0)
 
@@ -66,36 +69,49 @@ def main():
 	for attempt in range(app_config.max_attempts):
 		print(f'### Attempt {attempt + 1} / {app_config.max_attempts} ###')
 		print()
+		print(f'Expecting this attempt to end after {app_config.max_duration_seconds_per_attempt} seconds at worst.')
+		print()
 
+		extraction_process = None
+		emulator_pid = multiprocessing.Value('i', 0)
 		try:
-			run_token_extraction(app_config, all_available_steps, start_time, start_datetime, attempt)
+			extraction_process = multiprocessing.Process(target=run_token_extraction,
+														 args=(app_config, all_available_steps, start_time, start_datetime, attempt, emulator_pid))
+			extraction_process.start()
+
+			targeted_end_time = time.time() + app_config.max_duration_seconds_per_attempt
+			while time.time() < targeted_end_time and extraction_process.is_alive():
+				time.sleep(1)
+
+			if extraction_process.is_alive():
+				raise Exception(f'Extraction did not finish in time ({app_config.max_duration_seconds_per_attempt} seconds), forcing restart...')
+			elif extraction_process.exitcode is not None and extraction_process.exitcode == 0:
+				sys.exit(0)
+
 		except Exception as e:
 			print(f'### Exception ###')
 			print(e)
 			print()
 
+			if extraction_process is not None and extraction_process.is_alive():
+				print(f'Terminating extraction process...')
+				extraction_process.terminate()
+				time.sleep(10)
+				extraction_process.kill()
+				print('Process terminated.')
+				print()
+
 			# ensure a potentially created snapshot has been deleted.
 			delete_snapshot(app_config)
 			request_emulator_shutdown(app_config)
 
-			global emulator_proc
-			if emulator_proc is not None and emulator_proc.poll() is None:
-				for i in range(5):
-					print('Emulator is still alive, killing its process...')
-					try:
-						emulator_proc.kill()
-					except Exception as e:
-						print(f'### Exception during emulator kill ###')
-						print(e)
-
-					if emulator_proc.poll() is not None:
-						break
-
-				if emulator_proc.poll() is not None:
-					print('### FATAL ERROR: Emulator process could not be exited ###')
-					print('The emulator could not be reset after an Exception happened. This application is now in an instable state and will exit.')
-					sys.exit(3)
-
+			if emulator_pid.value is not None and emulator_pid.value > 0:
+				try:
+					print('Emulator process might still be alive, sending KILL signal...')
+					print()
+					os.kill(emulator_pid.value, signal.SIGKILL)
+				except Exception as e2:
+					print(e2)
 
 	ended = time.time()
 	elapsed = ended - start_time
@@ -106,5 +122,4 @@ def main():
 
 
 if __name__ == '__main__':
-	emulator_proc: Popen
 	main()
