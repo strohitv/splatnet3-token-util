@@ -1,7 +1,8 @@
 # file location: /home/stroh/.config/systemd/user/splatnet3-token-util.service
 # systemd KDE example: spawns a Konsole terminal emulator and executes the run-and-upload-to-server.sh script
-# create this systemd and use "systemctl --user start splatnet3-token-util" to start the extraction once. For regular executions, see the systemd-timer.txt file.
+# create this systemd and use "systemctl --user start splatnet3-token-util.service" to start the extraction once. For regular executions, see the systemd-timer.txt file.
 # on other desktop environments, change konsole to your preferred terminal
+# if the service cannot be found, use "systemctl daemon-reload"
 
 [Unit]
 Description=Execute splatnet3-token-util

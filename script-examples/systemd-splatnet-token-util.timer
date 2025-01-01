@@ -1,8 +1,9 @@
 # file location: /home/stroh/.config/systemd/user/splatnet3-token-util.timer
 # systemd timer which spawns the systemd-service.txt service each hour at :45
 # an hourly refresh is probably the best way
-# create both systemd files from example on this location and use "systemctl --user enable splatnet3-token-util" to start the timer.
+# create both systemd files from example on this location and use "systemctl --user enable splatnet3-token-util.timer" to start the timer.
 # IMPORTANT: the user must be logged in for the timer to be executed
+# if the timer cannot be found, use "systemctl daemon-reload"
 
 [Unit]
 Description=Execute splatnet3-token-util
