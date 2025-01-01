@@ -3,8 +3,9 @@ First, install Android Studio + emulator. Then do the [initial steps](## Initial
 
 You need to install miniconda first. Afterwards, install the required libs using this command:
 ```shell
-conda create --name <env> --file conda-requirements.txt
+conda env create --name splatnet3-token-util --file conda-environment.yml
 ```
+(you can give the environment another name, splatnet3-token-util is just recommended because it's the name of this project)
 
 # Usage
 The application will create default configs in the `./config/` folder at first launch.
