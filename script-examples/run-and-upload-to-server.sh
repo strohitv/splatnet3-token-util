@@ -4,6 +4,9 @@
 
 cd /home/stroh/code/python/splatnet3-token-util
 
+git fetch
+git pull
+
 # 1. activate conda environment (installation of libs has to be prepared beforehand)
 source /home/stroh/miniconda3/etc/profile.d/conda.sh # ~/miniconda3/etc/profile.d/conda.sh # Or path to where your conda is
 conda init
