@@ -1,5 +1,5 @@
 /generated.json
-/config.txt
+/config*.txt
 /run-and-upload-to-server.sh
 /stats.csv
 /cron-log.log
