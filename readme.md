@@ -8,6 +8,11 @@ conda activate splatnet3-token-util
 ```
 (you can give the environment another name, splatnet3-token-util is just recommended because it's the name of this project)
 
+To update the dependencies, use this command:
+```shell
+conda env update --name splatnet3-token-util --file conda-environment.yml --prune
+```
+
 # Usage
 The application will create default configs in the `./config/` folder at first launch.
 

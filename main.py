@@ -73,6 +73,7 @@ def main():
 
 	if regenerated:
 		print('Configs were regenerated, application will exit. Bye!')
+		print()
 		sys.exit(0)
 
 	start_datetime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -137,6 +138,7 @@ def main():
 
 	write_stats(app_config.log_stats_csv, app_config.stats_csv_path, start_datetime, False, attempt, elapsed)
 	print(f'Could not find all three tokens in {attempt} attempts, application will stop now.\nPlease try again.\nBye!')
+	print()
 	sys.exit(1)
 
 
