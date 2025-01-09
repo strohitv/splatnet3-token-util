@@ -4,8 +4,8 @@
 /stats.csv
 /cron-log.log
 
-/config
-/screenshots
+/config*
+/screenshots*
 __pycache__
 
 .idea
