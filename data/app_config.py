@@ -24,6 +24,7 @@ class AppConfig:
 				 validate_bullet_token = True,
 				 validate_session_token = False,
 				 validate_target_file_as_json = True,
+				 validate_splat3_homepage = True,
 				 log_stats_csv=False,
 				 stats_csv_path='./stats.csv',
 				 debug=False):
@@ -46,6 +47,7 @@ class AppConfig:
 		self.validate_bullet_token = validate_bullet_token
 		self.validate_session_token = validate_session_token
 		self.validate_target_file_as_json = validate_target_file_as_json
+		self.validate_splat3_homepage = validate_splat3_homepage
 		self.log_stats_csv = log_stats_csv
 		self.stats_csv_path = stats_csv_path
 		self.debug = debug

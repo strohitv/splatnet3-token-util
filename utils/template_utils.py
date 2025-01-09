@@ -30,5 +30,6 @@ def create_target_file(app_config, g_token, bullet_token, session_token):
 		with open(app_config.target_path, 'w') as target_file:
 			print(f'Writing content.')
 			target_file.write(final_file)
+			target_file.flush()
 			print('Content written successfully.')
 			print()

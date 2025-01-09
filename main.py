@@ -11,6 +11,7 @@ from utils.config_utils import load_config, ensure_scripts_exist, ensure_templat
 from utils.emulator_utils import boot_emulator, wait_for_shutdown, create_snapshot, delete_snapshot, request_emulator_shutdown
 from utils.script_utils import execute_script
 from utils.snapshot_utils import search_for_tokens
+from utils.splatnet3_utils import is_homepage_reachable
 from utils.stats_utils import prepare_stats, write_stats
 from utils.template_utils import create_target_file
 
@@ -31,6 +32,16 @@ def run_token_extraction(app_config, all_available_steps, start, started_at, att
 	delete_snapshot(app_config)
 
 	if g_token is not None and bullet_token is not None and session_token is not None:
+		# do a webrequest to see whether they work
+		if (app_config.validate_splat3_homepage
+			and app_config.extract_g_token and app_config.validate_g_token
+			and app_config.extract_bullet_token and app_config.validate_bullet_token):
+
+			if not is_homepage_reachable(g_token, bullet_token):
+				print('tokens were found but are invalid, attempt did not work')
+				print()
+				return
+
 		# export tokens to target file
 		end = time.time()
 		elapsed = end - start
@@ -40,6 +51,9 @@ def run_token_extraction(app_config, all_available_steps, start, started_at, att
 		print(f'Done after {attempt} attempts and {elapsed:0.1f} seconds total. Application will exit now. Bye!')
 
 		sys.exit(0)
+	else:
+		print('not all tokens could be found, attempt did not work')
+		print()
 
 
 def main():
@@ -62,6 +76,8 @@ def main():
 		sys.exit(0)
 
 	start_datetime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+	print(f'### Script started at {start_datetime} ###')
+
 	start_time = time.time()
 	prepare_stats(app_config.log_stats_csv, app_config.stats_csv_path)
 

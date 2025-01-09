@@ -1,16 +1,21 @@
 name: splatnet3-token-util
 channels:
+  - anaconda
   - conda-forge
   - defaults
 dependencies:
   - _libgcc_mutex=0.1
   - _openmp_mutex=4.5
   - blas=1.0
+  - brotli-python=1.0.9
   - bzip2=1.0.8
-  - ca-certificates=2024.12.14
+  - ca-certificates=2024.12.31
+  - certifi=2024.12.14
+  - charset-normalizer=3.3.2
   - expat=2.6.4
   - freetype=2.12.1
   - icu=73.2
+  - idna=3.7
   - imagehash=4.3.1
   - intel-openmp=2023.1.0
   - jpeg=9e
@@ -44,6 +49,7 @@ dependencies:
   - libxcrypt=4.4.36
   - libxml2=2.13.5
   - libzlib=1.2.13
+  - llvm-openmp=19.1.6
   - lz4-c=1.10.0
   - mkl=2023.1.0
   - mkl-service=2.4.0
@@ -56,16 +62,19 @@ dependencies:
   - openssl=3.4.0
   - pillow=11.0.0
   - pip=24.3.1
+  - pysocks=1.7.1
   - python=3.12.3
   - python_abi=3.12
   - pywavelets=1.8.0
   - readline=8.2
+  - requests=2.32.3
   - scipy=1.14.1
   - setuptools=75.6.0
   - sqlite=3.46.0
   - tbb=2021.13.0
   - tk=8.6.14
   - tzdata=2024b
+  - urllib3=2.2.3
   - wheel=0.45.1
   - xz=5.6.3
   - xz-gpl-tools=5.6.3
