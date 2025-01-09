@@ -40,7 +40,7 @@ def run_token_extraction(app_config, all_available_steps, start, started_at, att
 			if not is_homepage_reachable(g_token, bullet_token):
 				print('tokens were found but are invalid, attempt did not work')
 				print()
-				return
+				sys.exit(2)
 
 		# export tokens to target file
 		end = time.time()
@@ -54,6 +54,7 @@ def run_token_extraction(app_config, all_available_steps, start, started_at, att
 	else:
 		print('not all tokens could be found, attempt did not work')
 		print()
+		sys.exit(1)
 
 
 def main():
