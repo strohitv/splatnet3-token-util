@@ -73,8 +73,10 @@ class BlockUntilScreenshotRegionMatches:
 		hash0 = imagehash.average_hash(base_cropped)
 		hash1 = imagehash.average_hash(compare_image_cropped)
 
-		if debug:
+		if self.app_config.debug:
 			print(f'hash #1: {hash0}, hash #2: {hash1}, difference: {hash1 - hash0}')
+			base_cropped.save(f'{filename}-cropped.png')
+			compare_image_cropped.save(f'{actual_screenshot_path}-cropped.png')
 
 		cutoff = 5
 
