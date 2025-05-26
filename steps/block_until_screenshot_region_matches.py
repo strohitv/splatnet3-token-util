@@ -64,21 +64,25 @@ class BlockUntilScreenshotRegionMatches:
 				f'\n#    - Example 2: "{self.command_name} --filename ./base.png --x1 100 --y1 200 --x2 300 --y2 400 --duration 2000 --actual_screenshot_path ./compare.png" to compare the rectangle from (100, 200) to (300, 400) of base.png and compare.png. If not found, wait for 2 seconds.')
 
 	def compare(self, filename, actual_screenshot_path, x1, y1, x2, y2, debug):
-		base_image = Image.open(filename)
-		compare_image = Image.open(actual_screenshot_path)
+		try:
+			base_image = Image.open(filename)
+			compare_image = Image.open(actual_screenshot_path)
 
-		base_cropped = base_image.crop((int(x1), int(y1), int(x2), int(y2)))
-		compare_image_cropped = compare_image.crop((int(x1), int(y1), int(x2), int(y2)))
+			base_cropped = base_image.crop((int(x1), int(y1), int(x2), int(y2)))
+			compare_image_cropped = compare_image.crop((int(x1), int(y1), int(x2), int(y2)))
 
-		hash0 = imagehash.average_hash(base_cropped)
-		hash1 = imagehash.average_hash(compare_image_cropped)
+			hash0 = imagehash.average_hash(base_cropped)
+			hash1 = imagehash.average_hash(compare_image_cropped)
 
-		if self.app_config.debug:
-			print(f'hash #1: {hash0}, hash #2: {hash1}, difference: {hash1 - hash0}')
-			base_cropped.save(f'{filename}-cropped.png')
-			compare_image_cropped.save(f'{actual_screenshot_path}-cropped.png')
+			if self.app_config.debug:
+				print(f'hash #1: {hash0}, hash #2: {hash1}, difference: {hash1 - hash0}')
+				base_cropped.save(f'{filename}-cropped.png')
+				compare_image_cropped.save(f'{actual_screenshot_path}-cropped.png')
 
-		cutoff = 5
+			cutoff = 5
 
-		hash_diff = hash0 - hash1
+			hash_diff = hash0 - hash1
+		except:
+			hash_diff = 1000
+		
 		return hash_diff < cutoff
