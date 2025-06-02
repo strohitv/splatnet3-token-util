@@ -2,6 +2,9 @@ import base64
 import os
 import re
 
+import requests
+import uncurl
+
 
 def read_in_chunks(file_object, chunk_size=10 * 1024 * 1024):
 	while True:
@@ -42,27 +45,27 @@ def search_for_tokens(app_config):
 					index += 1
 
 				if len(gtoken) < 850 or (app_config.validate_g_token and not re.match(r'^[0-9a-zA-Z.=\-_]+$', gtoken)):
-					# TODO jwt validation
 					gtoken = None
 
-			# bullet_token search
-			if bullet_token is None and b'"bulletToken":"' in piece:
-				bullet_token = ''
-				index = piece.index(b'"bulletToken":"') + len(b'"bulletToken":"')
-				while index < len(piece):
-					next_piece = piece[index]
-					if chr(next_piece) == '\x00':
-						bullet_token = None
-						break
-					if chr(next_piece) == '"':
-						break
-					bullet_token += chr(next_piece)
-					index += 1
-
-				if len(bullet_token) <= 100 or (app_config.validate_bullet_token
-												and not re.match(r'^[0-9a-zA-Z=\-_]+$', bullet_token)
-												and not try_base64_decode(bullet_token)):
-					bullet_token = None
+				if gtoken is not None:
+					# bullet_token request to SplatNet3
+					if app_config.extract_bullet_token:
+						try:
+							curl_request = app_config.bullet_token_curl_request.replace('{GTOKEN}', gtoken)
+							ctx = uncurl.parse_context(curl_request)
+							response = requests.request(ctx.method.upper(), ctx.url, data=ctx.data, cookies=ctx.cookies, headers=ctx.headers, auth=ctx.auth)
+							if 200 <= response.status_code < 300:
+								bullet_token = response.json()['bulletToken']
+							else:
+								print('ERROR: did not receive a 2xx response when loading bullet_token with gtoken')
+								if app_config.validate_g_token:
+									gtoken = None
+						except Exception as e:
+							print('ERROR: exception occurred when loading bullet_token with gtoken')
+							print(e)
+							bullet_token = None
+							if app_config.validate_g_token:
+								gtoken = None
 
 			# session_token search
 			if session_token is None and b'eyJhbGciOiJIUzI1NiJ9' in piece:
@@ -76,7 +79,6 @@ def search_for_tokens(app_config):
 					index += 1
 
 				if len(session_token) < 260 or (app_config.validate_session_token and not re.match(r'^[0-9a-zA-Z.=\-_]+$', session_token)):
-					# TODO jwt validation
 					session_token = None
 
 			if app_config.debug:
