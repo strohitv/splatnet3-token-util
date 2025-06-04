@@ -29,6 +29,7 @@ class ExecuteCommandUntilScreenshotRegionMatches:
 		parser.add_argument('-c', '--command', required=True)
 		parser.add_argument('-d', '--duration', required=False, default=500)
 		parser.add_argument('-asp', '--actual_screenshot_path', required=False, default='./screenshots/screenshot.png')
+		parser.add_argument('-co', '--cutoff', required=False, default=5)
 		parsed_args = parser.parse_args(only_args)
 
 		os.makedirs(os.path.dirname(parsed_args.filename), exist_ok=True)
@@ -37,14 +38,14 @@ class ExecuteCommandUntilScreenshotRegionMatches:
 		start = time.time()
 
 		while True:
-			print(f'Comparing screenshot "{parsed_args.actual_screenshot_path}" to base screenshot "{parsed_args.filename}".')
+			print(f'Comparing screenshot "{parsed_args.actual_screenshot_path}" to base screenshot "{parsed_args.filename}" with cutoff {parsed_args.cutoff}.')
 			subprocess.run(f'{self.app_config.adb_path} exec-out screencap -p > {parsed_args.actual_screenshot_path}',
 						   shell=True,
 						   stdout=subprocess.PIPE,
 						   stderr=subprocess.PIPE)
 
 			found = self.compare(parsed_args.filename, parsed_args.actual_screenshot_path, parsed_args.x1, parsed_args.y1, parsed_args.x2, parsed_args.y2,
-								 self.app_config.debug)
+						parsed_args.cutoff, self.app_config.debug)
 
 			if found:
 				break
@@ -59,7 +60,7 @@ class ExecuteCommandUntilScreenshotRegionMatches:
 
 	def description(self):
 		return ('executes a given command until a region in a screenshot matches the template provided. It will wait for [DURATION] milliseconds every time the region does not match.'
-				f'\n#    - Use: "{self.command_name} [TEMPLATE_SCREENSHOT] [REGION_X1] [REGION_Y1] [REGION_X2] [REGION_Y2] [COMMAND] [DURATION_MS] [ACTUAL_SCREENSHOT_PATH]" to do the comparison.'
+				f'\n#    - Use: "{self.command_name} [TEMPLATE_SCREENSHOT] [REGION_X1] [REGION_Y1] [REGION_X2] [REGION_Y2] [COMMAND] [DURATION_MS] [ACTUAL_SCREENSHOT_PATH] [CUTOFF]" to do the comparison.'
 				f'\n#        - [TEMPLATE_SCREENSHOT]: a file path to a screenshot which will be used as the base for comparison.'
 				f'\n#        - [REGION_X1]: X coordinate of the top left corner of the region to be compared.'
 				f'\n#        - [REGION_Y1]: Y coordinate of the top left corner of the region to be compared.'
@@ -68,12 +69,11 @@ class ExecuteCommandUntilScreenshotRegionMatches:
 				f'\n#        - [COMMAND]: The command which should be executed.'
 				f'\n#        - [DURATION_MS]: Optional duration in ms to wait before attempting again. It will wait for 1000 ms if no value is provided.'
 				f'\n#        - [ACTUAL_SCREENSHOT_PATH]: Optional path in which the screenshot will be saved. It will save to \'./screenshot.png\' if no value is provided.'
-				f'\n#    - Example 1: "{self.command_name} -f ./base.png -x1 100 -y1 200 -x2 300 -y2 400 -c "wait_s 5" -d 2000 -asp ./compare.png" to execute a wait command of 5 seconds and compare the rectangle from (100, 200) to (300, 400) of base.png and compare.png. If not found, wait for 2 seconds and try again.'
-				f'\n#    - Example 2: "{self.command_name} --filename ./base.png --x1 100 --y1 200 --x2 300 --y2 400 --command "wait_s 5" --duration 2000 --actual_screenshot_path ./compare.png" to execute a wait command of 5 seconds and compare the rectangle from (100, 200) to (300, 400) of base.png and compare.png. If not found, wait for 2 seconds and try again.')
+				f'\n#        - [CUTOFF]: Optional cutoff for the screenshot comparison. It will be 5 is none is provided. A lower number means stricter comparison.'
+				f'\n#    - Example 1: "{self.command_name} -f ./base.png -x1 100 -y1 200 -x2 300 -y2 400 "wait_s 5" -d 2000 -asp ./compare.png" -co 2 to execute a wait command of 5 seconds and compare the rectangle from (100, 200) to (300, 400) of base.png and compare.png with cutoff 2. If not found, wait for 2 seconds and try again.'
+				f'\n#    - Example 2: "{self.command_name} --filename ./base.png --x1 100 --y1 200 --x2 300 --y2 400 --command "wait_s 5" --duration 2000 --actual_screenshot_path ./compare.png" --cutoff 2 to execute a wait command of 5 seconds and compare the rectangle from (100, 200) to (300, 400) of base.png and compare.png with cutoff 2. If not found, wait for 2 seconds and try again.')
 
-	def compare(self, filename, actual_screenshot_path, x1, y1, x2, y2, debug):
-		cutoff = 5
-
+	def compare(self, filename, actual_screenshot_path, x1, y1, x2, y2, cutoff, debug):
 		try:
 			base_image = Image.open(filename)
 			compare_image = Image.open(actual_screenshot_path)
@@ -93,4 +93,4 @@ class ExecuteCommandUntilScreenshotRegionMatches:
 		except:
 			hash_diff = 1000
 		
-		return hash_diff < cutoff
+		return hash_diff < int(cutoff)
