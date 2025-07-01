@@ -1,4 +1,4 @@
-# file location: /home/stroh/.config/systemd/user/splatnet3-token-util.timer
+# file location: /home/{USERNAME}/.config/systemd/user/splatnet3-token-util.timer
 # systemd timer which spawns the systemd-service.txt service each hour at :45
 # an hourly refresh is probably the best way
 # create both systemd files from example on this location and use "systemctl --user enable splatnet3-token-util.timer" to start the timer.
@@ -11,8 +11,14 @@ After=graphical-session-pre.target
 PartOf=graphical-session.target
 
 [Timer]
-OnCalendar=*-*-* *:45:00
+# boot 1 min after desktop is available
+OnStartupSec=1min
 AccuracySec=1
+
+# [Timer]
+# # alternative: boot every hour at xx:20:00
+# OnCalendar=*-*-* *:20:00
+# AccuracySec=1
 
 [Install]
 WantedBy=graphical-session.target

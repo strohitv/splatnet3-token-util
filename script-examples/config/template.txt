@@ -1,0 +1,8 @@
+{
+	"acc_loc": "en-US|DE",
+	"api_key": "INSERT_YOUR_STAT_INK_API_KEY_HERE",
+    "bullettoken": "{BULLETTOKEN}",
+    "f_gen": "Never gonna give you up (dummy value)",
+    "gtoken": "{GTOKEN}",
+    "session_token": "{SESSIONTOKEN}"
+}

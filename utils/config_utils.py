@@ -54,12 +54,12 @@ def ensure_scripts_exist(args, app_config, all_available_steps):
 	if args.reinitialize_configs or not os.path.exists(app_config.boot_script_path):
 		print(f'Attempting to generate boot file at "{app_config.boot_script_path}"')
 
-		boot_summary = ('# This file contains the steps required to open the NSO SplatNet 3 app.\n'
+		boot_summary = ('# This file contains the steps required to open the NSA SplatNet 3 app.\n'
 						'# \n'
 						'# It starts executing AFTER the emulator has been started.\n'
 						'# Once this file has been fully executed, the script will create a snapshot of the emulator.\n'
 						'# \n'
-						'# Your goal for this script is to bring the freshly booted emulator to a state where the NSO app is opened and has entered SplatNet 3.\n')
+						'# Your goal for this script is to bring the freshly booted emulator to a state where the NSA app is opened and has entered SplatNet 3.\n')
 
 		create_script_file(all_available_steps, app_config.boot_script_path, boot_summary, 'boot')
 
@@ -69,7 +69,7 @@ def ensure_scripts_exist(args, app_config, all_available_steps):
 	if args.reinitialize_configs or not os.path.exists(app_config.cleanup_script_path):
 		print(f'Attempting to generate boot file at "{app_config.cleanup_script_path}"')
 
-		cleanup_summary = ('# This file contains the steps required to close the NSO SplatNet 3 app and shut down the emulator.\n'
+		cleanup_summary = ('# This file contains the steps required to close the NSA SplatNet 3 app and shut down the emulator.\n'
 						   '# \n'
 						   '# It starts executing AFTER the snapshot of the emulator has been created.\n'
 						   '# Once this file has been fully executed, the script will analyse the snapshot RAM dump to find the tokens.\n'

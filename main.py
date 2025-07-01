@@ -8,7 +8,7 @@ import datetime
 
 from steps import all_steps
 from utils.config_utils import load_config, ensure_scripts_exist, ensure_template_exists
-from utils.emulator_utils import boot_emulator, wait_for_shutdown, create_snapshot, delete_snapshot, request_emulator_shutdown
+from utils.emulator_utils import boot_emulator, run_adb, wait_for_shutdown, create_snapshot, delete_snapshot, request_emulator_shutdown
 from utils.script_utils import execute_script
 from utils.snapshot_utils import search_for_tokens
 from utils.splatnet3_utils import is_homepage_reachable
@@ -59,11 +59,16 @@ def run_token_extraction(app_config, all_available_steps, start, started_at, att
 
 def main():
 	parser = argparse.ArgumentParser(prog='splatnet3-emu-token-util',
-									 description='SplatNet3 Emulator Token Utility application to extract NSO SplatNet3 tokens from a controlled Android Studio emulator process')
+									 description='SplatNet3 Emulator Token Utility application to extract NSA SplatNet3 tokens from a controlled Android Studio emulator process')
 	parser.add_argument('-c', '--config', required=False, help='Path to configuration file', default='./config/config.json')
 	parser.add_argument('-r', '--reinitialize-configs', required=False,
 						help='Generates the config again (and potentially overwrites existing ones)', default=False,
 						action='store_true')
+	parser.add_argument('-b', '-emu', '--boot-emulator', '--emu', required=False,
+						help='Boots the emulator', default=False,
+						action='store_true')
+	parser.add_argument('-a', '-adb', '--run-adb', '--adb', required=False,
+						help='Executes a command via android debug bridge (adb)')
 	args = parser.parse_args()
 
 	regenerated, app_config = load_config(args)
@@ -76,6 +81,17 @@ def main():
 		print('Configs were regenerated, application will exit. Bye!')
 		print()
 		sys.exit(0)
+
+	if args.boot_emulator:
+		emulator_proc = boot_emulator(app_config)
+		wait_for_shutdown(emulator_proc)
+		print('Emulator was shut down, application will exit. Bye!')
+		sys.exit()
+
+	if args.run_adb is not None:
+		run_adb(app_config, args.run_adb)
+		print('Command execution finished, application will exit. Bye!')
+		sys.exit()
 
 	start_datetime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 	print(f'### Script started at {start_datetime} ###')

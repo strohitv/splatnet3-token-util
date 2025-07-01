@@ -2,6 +2,7 @@ import io
 import os
 import shutil
 import subprocess
+import sys
 import time
 from subprocess import Popen
 from time import sleep
@@ -51,6 +52,20 @@ def get_emulator_name(app_config):
 			break
 
 	return emulator_name
+
+
+def run_adb(app_config, command):
+	print(f'Running adb command "{command}"...\n')
+	# get emulator name
+	emulator_name = get_emulator_name(app_config)
+
+	# run command
+	subprocess.run(f'{app_config.adb_path} -s {emulator_name} {command}',
+				   shell=True,
+				   stderr=sys.stderr,
+				   stdout=sys.stdout)
+	print(f'Command execution finished')
+	print()
 
 
 def create_snapshot(app_config):

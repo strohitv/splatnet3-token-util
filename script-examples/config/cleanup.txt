@@ -1,0 +1,20 @@
+#####
+# EXECUTE ON PIXEL 8 / ANDROID API LEVEL 30 EMULATOR
+#####
+
+echo
+echo Close NSA
+echo '#########'
+echo
+
+execute_command_as_long_as_screenshot_region_matches -f ./screenshots/template-splatnet3-opened.png -x1 425 -y1 415 -x2 660 -y2 490 -d 500 -asp ./screenshots/actual-task-manager-opened.png -c "tap -x 850 -y 2336"
+execute_command_until_screenshot_region_matches -f ./screenshots/template-task-manager.png -x1 110 -y1 1060 -x2 250 -y2 1090 -d 500 -asp ./screenshots/actual-task-manager-swiped.png -c "swipe -x1 100 -y1 1200 -x2 900 -y2 1200 -d 200"
+execute_command_as_long_as_screenshot_region_matches -f ./screenshots/template-task-manager.png -x1 110 -y1 1060 -x2 250 -y2 1090 -d 500 -asp ./screenshots/actual-task-manager-close-all.png -c "tap -x 200 -y 1075"
+
+echo
+echo Shutdown emulator
+echo '#################'
+echo
+
+execute_command_until_screenshot_region_matches -f ./screenshots/template-power-menu.png -x1 450 -y1 250 -x2 620 -y2 390 -d 1000 -asp ./screenshots/actual-power-menu.png -c "long_press_power_button"
+execute_command_as_long_as_screenshot_region_matches -f ./screenshots/template-power-menu.png -x1 450 -y1 250 -x2 620 -y2 390 -d 1000 -asp ./screenshots/actual-power-button-pressed.png -c "tap -x 540 -y 275"

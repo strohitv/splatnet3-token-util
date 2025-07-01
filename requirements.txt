@@ -1,0 +1,15 @@
+certifi==2025.6.15
+charset-normalizer==3.4.2
+idna==3.10
+ImageHash==4.3.2
+numpy==2.3.1
+pillow==11.3.0
+pyperclip==1.9.0
+PyWavelets==1.8.0
+requests==2.32.4
+scipy==1.16.0
+setuptools==78.1.1
+six==1.17.0
+uncurl==0.0.11
+urllib3==2.5.0
+wheel==0.45.1
