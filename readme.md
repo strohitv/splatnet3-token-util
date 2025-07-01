@@ -160,3 +160,16 @@ PLEASE NOTE: this script does not work when several emulators are booted at the 
 - gtoken: search for `_gtoken=ey`
 - bullettoken: search for `"bulletToken":"`, if not found, search for `Bearer ` and afterwards a weird String with roughly 124 characters
 - sessionToken: search for `SessionToken">ey`, better string: `eyJhbGciOiJIUzI1NiJ9` (which usually is the first part of the session token)
+
+# Contribution
+If you want to add a feature or fix a bug, please fork the project and send a pull request once you're done. I appreciate all help!
+
+Should you need help with using the application or stumble across an error, please open an issue.
+
+# License
+This software is released under the Creative Commons BY-NC-SA 4.0 license. In short, this means:
+- you may edit and redistribute the application, however you need to properly attribute the changed version so that your users can find the original project and can understand what changes were made and why.
+- you are **not** permitted to use this application or a changed version in a commercial way, **no exceptions**!
+- if you redistribute a changed version, you are required to put it under the same Creative Commons BY-NC-SA 4.0 or a compatible license. A "compatible" license is one which also has these three properties listed here.
+
+Details can be found either in the [LICENSE file](./LICENSE) or at the [official Creative Commons website](https://creativecommons.org/licenses/by-nc-sa/4.0/).
