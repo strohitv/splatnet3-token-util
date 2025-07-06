@@ -22,6 +22,7 @@ if [[ -z "${S3S_ARGS// }" ]];
 then
 	echo "using '--help' as command line args since you did not provide any."
 	S3S_ARGS="--help"
+	echo ""
 fi
 
 # 0. activate conda environment (installation of libs has to be prepared beforehand)
@@ -31,6 +32,7 @@ then
 	source "$CONDA_SOURCE"
 	conda init
 	conda activate "$CONDA_ENVIRONMENT"
+	echo ""
 fi
 
 while :
