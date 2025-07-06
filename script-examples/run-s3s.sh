@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# This script demonstrates how to execute the refresh and run s3s afterwards with valid tokens
+# This script serves as a wrapper for s3s and automatically refreshes the tokens used by it if necessary
 
 # VARIABLES - change them according to your system
 MAIN_DIRECTORY="$HOME/code/python/splatnet3-token-util" # insert path to project directory
@@ -33,9 +33,6 @@ then
 	conda activate "$CONDA_ENVIRONMENT"
 fi
 
-CURRENT_TIME=$(date +%s)
-NEXT_RUN_TIME=$((CURRENT_TIME + 0 * 60))
-
 while :
 do
 	# 1. prepare s3s run
@@ -64,6 +61,7 @@ do
 	echo ""
 	echo "s3s finished. Return code: $S3S_RC"
 
+	# stop script if s3s ran successfully
 	if [[ $S3S_RC -eq 0 ]];
 	then
 		echo "s3s finished successful -> exiting script."
@@ -78,20 +76,10 @@ do
 		# ERROR: s3s failed
 		echo "ERROR DURING s3s!!!"
 		echo "exiting script."
-		exit 2
+		exit 1
 	fi
 
-	# 3. s3s finished - wait up to 115 minutes before refreshing tokens again if monitoring mode
-	CURRENT_TIME=$(date +%s)
-	if [ $NEXT_RUN_TIME -gt $CURRENT_TIME ];
-	then
-		SLEEP_TIME=$((NEXT_RUN_TIME - CURRENT_TIME))
-		WAKEUP_TIME=$(date -d "$SLEEP_TIME secs" '+%H:%M')
-		echo "Less than 115 minutes have passed since the last execution. Sleeping for $((SLEEP_TIME / 60)) minutes (until $WAKEUP_TIME)"
-		sleep $SLEEP_TIME
-	fi
-
-	# 4. token refresh required - prepare splatnet3-token-util run
+	# 3. token refresh required - prepare splatnet3-token-util run
 	cd "$MAIN_DIRECTORY"
 
 	echo "###########################"
@@ -106,12 +94,9 @@ do
 		UPDATE_STU=0
 	fi
 
-	# 5. run splatnet3-token-util and check result
+	# 4. run splatnet3-token-util and act according to result
 	if python3 main.py;
 	then
-		CURRENT_TIME=$(date +%s)
-		NEXT_RUN_TIME=$((CURRENT_TIME + 115 * 60))
-
 		# copy config to s3s directory
 		cp -f "$MAIN_DIRECTORY/config.txt" "$S3S_DIRECTORY/config.txt"
 		echo "config.txt written into s3s folder"
@@ -121,6 +106,6 @@ do
 		echo "ERROR DURING TOKEN EXTRACTION!!!"
 
 		echo "exiting the script"
-		exit 1
+		exit 2
 	fi
 done
