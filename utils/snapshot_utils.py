@@ -27,7 +27,7 @@ def search_for_tokens(app_config):
 
 	gtoken = None if app_config.extract_g_token else 'NO_G_TOKEN_EXTRACTED'
 	bullet_token = None if app_config.extract_bullet_token else 'NO_BULLET_TOKEN_EXTRACTED'
-	session_token = None if app_config.extract_session_token else 'NO_SESSION_TOKEN_EXTRACTED'
+	session_token = None if app_config.extract_session_token else 'skip'
 
 	# analyse snapshot and find values
 	print(f'Searching for tokens...')

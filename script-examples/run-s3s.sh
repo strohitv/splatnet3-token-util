@@ -6,7 +6,13 @@
 MAIN_DIRECTORY="$HOME/code/python/splatnet3-token-util" # insert path to project directory
 
 S3S_DIRECTORY="$HOME/code/python/s3s" # insert path to s3s directory
-S3S_ARGS="-M -r" # insert your command arguments for the s3s command
+S3S_ARGS="$@" # insert your command arguments for the s3s command
+
+if [[ -z "${S3S_ARGS// }" ]];
+then
+	echo "using '--help' as command line args since you did not provide any."
+	S3S_ARGS="--help"
+fi
 
 USE_CONDA=1 # 1 if you want to use (mini)conda, 0 otherwise
 CONDA_SOURCE="$HOME/miniconda3/etc/profile.d/conda.sh" # insert path to conda main script
@@ -35,7 +41,7 @@ do
 	pip install -r ./requirements.txt
 
 	# 1. run splatnet3-token-util and check result
-	if python3 main.py;
+	if [[ $S3S_ARGS == *"-h"* ]] || python3 main.py;
 	then
 		CURRENT_TIME=$(date +%s)
 		NEXT_RUN_TIME=$((CURRENT_TIME + 115 * 60))
@@ -52,27 +58,36 @@ do
 		cp -f "$MAIN_DIRECTORY/config.txt" "$S3S_DIRECTORY/config.txt"
 		echo "config.txt written into s3s folder"
 
-		echo "Running s3s with command 'python s3s.py $S3S_ARGS'"
-		cd $S3S_DIRECTORY
+		echo "Running s3s with command 'python s3s.py --norefresh $S3S_ARGS'"
+		echo ""
 
+		cd $S3S_DIRECTORY
 		git pull
 		pip install -r requirements.txt
+		echo ""
 
-		(python s3s.py $S3S_ARGS)
+		(python s3s.py --norefresh $S3S_ARGS)
 		S3S_RC=$?
 
+		echo ""
 		echo "s3s finished. Return code: $S3S_RC"
 		echo ""
 
-		# # optional: stop script if s3s fails. Not useful for monitoring mode.
-		# if [ $S3S_RC -gt 0 ];
-		# then
-		# 	# ERROR: s3s failed
-		# 	echo "ERROR DURING s3s!!!"
+		if [[ $S3S_ARGS != *"-M"* ]] || [[ $S3S_ARGS == *"-h"* ]];
+		then
+			echo "s3s params did not request monitoring mode (-M) or requested help (-h / --help); only one run required -> exiting script."
+			exit 0
+		fi
 
-		# 	echo "exiting the script"
-		# 	exit 2
-		# fi
+		# stop script if s3s fails
+		if [ $S3S_RC -gt 0 ];
+		then
+			# ERROR: s3s failed
+			echo "ERROR DURING s3s!!!"
+
+			echo "exiting the script"
+			exit 2
+		fi
 
 		# 3. s3s finished - wait up to 115 minutes before refreshing tokens again
 		CURRENT_TIME=$(date +%s)
