@@ -10,7 +10,7 @@ def create_headers(bullet_token):
 	graphql_head = {
 		'Authorization': f'Bearer {bullet_token}',  # update every time it's called with current global var
 		'Accept-Language': lang,
-		'User-Agent': 'Mozilla/5.0 (Linux; Android 14; Pixel 8) '
+		'User-Agent': 'Mozilla/5.0 (Linux; Android 11; Pixel 4) '
 					  'AppleWebKit/537.36 (KHTML, like Gecko) '
 					  'Chrome/120.0.6099.230 Mobile Safari',
 		'X-Web-View-Ver': '6.0.0-9253fd84',

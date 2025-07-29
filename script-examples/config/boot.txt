@@ -1,16 +1,16 @@
 #####
-# EXECUTE ON PIXEL 8 / ANDROID API LEVEL 30 EMULATOR
+# EXECUTE ON PIXEL 4 / ANDROID API LEVEL 30 WITH PLAY STORE EMULATOR
 #####
 
-block_until_screenshot_region_matches -f ./screenshots/template-emulator-main-menu.png -x1 50 -y1 540 -x2 230 -y2 750 -d 500 -asp ./screenshots/actual-emulator-booted.png
+block_until_screenshot_region_matches -f ./screenshots/template-emulator-booted.png -x1 50 -y1 530 -x2 230 -y2 700 -d 500 -asp ./screenshots/actual-emulator-booted.png
 
 echo
 echo Open NSA
 echo '########'
 echo
 
-execute_command_as_long_as_screenshot_region_matches -f ./screenshots/template-emulator-main-menu.png -x1 50 -y1 540 -x2 230 -y2 750 -d 500 -asp ./screenshots/actual-nsa-tapped.png -c "tap -x 130 -y 610"
-block_until_screenshot_region_matches -f ./screenshots/template-nsa-opened.png -x1 40 -y1 350 -x2 170 -y2 390 -d 500 -asp ./screenshots/actual-nsa-opened.png
+execute_command_as_long_as_screenshot_region_matches -f ./screenshots/template-emulator-main-menu.png -x1 50 -y1 530 -x2 230 -y2 700 -d 500 -asp ./screenshots/actual-nsa-tapped.png -c "tap -x 140 -y 610"
+block_until_screenshot_region_matches -f ./screenshots/template-nsa-opened.png -x1 35 -y1 390 -x2 180 -y2 430 -d 500 -asp ./screenshots/actual-nsa-opened.png
 
 
 echo
@@ -20,7 +20,7 @@ echo
 
 
 wait_s 1
-execute_command_until_screenshot_region_matches -f ./screenshots/template-nsa-opened.png -x1 42 -y1 828 -x2 528 -y2 1314 -d 500 -asp ./screenshots/actual-nsa-scrolled.png -c "swipe -x1 718 -y1 1232 -x2 200 -y2 1232 -d 2000"
+execute_command_until_screenshot_region_matches -f ./screenshots/template-nsa-opened.png -x1 44 -y1 897 -x2 527 -y2 1380 -d 500 -asp ./screenshots/actual-nsa-scrolled.png -c "swipe -x1 1033 -y1 1140 -x2 527 -y2 1140 -d 3000"
 
 
 echo
@@ -28,5 +28,5 @@ echo Open SplatNet3
 echo '##############'
 echo
 
-execute_command_as_long_as_screenshot_region_matches -f ./screenshots/template-nsa-opened.png -x1 30 -y1 160 -x2 590 -y2 275 -d 500 -asp ./screenshots/actual-splatnet3-tapped.png -c "tap -x 275 -y 1100"
-block_until_screenshot_region_matches -f ./screenshots/template-splatnet3-opened.png -x1 25 -y1 100 -x2 250 -y2 250 -d 250 -asp ./screenshots/actual-splatnet3-opened.png
+execute_command_as_long_as_screenshot_region_matches -f ./screenshots/template-nsa-opened.png -x1 35 -y1 390 -x2 180 -y2 430 -d 500 -asp ./screenshots/actual-splatnet3-tapped.png -c "tap -x 280 -y 1140"
+block_until_screenshot_region_matches -f ./screenshots/template-splatnet3-opened.png -x1 25 -y1 100 -x2 250 -y2 250 -d 300 -asp ./screenshots/actual-splatnet3-opened.png
