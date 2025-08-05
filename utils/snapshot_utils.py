@@ -87,7 +87,7 @@ def search_for_tokens(app_config):
 	print('Result:')
 	print('- SKIPPED\tgToken' if gtoken == 'NO_G_TOKEN_EXTRACTED' else '- SUCCESS\tgToken' if gtoken is not None else '- FAIL\t\tgToken')
 	print('- SKIPPED\tbulletToken' if bullet_token == 'NO_BULLET_TOKEN_EXTRACTED' else '- SUCCESS\tbulletToken' if bullet_token is not None else '- FAIL\t\tbulletToken')
-	print('- SKIPPED\tsessionToken' if session_token == 'NO_SESSION_TOKEN_EXTRACTED' else '- SUCCESS\tsessionToken' if session_token is not None else '- FAIL\t\tsessionToken')
+	print('- SKIPPED\tsessionToken' if session_token == 'skip' else '- SUCCESS\tsessionToken' if session_token is not None else '- FAIL\t\tsessionToken')
 	print()
 
 	if gtoken is not None:
