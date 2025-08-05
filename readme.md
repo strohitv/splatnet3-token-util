@@ -76,35 +76,46 @@ Open `./config/config.json` and check that all settings are correct:
 - `max_attempt_duration_seconds` sets how many seconds the script is allowed to use to boot the emulator, open SplatNet3, create the snapshot and shut the emulator down again. If it takes longer, a HARD reset will be done, forcing it to start all over again. This is to prevent the script from getting stuck (for example because it accidentially did something which it wasn't supposed to be doing and now it's in the wrong menu)
 - `max_run_duration_minutes` sets how many minutes may pass until the script does not retry again and gives up instead. If it takes that long to find the token, something is probably broken and needs to be fixed.
 
-### Copy and edit the application script
-Copy `./script-examples/run-s3s.sh` to `./run-s3s.sh`.
-
-Afterwards, open `./run-s3s.sh` and edit the variables at the start of the file in the `# VARIABLES` section so that they work with your installation.
-
-**IMPORTANT:** I recommend to not edit `./script-examples/run-s3s.sh` directly. Copy the file somewhere else and edit the newly created one instead. Updating the splatnet3-token-util might not be possible anymore if you edit `./script-examples/run-s3s.sh` directly because of conflicts in the file.
-
 ### Run splatnet3-token-util and s3s
-To run s3s in combination with splatnet3-token-util, simply execute the edited shell script from a terminal window instead of using s3s directly.
+This repository contains a wrapper script, `run_s3s.py`, which runs s3s and uses splatnet3-token-util to refresh the tokens whenever the tokens are not valid.
 
-`sh run-s3s.sh` simply forwards the command line arguments to s3s which means you can use it the same way you would normally use s3s:
+First, you need to run the script without any parameters to create the configuration for it:
+```shell
+# one of these depending on your python installation
+python run_s3s.py
+python3 run_s3s.py
+```
+During the run, a file called 'config_run_s3s.json' will be created. Edit this file and fill in the directory of your s3s.
+
+The other settings are usually fine. If you've set up splatnet3-token-util to not write the generated file as config.txt, change it accordingly. If any of the required tools (git, python, pip) need to be called differently, edit the calls as well. If update_s3s or update_stu is set, it will execute a `git pull` followed by a `pip install` the first time the script is executed before running either s3s or splatnet3-token-util.
+
+**IMPORTANT FOR WINDOWS USERS**: for file paths, make sure to use double backslashes `\\` instead of single backslashes `\`, for example: `C:\\Users\\someone` instead of `C:\Users\someone`.
+
+`python run_s3s.py` simply forwards the command line arguments to s3s which means you can use it the same way you would normally use s3s:
 ```shell
 # these uses of s3s...
 python s3s.py -M -r
 python3 s3s.py -M -r
-# ... both translate to this use of run-s3s.sh with added automatic token refresh:
-sh run-s3s.sh -M -r
 
-# run either of these commands to get a list of s3s commands (which are all supported by run-s3s.sh)
-sh run-s3s.sh 
-sh run-s3s.sh -h
-sh run-s3s.sh --help
+# ... both translate to these use of run_s3s.py with added automatic token refresh:
+python run_s3s.py -M -r
+python3 run_s3s.py -M -r
+
+# run either of these commands to get a list of s3s commands (which are all supported by run_s3s.py)
+python run_s3s.py 
+python run_s3s.py -h
+python run_s3s.py --help
+
+python3 run_s3s.py 
+python3 run_s3s.py -h
+python3 run_s3s.py --help
 ```
 
-`run-s3s.sh` will try to execute s3s with the given parameters. If s3s exits with return code 0 or an error code (usually RC 1), run-s3s.sh will exit with the same result.
+`run_s3s.py` will try to execute s3s with the given parameters. If s3s exits with return code 0 or an error code (usually RC 1), run_s3s.py will exit with the same result.
 
-It behaves different if s3s finishes with the "outdated tokens" `--norefresh` return code (default: 42): once the tokens are outdated, splatnet3-token-util will be called to refresh the tokens. The newly created `config.txt` file with valid tokens will be copied into the s3s directory and afterwards the run-s3s.sh will automatically restart to call s3s again.
+It behaves different if s3s finishes with the "outdated tokens" `--norefresh` return code (default: 42): once the tokens are outdated, splatnet3-token-util will be called to refresh the tokens. The newly created `config.txt` file with valid tokens will be copied into the s3s directory and afterwards the run_s3s.py will automatically restart to call s3s again.
 
-If s3s gets called with monitoring mode (`-M`), the script will switch between s3s monitoring mode and token refresh indefinitely until it gets manually stopped by using `CTRL` + `V`.
+If s3s gets called with monitoring mode (`-M`), the script will switch between s3s monitoring mode and token refresh indefinitely until it gets manually stopped by using `CTRL` + `C`.
 
 **IMPORTANT**: the script ensures that a token refresh will only happen if s3s does not find valid tokens. The bullet_token is valid for 2 hours so there is no need to refresh the tokens earlier. **DO NOT** change to code to act differently and **DO NOT** flood Nintendo with token refreshes!
 
