@@ -8,7 +8,8 @@ from PIL import Image
 import imagehash
 
 from data.app_config import AppConfig
-from utils.script_utils import execute
+from steps.execute_command_as_long_as_region_matches import ExecuteCommandAsLongAsRegionMatches
+from utils import script_utils
 
 
 class SearchRegionAndTapCenter:
@@ -16,6 +17,15 @@ class SearchRegionAndTapCenter:
 		self.command_name = command_name
 		self.app_config = app_config
 		self.all_steps = all_steps
+
+		self.execute_command_step = None
+		for step_key in self.all_steps:
+			if isinstance(self.all_steps[step_key], ExecuteCommandAsLongAsRegionMatches):
+				self.execute_command_step = self.all_steps[step_key]
+				break
+
+		if self.execute_command_step is None:
+			raise Exception('Could not find execute_command_step!')
 
 		self.parsed_args = None
 
@@ -77,7 +87,7 @@ class SearchRegionAndTapCenter:
 				if result is not None:
 					break
 
-				execute(parsed_args.command, self.all_steps)
+				script_utils.execute(parsed_args.command, self.all_steps)
 
 				time.sleep(int(parsed_args.duration) / 1000.0)
 
@@ -88,7 +98,7 @@ class SearchRegionAndTapCenter:
 
 			print(f'Found at: ({x1}, {y2}), tapping position ({tap_x, tap_y}) until something happens')
 
-			execute(f'execute_command_as_long_as_screenshot_region_matches -f {parsed_args.filename} -x1 {x1} -y1 {y1} -x2 {x2} -y2 {y2} -d 500 -asp {parsed_args.actual_screenshot_path}_tapped.png -c "tap -x {tap_x} -y {tap_y}"', self.all_steps)
+			script_utils.execute(f'{self.execute_command_step.command_name} -f {parsed_args.filename} -x1 {x1} -y1 {y1} -x2 {x2} -y2 {y2} -d 500 -asp {parsed_args.actual_screenshot_path}_tapped.png -c "tap -x {tap_x} -y {tap_y}"', self.all_steps)
 
 			end = time.time()
 			print(f'Finished search_region_and_tap_center after {(end - start):0.1f} seconds.')

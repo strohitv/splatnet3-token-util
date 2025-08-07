@@ -5,7 +5,7 @@
 /cron-log.log
 
 /config*
-/screenshots*
+/screenshots/**/actual*
 __pycache__
 
 .idea
