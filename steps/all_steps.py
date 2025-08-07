@@ -1,3 +1,4 @@
+from data.app_config import AppConfig
 from steps.block_until_screenshot_region_matches import BlockUntilScreenshotRegionMatches
 from steps.echo import Echo
 from steps.execute_command_as_long_as_screenshot_region_matches import ExecuteCommandAsLongAsScreenshotRegionMatches
@@ -9,7 +10,7 @@ from steps.tap import Tap
 from steps.wait_ms import WaitMS
 from steps.wait_s import WaitS
 
-def get_steps(app_config):
+def get_steps(app_config: AppConfig):
 	steps = {}
 
 	steps['block_until_screenshot_region_matches'] = BlockUntilScreenshotRegionMatches('block_until_screenshot_region_matches', app_config)

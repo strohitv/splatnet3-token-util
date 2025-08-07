@@ -22,7 +22,7 @@ class Swipe:
 		parsed_args = parser.parse_args(only_args)
 
 		print(f'Swiping from position ({parsed_args.x1}, {parsed_args.y1}) to ({parsed_args.x2}, {parsed_args.y2}) in {parsed_args.duration} milliseconds.')
-		subprocess.run(f'{self.app_config.adb_path} shell input swipe {parsed_args.x1} {parsed_args.y1} {parsed_args.x2} {parsed_args.y2} {parsed_args.duration}',
+		subprocess.run(f'{self.app_config.emulator_config.adb_path} shell input swipe {parsed_args.x1} {parsed_args.y1} {parsed_args.x2} {parsed_args.y2} {parsed_args.duration}',
 					   shell=True,
 					   stdout=subprocess.PIPE,
 					   stderr=subprocess.PIPE)

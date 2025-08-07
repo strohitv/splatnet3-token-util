@@ -1,14 +1,16 @@
 import json
 import sys
 
+from data.app_config import AppConfig
 
-def create_target_file(app_config, g_token, bullet_token, session_token):
-	print(f'Reading the template file "{app_config.template_path}".')
-	with open(app_config.template_path, 'r') as template:
+
+def create_target_file(app_config: AppConfig, g_token, bullet_token, session_token):
+	print(f'Reading the template file "{app_config.run_config.template_path}".')
+	with open(app_config.run_config.template_path, 'r') as template:
 		print(f'Creating target file content from template.')
 		template_file = template.read()
 
-		if app_config.validate_target_file_as_json:
+		if app_config.token_config.validate_target_file_as_json:
 			try:
 				json.loads(template_file)
 			except json.decoder.JSONDecodeError as e:
@@ -18,7 +20,7 @@ def create_target_file(app_config, g_token, bullet_token, session_token):
 
 		final_file = template_file.replace('{GTOKEN}', g_token).replace('{BULLETTOKEN}', bullet_token).replace('{SESSIONTOKEN}', session_token)
 
-		if app_config.validate_target_file_as_json:
+		if app_config.token_config.validate_target_file_as_json:
 			try:
 				json.loads(final_file)
 			except json.decoder.JSONDecodeError as e:
@@ -26,8 +28,8 @@ def create_target_file(app_config, g_token, bullet_token, session_token):
 				# no sys.exit here as we were obviously able to read the template file, thus the issue has to be with the tokens. Try again or stop cause max attempts.
 				raise e
 
-		print(f'Creating the target file "{app_config.target_path}".')
-		with open(app_config.target_path, 'w') as target_file:
+		print(f'Creating the target file "{app_config.run_config.target_path}".')
+		with open(app_config.run_config.target_path, 'w') as target_file:
 			print(f'Writing content.')
 			target_file.write(final_file)
 			target_file.flush()

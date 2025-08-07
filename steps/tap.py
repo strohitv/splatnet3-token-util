@@ -19,7 +19,7 @@ class Tap:
 		parsed_args = parser.parse_args(only_args)
 
 		print(f'Tapping position ({parsed_args.x}, {parsed_args.y}).')
-		subprocess.run(f'{self.app_config.adb_path} shell input tap {parsed_args.x} {parsed_args.y}',
+		subprocess.run(f'{self.app_config.emulator_config.adb_path} shell input tap {parsed_args.x} {parsed_args.y}',
 					   shell=True,
 					   stdout=subprocess.PIPE,
 					   stderr=subprocess.PIPE)

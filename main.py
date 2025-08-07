@@ -6,6 +6,7 @@ import sys
 import time
 import datetime
 
+from data.app_config import AppConfig
 from steps import all_steps
 from utils.config_utils import load_config, ensure_scripts_exist, ensure_template_exists
 from utils.emulator_utils import boot_emulator, run_adb, wait_for_shutdown, create_snapshot, delete_snapshot, request_emulator_shutdown
@@ -15,15 +16,20 @@ from utils.splatnet3_utils import is_homepage_reachable
 from utils.stats_utils import prepare_stats, write_stats
 from utils.template_utils import create_target_file
 
+SUCCESS = 0
+INPUT_VALIDATION_FAILED = 1
+NOT_ALL_TOKENS_FOUND = 2
+INVALID_TOKENS_FOUND = 3
 
-def run_token_extraction(app_config, all_available_steps, start, started_at, attempt, emulator_pid):
+
+def run_token_extraction(app_config: AppConfig, all_available_steps, start, started_at, attempt, emulator_pid):
 	# run emulator and create RAM dump
 	emulator_proc = boot_emulator(app_config)
 	emulator_pid.value = emulator_proc.pid
 
-	execute_script(all_available_steps, app_config.boot_script_path, 'boot', app_config.debug)
+	execute_script(all_available_steps, app_config.run_config.boot_script_path, 'boot', app_config.debug)
 	create_snapshot(app_config)
-	execute_script(all_available_steps, app_config.cleanup_script_path, 'cleanup', app_config.debug)
+	execute_script(all_available_steps, app_config.run_config.cleanup_script_path, 'cleanup', app_config.debug)
 	wait_for_shutdown(emulator_proc)
 	emulator_pid.value = 0
 
@@ -33,41 +39,41 @@ def run_token_extraction(app_config, all_available_steps, start, started_at, att
 
 	if g_token is not None and bullet_token is not None and session_token is not None:
 		# do a webrequest to see whether they work
-		if (app_config.validate_splat3_homepage
-			and app_config.extract_g_token and app_config.validate_g_token
-			and app_config.extract_bullet_token and app_config.validate_bullet_token):
+		if (app_config.token_config.validate_splat3_homepage
+			and app_config.token_config.extract_g_token and app_config.token_config.validate_g_token
+			and app_config.token_config.extract_bullet_token and app_config.token_config.validate_bullet_token):
 
 			if not is_homepage_reachable(g_token, bullet_token):
 				print('tokens were found but are invalid, attempt did not work')
 				print()
-				sys.exit(2)
+				sys.exit(INVALID_TOKENS_FOUND)
 
 		# export tokens to target file
 		end = time.time()
 		elapsed = end - start
 
 		create_target_file(app_config, g_token, bullet_token, session_token)
-		write_stats(app_config.log_stats_csv, app_config.stats_csv_path, started_at, True, attempt, elapsed)
+		write_stats(app_config.run_config.log_stats_csv, app_config.run_config.stats_csv_path, started_at, True, attempt, elapsed)
 		print(f'Done after {attempt} attempts and {elapsed:0.1f} seconds total. Application will exit now. Bye!')
 
-		sys.exit(0)
+		sys.exit(SUCCESS)
 	else:
 		print('not all tokens could be found, attempt did not work')
 		print()
-		sys.exit(1)
+		sys.exit(NOT_ALL_TOKENS_FOUND)
 
 
 def main():
-	parser = argparse.ArgumentParser(prog='splatnet3-emu-token-util',
+	parser = argparse.ArgumentParser(prog='main.py',
 									 description='SplatNet3 Emulator Token Utility application to extract NSA SplatNet3 tokens from a controlled Android Studio emulator process')
 	parser.add_argument('-c', '--config', required=False, help='Path to configuration file', default='./config/config.json')
 	parser.add_argument('-r', '--reinitialize-configs', required=False,
-						help='Generates the config again (and potentially overwrites existing ones)', default=False,
+						help='Regenerates the configuration file (and overwrites existing ones)', default=False,
 						action='store_true')
 	parser.add_argument('-b', '-emu', '--boot-emulator', '--emu', required=False,
 						help='Boots the emulator', default=False,
 						action='store_true')
-	parser.add_argument('-a', '-adb', '--run-adb', '--adb', required=False,
+	parser.add_argument('-a', '-adb', '--run-adb', '--adb', dest='ADB_COMMAND', required=False,
 						help='Executes a command via android debug bridge (adb)')
 	args = parser.parse_args()
 
@@ -80,33 +86,57 @@ def main():
 	if regenerated:
 		print('Configs were regenerated, application will exit. Bye!')
 		print()
-		sys.exit(0)
+		sys.exit(SUCCESS)
 
 	if args.boot_emulator:
 		emulator_proc = boot_emulator(app_config)
 		wait_for_shutdown(emulator_proc)
 		print('Emulator was shut down, application will exit. Bye!')
-		sys.exit()
+		sys.exit(SUCCESS)
 
-	if args.run_adb is not None:
-		run_adb(app_config, args.run_adb)
+	if args.ADB_COMMAND is not None:
+		run_adb(app_config, args.ADB_COMMAND)
 		print('Command execution finished, application will exit. Bye!')
-		sys.exit()
+		sys.exit(SUCCESS)
+
+	if not os.path.exists(app_config.emulator_config.emulator_path):
+		print('ERROR: emulator_path in config does not exist. Please edit the config file and insert a valid emulator_path. Exiting now.')
+		sys.exit(INPUT_VALIDATION_FAILED)
+
+	if not os.path.exists(app_config.emulator_config.adb_path):
+		print('ERROR: adb_path in config does not exist. Please edit the config file and insert a valid adb_path. Exiting now.')
+		sys.exit(INPUT_VALIDATION_FAILED)
+
+	if not os.path.exists(app_config.emulator_config.get_snapshot_dir()):
+		print('ERROR: snapshot_dir in config does not exist. Please edit the config file and insert a valid snapshot_dir. Exiting now.')
+		sys.exit(INPUT_VALIDATION_FAILED)
+
+	if not os.path.exists(app_config.run_config.boot_script_path):
+		print('ERROR: boot_script_path in config does not exist. Please edit the config file and insert a valid boot_script_path. Exiting now.')
+		sys.exit(INPUT_VALIDATION_FAILED)
+
+	if not os.path.exists(app_config.run_config.cleanup_script_path):
+		print('ERROR: cleanup_script_path in config does not exist. Please edit the config file and insert a valid cleanup_script_path. Exiting now.')
+		sys.exit(INPUT_VALIDATION_FAILED)
+
+	if not os.path.exists(app_config.run_config.template_path):
+		print('ERROR: template_path in config does not exist. Please edit the config file and insert a valid template_path. Exiting now.')
+		sys.exit(INPUT_VALIDATION_FAILED)
 
 	start_datetime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 	print(f'### Script started at {start_datetime} ###')
 
 	start_time = time.time()
-	prepare_stats(app_config.log_stats_csv, app_config.stats_csv_path)
+	prepare_stats(app_config.run_config.log_stats_csv, app_config.run_config.stats_csv_path)
 
-	last_allowed_attempt_start_time = start_time + app_config.max_run_duration_minutes * 60
+	last_allowed_attempt_start_time = start_time + app_config.run_config.max_run_duration_minutes * 60
 	attempt = 0
 	while time.time() < last_allowed_attempt_start_time:
 		attempt += 1
 
 		print(f'### Attempt {attempt} ###')
 		print()
-		print(f'Expecting this attempt to take {app_config.max_attempt_duration_seconds} seconds at worst.')
+		print(f'Expecting this attempt to take {app_config.run_config.max_attempt_duration_seconds} seconds at worst.')
 		print()
 
 		extraction_process = None
@@ -116,14 +146,14 @@ def main():
 														 args=(app_config, all_available_steps, start_time, start_datetime, attempt, emulator_pid))
 			extraction_process.start()
 
-			targeted_end_time = time.time() + app_config.max_attempt_duration_seconds
+			targeted_end_time = time.time() + app_config.run_config.max_attempt_duration_seconds
 			while time.time() < targeted_end_time and extraction_process.is_alive():
 				time.sleep(1)
 
 			if extraction_process.is_alive():
-				raise Exception(f'Extraction did not finish in time ({app_config.max_attempt_duration_seconds} seconds), forcing restart...')
+				raise Exception(f'Extraction did not finish in time ({app_config.run_config.max_attempt_duration_seconds} seconds), forcing restart...')
 			elif extraction_process.exitcode is not None and extraction_process.exitcode == 0:
-				sys.exit(0)
+				sys.exit(SUCCESS)
 
 		except Exception as e:
 			print(f'### Exception ###')
@@ -153,10 +183,10 @@ def main():
 	ended = time.time()
 	elapsed = ended - start_time
 
-	write_stats(app_config.log_stats_csv, app_config.stats_csv_path, start_datetime, False, attempt, elapsed)
+	write_stats(app_config.run_config.log_stats_csv, app_config.run_config.stats_csv_path, start_datetime, False, attempt, elapsed)
 	print(f'Could not find all three tokens in {attempt} attempts, application will stop now.\nPlease try again.\nBye!')
 	print()
-	sys.exit(1)
+	sys.exit(NOT_ALL_TOKENS_FOUND)
 
 
 if __name__ == '__main__':

@@ -5,6 +5,8 @@ import re
 import requests
 import uncurl
 
+from data.app_config import AppConfig
+
 
 def read_in_chunks(file_object, chunk_size=10 * 1024 * 1024):
 	while True:
@@ -22,12 +24,12 @@ def try_base64_decode(base64_string):
 		return False
 
 
-def search_for_tokens(app_config):
-	snapshot_path = os.path.expanduser(os.path.join(app_config.snapshot_dir, app_config.snapshot_name, 'ram.bin'))
+def search_for_tokens(app_config: AppConfig):
+	snapshot_path = os.path.expanduser(os.path.join(app_config.emulator_config.get_snapshot_dir(), app_config.emulator_config.snapshot_name, 'ram.bin'))
 
-	gtoken = None if app_config.extract_g_token else 'NO_G_TOKEN_EXTRACTED'
-	bullet_token = None if app_config.extract_bullet_token else 'NO_BULLET_TOKEN_EXTRACTED'
-	session_token = None if app_config.extract_session_token else 'skip'
+	gtoken = None if app_config.token_config.extract_g_token else 'NO_G_TOKEN_EXTRACTED'
+	bullet_token = None if app_config.token_config.extract_bullet_token else 'NO_BULLET_TOKEN_EXTRACTED'
+	session_token = None if app_config.token_config.extract_session_token else 'skip'
 
 	# analyse snapshot and find values
 	print(f'Searching for tokens...')
@@ -44,27 +46,27 @@ def search_for_tokens(app_config):
 					gtoken += chr(next_piece)
 					index += 1
 
-				if len(gtoken) < 850 or (app_config.validate_g_token and not re.match(r'^[0-9a-zA-Z.=\-_]+$', gtoken)):
+				if len(gtoken) < 850 or (app_config.token_config.validate_g_token and not re.match(r'^[0-9a-zA-Z.=\-_]+$', gtoken)):
 					gtoken = None
 
 				if gtoken is not None:
 					# bullet_token request to SplatNet3
-					if app_config.extract_bullet_token:
+					if app_config.token_config.extract_bullet_token:
 						try:
-							curl_request = app_config.bullet_token_curl_request.replace('{GTOKEN}', gtoken)
+							curl_request = app_config.token_config.bullet_token_curl_request.replace('{GTOKEN}', gtoken)
 							ctx = uncurl.parse_context(curl_request)
 							response = requests.request(ctx.method.upper(), ctx.url, data=ctx.data, cookies=ctx.cookies, headers=ctx.headers, auth=ctx.auth)
 							if 200 <= response.status_code < 300:
 								bullet_token = response.json()['bulletToken']
 							else:
 								print('ERROR: did not receive a 2xx response when loading bullet_token with gtoken')
-								if app_config.validate_g_token:
+								if app_config.token_config.validate_g_token:
 									gtoken = None
 						except Exception as e:
 							print('ERROR: exception occurred when loading bullet_token with gtoken')
 							print(e)
 							bullet_token = None
-							if app_config.validate_g_token:
+							if app_config.token_config.validate_g_token:
 								gtoken = None
 
 			# session_token search
@@ -78,7 +80,7 @@ def search_for_tokens(app_config):
 					session_token += chr(next_piece)
 					index += 1
 
-				if len(session_token) < 260 or (app_config.validate_session_token and not re.match(r'^[0-9a-zA-Z.=\-_]+$', session_token)):
+				if len(session_token) < 260 or (app_config.token_config.validate_session_token and not re.match(r'^[0-9a-zA-Z.=\-_]+$', session_token)):
 					session_token = None
 
 			if app_config.debug:

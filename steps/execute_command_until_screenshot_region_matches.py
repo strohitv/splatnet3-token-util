@@ -39,7 +39,7 @@ class ExecuteCommandUntilScreenshotRegionMatches:
 
 		while True:
 			print(f'Comparing screenshot "{parsed_args.actual_screenshot_path}" to base screenshot "{parsed_args.filename}" with cutoff {parsed_args.cutoff}.')
-			subprocess.run(f'{self.app_config.adb_path} exec-out screencap -p > {parsed_args.actual_screenshot_path}',
+			subprocess.run(f'{self.app_config.emulator_config.adb_path} exec-out screencap -p > {parsed_args.actual_screenshot_path}',
 						   shell=True,
 						   stdout=subprocess.PIPE,
 						   stderr=subprocess.PIPE)

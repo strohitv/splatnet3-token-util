@@ -52,7 +52,7 @@ class SearchRegionAndTapCenter:
 
 			while True:
 				print(f'Searching for image from base screenshot "{parsed_args.filename}" in screenshot "{parsed_args.actual_screenshot_path}" with cutoff {parsed_args.cutoff}.')
-				subprocess.run(f'{self.app_config.adb_path} exec-out screencap -p > {parsed_args.actual_screenshot_path}',
+				subprocess.run(f'{self.app_config.emulator_config.adb_path} exec-out screencap -p > {parsed_args.actual_screenshot_path}',
 							shell=True,
 							stdout=subprocess.PIPE,
 							stderr=subprocess.PIPE)
@@ -92,8 +92,9 @@ class SearchRegionAndTapCenter:
 
 			end = time.time()
 			print(f'Finished search_region_and_tap_center after {(end - start):0.1f} seconds.')
-		except:
+		except Exception as e:
 			print(f'ERROR occured, stopping.')
+			print(e)
 
 	def description(self):
 		return ('searches whether a given region contains an image. If found, it will tap the center of the found image until the image is not found anymore. It will wait for [DURATION] milliseconds every time the region does not contain the image.'
