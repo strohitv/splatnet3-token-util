@@ -17,6 +17,8 @@ Please ensure you have these applications installed on your computer:
 
 If you are unsure on how to install the software listed here, usually a quick internet search similar to `Windows install Android Studio` will help. Of course, replace `Windows` with your operating system and `Android Studio` with the software you want to install.
 
+**IMPORTANT**: Android Studio does not run on ARM computers, which means very small computers like the Raspberry Pi are **not** supported! It might be possible to run splatnet3-token-util with a custom emulator on ARM computers, but it needs to support ADB and be bootable using a command line. The community would need to find a way to do that, I will not provide support for these kind of scenarios. If you find a way, feel free to open an issue or a Pull Request!
+
 ## Clone the projects
 I recommend using a distinct directory on your computer and add both the s3s and stu directories in that folder. If you already have downloaded s3s, you can use this version and don't need to download s3s again. However, this tutorial requires s3s to be at least at version `0.7.0` or newer.
 
