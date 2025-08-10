@@ -1,5 +1,5 @@
 # file location: /home/{USERNAME}/.config/systemd/user/splatnet3-token-util.service
-# systemd KDE example: spawns a Konsole terminal emulator and executes the run-s3s.sh script
+# systemd KDE example: spawns a Konsole terminal emulator and executes the run-s3s.py script
 # create this systemd and use "systemctl --user start splatnet3-token-util.service" to start the extraction once.
 # For scheduled executions, see the splatnet3-token-util.timer file.
 # on other desktop environments, change 'konsole' to your preferred terminal
@@ -13,7 +13,7 @@ ConditionEnvironment=DISPLAY
 [Service]
 Type=exec
 # %h is your user folder (/home/{USERNAME}/ on linux)
-ExecStart=konsole -e "sh %h/code/python/splatnet3-token-util/run-s3s.sh"
+ExecStart=konsole -e "python %h/code/python/splatnet3-token-util/run-s3s.py -r -M"
 # optional: restart after 30 seconds if the script exits for whatever reason
 Restart=always
 RestartSec=30s
