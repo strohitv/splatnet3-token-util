@@ -14,6 +14,7 @@ from utils.script_utils import execute_script
 from utils.snapshot_utils import search_for_tokens
 from utils.splatnet3_utils import is_homepage_reachable
 from utils.stats_utils import prepare_stats, write_stats
+from utils.step_doc_creator import create_step_doc
 from utils.template_utils import create_target_file
 
 SUCCESS = 0
@@ -79,8 +80,9 @@ def main():
 
 	regenerated, app_config = load_config(args)
 	all_available_steps = all_steps.get_steps(app_config)
+	create_step_doc(all_available_steps)
 
-	regenerated |= ensure_scripts_exist(args, app_config, all_available_steps)
+	regenerated |= ensure_scripts_exist(args, app_config)
 	regenerated |= ensure_template_exists(args, app_config)
 
 	if regenerated:

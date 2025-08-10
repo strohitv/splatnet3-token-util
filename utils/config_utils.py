@@ -116,34 +116,19 @@ def load_config(args):
 
 	# read config
 	with open(args.config, 'r') as f:
-		app_config = AppConfig(**json.loads(f.read())) # AppConfig.from_json(json.loads(f.read()))
+		app_config = AppConfig(**json.loads(f.read()))
 
 	return regenerated, app_config
 
 
-def create_script_file(all_available_steps, script_path, script_summary, steps_name):
-	default_script = \
-		('############################\n'
-		 '# STEPS FILE DOCUMENTATION #\n'
-		 '############################\n'
-		 '# \n'
-		 '# \n') + script_summary + ('# \n'
-									 '# \n'
-									 '# Available commands:\n'
-									 '# - Use # at the start of a line to create a comment (line will be ignored)\n'
-									 '# - WARNING: # after a command will lead to an error, # must be at the start of a line\n')
-
-	for key in all_available_steps:
-		default_script += f'# \n# - {key}: {all_available_steps[key].description()}\n'
-
-	default_script += f'\necho Please insert your {steps_name} steps here.'
+def create_script_file(script_path, script_summary):
 	os.makedirs(os.path.dirname(script_path), exist_ok=True)
 
 	with open(script_path, 'w') as f:
-		f.write(default_script)
+		f.write(script_summary)
 
 
-def ensure_scripts_exist(args, app_config: AppConfig, all_available_steps):
+def ensure_scripts_exist(args, app_config: AppConfig):
 	regenerated = False
 
 	if args.reinitialize_configs or not os.path.exists(app_config.run_config.boot_script_path):
@@ -154,9 +139,11 @@ def ensure_scripts_exist(args, app_config: AppConfig, all_available_steps):
 						'# It starts executing AFTER the emulator has been started.\n'
 						'# Once this file has been fully executed, the script will create a snapshot of the emulator.\n'
 						'# \n'
-						'# Your goal for this script is to bring the freshly booted emulator to a state where the NSA app is opened and has entered SplatNet 3.\n')
+						'# Your goal for this script is to bring the freshly booted emulator to a state where the NSA app is opened and has entered SplatNet 3.\n'
+						'# \n'
+						'# For a list of all supported commands, please open the `steps_documentation.md` file in the base directory.\n\n')
 
-		create_script_file(all_available_steps, app_config.run_config.boot_script_path, boot_summary, 'boot')
+		create_script_file(app_config.run_config.boot_script_path, boot_summary)
 
 		print(f'Successfully generated boot file at "{app_config.run_config.boot_script_path}", please fill it with correct steps and run the application again')
 		regenerated = True
@@ -169,9 +156,11 @@ def ensure_scripts_exist(args, app_config: AppConfig, all_available_steps):
 						   '# It starts executing AFTER the snapshot of the emulator has been created.\n'
 						   '# Once this file has been fully executed, the script will analyse the snapshot RAM dump to find the tokens.\n'
 						   '# \n'
-						   '# Your goal for this script is to close the SplatNet 3 app and shut down the emulator.\n')
+						   '# Your goal for this script is to close the SplatNet 3 app and shut down the emulator.\n'
+						   '# \n'
+						   '# For a list of all supported commands, please open the `steps_documentation.md` file in the base directory.\n\n')
 
-		create_script_file(all_available_steps, app_config.run_config.cleanup_script_path, cleanup_summary, 'cleanup')
+		create_script_file(app_config.run_config.cleanup_script_path, cleanup_summary)
 
 		print(f'Successfully generated cleanup file at "{app_config.run_config.cleanup_script_path}", please fill it with correct steps and run the application again')
 		regenerated = True

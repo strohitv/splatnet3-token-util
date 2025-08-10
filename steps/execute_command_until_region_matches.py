@@ -17,20 +17,30 @@ class ExecuteCommandUntilRegionMatches:
 		self.app_config = app_config
 		self.all_steps = all_steps
 
+		self.parser = argparse.ArgumentParser(prog=self.command_name,
+											  description='Repeatedly executes a given command until a specific region on the screen (between points (X1, Y1) to (X2, Y2)) looks similar to the same region on a given template',
+											  conflict_handler='resolve')
+		self.parser.add_argument('-h', '--help', required=False, help=argparse.SUPPRESS)
+		self.parser.add_argument('-f', '--filename', required=True, help='The file path of the template screenshot which will be used for the comparison')
+		self.parser.add_argument('-x1', '--x1', required=True, help='The X coordinate of the top left corner of the region to compare')
+		self.parser.add_argument('-y1', '--y1', required=True, help='The Y coordinate of the top left corner of the region to compare')
+		self.parser.add_argument('-x2', '--x2', required=True, help='The X coordinate of the bottom right corner of the region to compare')
+		self.parser.add_argument('-y2', '--y2', required=True, help='The Y coordinate of the bottom right corner of the region to compare')
+		self.parser.add_argument('-c', '--command', required=True,
+								 help='The command which should be executed. Several commands can be provided by splitting them with a semicolon `;`')
+		self.parser.add_argument('-d', '--duration', required=False, default=500,
+								 help='The frequency of how often this command should check whether the regions match. Default: 500 ms')
+		self.parser.add_argument('-asp', '--actual_screenshot_path', required=False, default='./screenshots/screenshot.png',
+								 help='The file path where the actual screenshot of the emulator should be stored. Default: "./screenshots/screenshot.png"')
+		self.parser.add_argument('-co', '--cutoff', required=False, default=5,
+								 help='The cutoff for the comparison. This value decides how similar the regions must be to be considered equal. Lower values mean stricter comparison, higher values will match less similar screenshots. Default: 5')
+
+		self.description = self.parser.format_help()
+		self.introduction = 'This command repeatedly executes a given command until a specific region of the emulator screen looks similar to the same region in a given template file. Its biggest use case is to ensure consistent behaviour of the emulator by ensuring a command really came through. Example: tapping an app icon until the main screen of the app is visible (=> the app is now visible).'
+
 	def execute(self, args):
 		only_args = shlex.split(args)[1:]
-
-		parser = argparse.ArgumentParser()
-		parser.add_argument('-f', '--filename', required=True)
-		parser.add_argument('-x1', '--x1', required=True)
-		parser.add_argument('-y1', '--y1', required=True)
-		parser.add_argument('-x2', '--x2', required=True)
-		parser.add_argument('-y2', '--y2', required=True)
-		parser.add_argument('-c', '--command', required=True)
-		parser.add_argument('-d', '--duration', required=False, default=500)
-		parser.add_argument('-asp', '--actual_screenshot_path', required=False, default='./screenshots/screenshot.png')
-		parser.add_argument('-co', '--cutoff', required=False, default=5)
-		parsed_args = parser.parse_args(only_args)
+		parsed_args = self.parser.parse_args(only_args)
 
 		os.makedirs(os.path.dirname(parsed_args.filename), exist_ok=True)
 		os.makedirs(os.path.dirname(parsed_args.actual_screenshot_path), exist_ok=True)
@@ -45,7 +55,7 @@ class ExecuteCommandUntilRegionMatches:
 						   stderr=subprocess.PIPE)
 
 			found = self.compare(parsed_args.filename, parsed_args.actual_screenshot_path, parsed_args.x1, parsed_args.y1, parsed_args.x2, parsed_args.y2,
-						parsed_args.cutoff, self.app_config.debug)
+								 parsed_args.cutoff, self.app_config.debug)
 
 			if found:
 				break
@@ -54,24 +64,8 @@ class ExecuteCommandUntilRegionMatches:
 
 			time.sleep(int(parsed_args.duration) / 1000.0)
 
-
 		end = time.time()
 		print(f'Found after {(end - start):0.1f} seconds.')
-
-	def description(self):
-		return ('executes a given command until a region in a screenshot matches the template provided. It will wait for [DURATION] milliseconds every time the region does not match.'
-				f'\n#    - Use: "{self.command_name} [TEMPLATE_SCREENSHOT] [REGION_X1] [REGION_Y1] [REGION_X2] [REGION_Y2] [COMMAND] [DURATION_MS] [ACTUAL_SCREENSHOT_PATH] [CUTOFF]" to do the comparison.'
-				f'\n#        - [TEMPLATE_SCREENSHOT]: a file path to a screenshot which will be used as the base for comparison.'
-				f'\n#        - [REGION_X1]: X coordinate of the top left corner of the region to be compared.'
-				f'\n#        - [REGION_Y1]: Y coordinate of the top left corner of the region to be compared.'
-				f'\n#        - [REGION_X2]: X coordinate of the bottom right corner of the region to be compared.'
-				f'\n#        - [REGION_Y2]: Y coordinate of the bottom right corner of the region to be compared.'
-				f'\n#        - [COMMAND]: The command which should be executed.'
-				f'\n#        - [DURATION_MS]: Optional duration in ms to wait before attempting again. It will wait for 1000 ms if no value is provided.'
-				f'\n#        - [ACTUAL_SCREENSHOT_PATH]: Optional path in which the screenshot will be saved. It will save to \'./screenshot.png\' if no value is provided.'
-				f'\n#        - [CUTOFF]: Optional cutoff for the screenshot comparison. It will be 5 is none is provided. A lower number means stricter comparison.'
-				f'\n#    - Example 1: "{self.command_name} -f ./base.png -x1 100 -y1 200 -x2 300 -y2 400 "wait_s 5" -d 2000 -asp ./compare.png" -co 2 to execute a wait command of 5 seconds and compare the rectangle from (100, 200) to (300, 400) of base.png and compare.png with cutoff 2. If not found, wait for 2 seconds and try again.'
-				f'\n#    - Example 2: "{self.command_name} --filename ./base.png --x1 100 --y1 200 --x2 300 --y2 400 --command "wait_s 5" --duration 2000 --actual_screenshot_path ./compare.png" --cutoff 2 to execute a wait command of 5 seconds and compare the rectangle from (100, 200) to (300, 400) of base.png and compare.png with cutoff 2. If not found, wait for 2 seconds and try again.')
 
 	def compare(self, filename, actual_screenshot_path, x1, y1, x2, y2, cutoff, debug):
 		try:
@@ -92,5 +86,5 @@ class ExecuteCommandUntilRegionMatches:
 			hash_diff = hash0 - hash1
 		except:
 			hash_diff = 1000
-		
+
 		return hash_diff < int(cutoff)

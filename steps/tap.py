@@ -10,22 +10,22 @@ class Tap:
 		self.command_name = command_name
 		self.app_config = app_config
 
+		self.parser = argparse.ArgumentParser(prog=self.command_name,
+									 description='Taps a given position (X, Y) on the screen once',
+									 conflict_handler='resolve')
+		self.parser.add_argument('-h', '--help', required=False, help=argparse.SUPPRESS)
+		self.parser.add_argument('-x', '--x', required=True, help='The X coordinate of the position which should be tapped')
+		self.parser.add_argument('-y', '--y', required=True, help='The Y coordinate of the position which should be tapped')
+
+		self.description = self.parser.format_help()
+		self.introduction = 'This command will tap a given position on the screen.'
+
 	def execute(self, args):
 		only_args = shlex.split(args)[1:]
-
-		parser = argparse.ArgumentParser()
-		parser.add_argument('-x', '--x', required=False, default=5)
-		parser.add_argument('-y', '--y', required=False, default=5)
-		parsed_args = parser.parse_args(only_args)
+		parsed_args = self.parser.parse_args(only_args)
 
 		print(f'Tapping position ({parsed_args.x}, {parsed_args.y}).')
 		subprocess.run(f'{self.app_config.emulator_config.adb_path} shell input tap {parsed_args.x} {parsed_args.y}',
 					   shell=True,
 					   stdout=subprocess.PIPE,
 					   stderr=subprocess.PIPE)
-
-	def description(self):
-		return ('taps a given position on the screen.'
-				f'\n#    - Use: "{self.command_name} [X] [Y]" to tap the position (X, Y) on the screen.'
-				f'\n#    - Example 1: "{self.command_name} -x 100 -y 200" to tap the position (100, 200) on the screen.'
-				f'\n#    - Example 2: "{self.command_name} --x 100 --y 200" to tap the position (100, 200) on the screen.')
