@@ -7,14 +7,14 @@ echo Close NSA
 echo '#########'
 echo
 
-execute_while -mode found -template ./screenshots/template-splatnet3-opened.png -x1 25 -y1 100 -x2 250 -y2 250 -d 500 -actual ./screenshots/actual/actual-task-manager-opened.png -cmd "tap -x 855 -y 2215"
-execute_while -mode not-found -template ./screenshots/template-task-manager.png -x1 110 -y1 1000 -x2 270 -y2 1050 -d 500 -actual ./screenshots/actual/actual-task-manager-swiped.png -cmd "swipe -x1 100 -y1 1200 -x2 900 -y2 1200 -d 200"
-execute_while -mode found -template ./screenshots/template-task-manager.png -x1 110 -y1 1000 -x2 270 -y2 1050 -d 500 -actual ./screenshots/actual/actual-task-manager-close-all.png -cmd "tap -x 200 -y 1030"
+execute_while -mode found -template ./screenshots/pixel_4_api_30_play_store/template-splatnet3-opened.png -x1 25 -y1 100 -x2 250 -y2 250 -d 500 -actual ./screenshots/pixel_4_api_30_play_store/actual/actual-task-manager-opened.png -cmd "tap -x 855 -y 2215"
+execute_while -mode not-found -template ./screenshots/pixel_4_api_30_play_store/template-task-manager.png -x1 110 -y1 1000 -x2 270 -y2 1050 -d 500 -actual ./screenshots/pixel_4_api_30_play_store/actual/actual-task-manager-swiped.png -cmd "swipe -x1 100 -y1 1200 -x2 900 -y2 1200 -d 200"
+execute_while -mode found -template ./screenshots/pixel_4_api_30_play_store/template-task-manager.png -x1 110 -y1 1000 -x2 270 -y2 1050 -d 500 -actual ./screenshots/pixel_4_api_30_play_store/actual/actual-task-manager-close-all.png -cmd "tap -x 200 -y 1030"
 
 echo
 echo Shutdown emulator
 echo '#################'
 echo
 
-execute_while -mode not-found -template ./screenshots/template-power-menu.png -x1 450 -y1 250 -x2 620 -y2 430 -d 1000 -actual ./screenshots/actual/actual-power-menu.png -cmd "press_power_button_long"
-execute_while -mode found -template ./screenshots/template-power-menu.png -x1 450 -y1 250 -x2 620 -y2 430 -d 1000 -actual ./screenshots/actual/actual-power-button-tapped.png -cmd "tap -x 540 -y 315"
+execute_while -mode not-found -template ./screenshots/pixel_4_api_30_play_store/template-power-menu.png -x1 450 -y1 250 -x2 620 -y2 430 -d 1000 -actual ./screenshots/pixel_4_api_30_play_store/actual/actual-power-menu.png -cmd "press_power_button_long"
+execute_while -mode found -template ./screenshots/pixel_4_api_30_play_store/template-power-menu.png -x1 450 -y1 250 -x2 620 -y2 430 -d 1000 -actual ./screenshots/pixel_4_api_30_play_store/actual/actual-power-button-tapped.png -cmd "tap -x 540 -y 315"

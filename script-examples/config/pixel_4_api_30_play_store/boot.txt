@@ -2,7 +2,7 @@
 # EXECUTE ON PIXEL 4 / ANDROID API LEVEL 30 WITH PLAY STORE EMULATOR
 #####
 
-block_while -mode not-found -template ./screenshots/template-emulator-booted.png -x1 831 -y1 2197 -x2 866 -y2 2231 -d 500 -actual ./screenshots/actual/actual-emulator-booted.png
+block_while -mode not-found -template ./screenshots/pixel_4_api_30_play_store/template-emulator-booted.png -x1 831 -y1 2197 -x2 866 -y2 2231 -d 500 -actual ./screenshots/pixel_4_api_30_play_store/actual/actual-emulator-booted.png
 
 echo
 echo Open NSA
@@ -10,9 +10,9 @@ echo '########'
 echo
 
 wait_s 1
-search_and_tap_center -template ./screenshots/template-emulator-booted.png -region_x1 0 -region_y1 0 -region_x2 1079 -region_y2 2279 -comparison_x1 71 -comparison_y1 538 -comparison_x2 205 -comparison_y2 672 -d 500 -actual ./screenshots/actual/actual-nsa-searched.png -cmd "swipe -x1 1000 -y1 1140 -x2 200 -y2 1140 -d 200" -co 10 -s 5
-block_while -mode not-found -template ./screenshots/template-nsa-shown.png -x1 41 -y1 232 -x2 549 -y2 284 -d 300 -actual ./screenshots/actual/actual-nsa-shown.png
-block_while -mode found -template ./screenshots/template-nsa-shown.png -x1 44 -y1 917 -x2 527 -y2 1400 -d 300 -actual ./screenshots/actual/actual-nsa-loaded.png
+search_and_tap_center -template ./screenshots/pixel_4_api_30_play_store/template-emulator-booted.png -region_x1 0 -region_y1 0 -region_x2 1079 -region_y2 2279 -comparison_x1 71 -comparison_y1 538 -comparison_x2 205 -comparison_y2 672 -d 500 -actual ./screenshots/pixel_4_api_30_play_store/actual/actual-nsa-searched.png -cmd "swipe -x1 1000 -y1 1140 -x2 200 -y2 1140 -d 200" -co 10 -s 5
+block_while -mode not-found -template ./screenshots/pixel_4_api_30_play_store/template-nsa-shown.png -x1 41 -y1 232 -x2 549 -y2 284 -d 300 -actual ./screenshots/pixel_4_api_30_play_store/actual/actual-nsa-shown.png
+block_while -mode found -template ./screenshots/pixel_4_api_30_play_store/template-nsa-shown.png -x1 44 -y1 917 -x2 527 -y2 1400 -d 300 -actual ./screenshots/pixel_4_api_30_play_store/actual/actual-nsa-loaded.png
 
 echo
 echo Open SplatNet3
@@ -20,5 +20,5 @@ echo '###################'
 echo
 
 wait_s 1
-search_and_tap_center -template ./screenshots/template-nsa-opened.png -region_x1 0 -region_y1 897 -region_x2 1079 -region_y2 1380 -comparison_x1 44 -comparison_y1 897 -comparison_x2 527 -comparison_y2 1380 -d 500 -actual ./screenshots/actual/actual-nsa-scrolled.png -cmd "swipe -x1 1000 -y1 1140 -x2 600 -y2 1140 -d 1000"
-block_while -mode not-found -template ./screenshots/template-splatnet3-opened.png -x1 25 -y1 100 -x2 250 -y2 250 -d 300 -actual ./screenshots/actual/actual-splatnet3-opened.png
+search_and_tap_center -template ./screenshots/pixel_4_api_30_play_store/template-nsa-opened.png -region_x1 0 -region_y1 897 -region_x2 1079 -region_y2 1380 -comparison_x1 44 -comparison_y1 897 -comparison_x2 527 -comparison_y2 1380 -d 500 -actual ./screenshots/pixel_4_api_30_play_store/actual/actual-nsa-scrolled.png -cmd "swipe -x1 1000 -y1 1140 -x2 600 -y2 1140 -d 1000"
+block_while -mode not-found -template ./screenshots/pixel_4_api_30_play_store/template-splatnet3-opened.png -x1 25 -y1 100 -x2 250 -y2 250 -d 300 -actual ./screenshots/pixel_4_api_30_play_store/actual/actual-splatnet3-opened.png
