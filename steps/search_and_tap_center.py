@@ -8,11 +8,11 @@ from PIL import Image
 import imagehash
 
 from data.app_config import AppConfig
-from steps.execute_command_as_long_as_region_matches import ExecuteCommandAsLongAsRegionMatches
+from steps.execute_while import ExecuteWhile
 from utils import script_utils
 
 
-class SearchRegionAndTapCenter:
+class SearchAndTapCenter:
 	def __init__(self, command_name, app_config: AppConfig, all_steps):
 		self.command_name = command_name
 		self.app_config = app_config
@@ -20,7 +20,7 @@ class SearchRegionAndTapCenter:
 
 		self.execute_command_step = None
 		for step_key in self.all_steps:
-			if isinstance(self.all_steps[step_key], ExecuteCommandAsLongAsRegionMatches):
+			if isinstance(self.all_steps[step_key], ExecuteWhile):
 				self.execute_command_step = self.all_steps[step_key]
 				break
 
@@ -33,7 +33,9 @@ class SearchRegionAndTapCenter:
 											  description='Searches a given region on the emulator screen to contain a (smaller) region from the template screenshot provided. If it finds it, it will tap the center of it. Otherwise it will execute the provided command and search again',
 											  conflict_handler='resolve')
 		self.parser.add_argument('-h', '--help', required=False, help=argparse.SUPPRESS)
-		self.parser.add_argument('-f', '--filename', required=True, help='The file path of the template screenshot which will be used for the comparison')
+		self.parser.add_argument('-template', '--template', required=True, help='The file path of the template screenshot which will be used for the comparison')
+		self.parser.add_argument('-actual', '--actual', required=False, default='./screenshots/screenshot.png',
+								 help='The file path where the actual screenshot of the emulator should be stored. Default: "./screenshots/screenshot.png"')
 		self.parser.add_argument('-region_x1', '--region_x1', required=True, help='The X coordinate of the top left corner of the region to search through')
 		self.parser.add_argument('-region_y1', '--region_y1', required=True, help='The Y coordinate of the top left corner of the region to search through')
 		self.parser.add_argument('-region_x2', '--region_x2', required=True, help='The X coordinate of the bottom right corner of the region to search through')
@@ -46,15 +48,13 @@ class SearchRegionAndTapCenter:
 								 help='The X coordinate of the bottom right corner of the region from the template screenshot which should be searched for')
 		self.parser.add_argument('-comparison_y2', '--comparison_y2', required=True,
 								 help='The Y coordinate of the bottom right corner of the region from the template screenshot which should be searched for')
-		self.parser.add_argument('-c', '--command', required=True,
+		self.parser.add_argument('-cmd', '--command', required=True,
 								 help='The command which should be executed if the requested search can not be found. Several commands can be provided by splitting them with a semicolon `;`')
 		self.parser.add_argument('-d', '--duration', required=False, default=500,
 								 help='The frequency of how often this command should check whether the regions match. Default: 500 ms')
-		self.parser.add_argument('-asp', '--actual_screenshot_path', required=False, default='./screenshots/screenshot.png',
-								 help='The file path where the actual screenshot of the emulator should be stored. Default: "./screenshots/screenshot.png"')
 		self.parser.add_argument('-co', '--cutoff', required=False, default=5,
 								 help='The cutoff for the comparison. This value decides how similar the regions must be to be considered equal. Lower values mean stricter comparison, higher values will match less similar screenshots. Default: 5')
-		self.parser.add_argument('-s', '--step', required=False, default=1,
+		self.parser.add_argument('-step', '--step', required=False, default=1,
 								 help='Decides how many pixels the region should be moved. Higher values are faster but a smaller part of the region is being screened and the target region could be missed for that reason. Default: 1 => search every possible position in the provided screen region')
 
 		self.description = self.parser.format_help()
@@ -65,25 +65,25 @@ class SearchRegionAndTapCenter:
 		parsed_args = self.parser.parse_args(only_args)
 		self.parsed_args = parsed_args
 
-		os.makedirs(os.path.dirname(parsed_args.filename), exist_ok=True)
-		os.makedirs(os.path.dirname(parsed_args.actual_screenshot_path), exist_ok=True)
+		os.makedirs(os.path.dirname(parsed_args.template), exist_ok=True)
+		os.makedirs(os.path.dirname(parsed_args.actual), exist_ok=True)
 
 		start = time.time()
 
 		try:
-			base_image = Image.open(parsed_args.filename)
+			base_image = Image.open(parsed_args.template)
 			base_cropped = base_image.crop(
 				(int(parsed_args.comparison_x1), int(parsed_args.comparison_y1), int(parsed_args.comparison_x2), int(parsed_args.comparison_y2)))
 
 			while True:
 				print(
-					f'Searching for image from base screenshot "{parsed_args.filename}" in screenshot "{parsed_args.actual_screenshot_path}" with cutoff {parsed_args.cutoff}.')
-				subprocess.run(f'{self.app_config.emulator_config.adb_path} exec-out screencap -p > {parsed_args.actual_screenshot_path}',
+					f'Searching for image from base screenshot "{parsed_args.template}" in screenshot "{parsed_args.actual}" with cutoff {parsed_args.cutoff}.')
+				subprocess.run(f'{self.app_config.emulator_config.adb_path} exec-out screencap -p > {parsed_args.actual}',
 							   shell=True,
 							   stdout=subprocess.PIPE,
 							   stderr=subprocess.PIPE)
 
-				compare_image = Image.open(parsed_args.actual_screenshot_path)
+				compare_image = Image.open(parsed_args.actual)
 
 				result = self.compare(
 					base_cropped,
@@ -115,11 +115,11 @@ class SearchRegionAndTapCenter:
 			print(f'Found at: ({x1}, {y2}), tapping position ({tap_x}, {tap_y}) until something happens')
 
 			script_utils.execute(
-				f'{self.execute_command_step.command_name} -f {parsed_args.filename} -x1 {x1} -y1 {y1} -x2 {x2} -y2 {y2} -d 500 -asp {parsed_args.actual_screenshot_path}_tapped.png -c "tap -x {tap_x} -y {tap_y}"',
+				f'{self.execute_command_step.command_name} -mode found -template {parsed_args.template} -actual {parsed_args.actual}_tapped.png -x1 {x1} -y1 {y1} -x2 {x2} -y2 {y2} -d 500 -cmd "tap -x {tap_x} -y {tap_y}"',
 				self.all_steps)
 
 			end = time.time()
-			print(f'Finished search_region_and_tap_center after {(end - start):0.1f} seconds.')
+			print(f'Finished {self.command_name} after {(end - start):0.1f} seconds.')
 		except Exception as e:
 			print(f'ERROR occured, stopping.')
 			print(e)
@@ -152,8 +152,8 @@ class SearchRegionAndTapCenter:
 
 			if self.app_config.debug and hash_diff < cutoff:
 				print(f'hash #1: {hash0}, hash #2: {hash1}, difference: {hash1 - hash0}')
-				base_cropped.save(f'{self.parsed_args.filename}-base-cropped.png')
-				compare_image_cropped.save(f'{self.parsed_args.actual_screenshot_path}-image-cropped.png')
+				base_cropped.save(f'{self.parsed_args.template}-base-cropped.png')
+				compare_image_cropped.save(f'{self.parsed_args.actual}-image-cropped.png')
 
 		except:
 			hash_diff = 1000

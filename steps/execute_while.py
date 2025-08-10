@@ -11,7 +11,7 @@ from data.app_config import AppConfig
 from utils import script_utils
 
 
-class ExecuteCommandAsLongAsRegionMatches:
+class ExecuteWhile:
 	def __init__(self, command_name, app_config: AppConfig, all_steps):
 		self.command_name = command_name
 		self.app_config = app_config
@@ -21,17 +21,19 @@ class ExecuteCommandAsLongAsRegionMatches:
 											  description='Repeatedly executes a given command as long as a specific region on the screen (between points (X1, Y1) to (X2, Y2)) looks similar to the same region on a given template',
 											  conflict_handler='resolve')
 		self.parser.add_argument('-h', '--help', required=False, help=argparse.SUPPRESS)
-		self.parser.add_argument('-f', '--filename', required=True, help='The file path of the template screenshot which will be used for the comparison')
+		self.parser.add_argument('-mode', '--mode', required=True, choices=['found', 'not-found'],
+								 help='Decides whether this step should execute the command as long as the region can be found or not, `found` = execute as long as found, `not-found` = execute until found')
+		self.parser.add_argument('-template', '--template', required=True, help='The file path of the template screenshot which will be used for the comparison')
+		self.parser.add_argument('-actual', '--actual', required=False, default='./screenshots/screenshot.png',
+								 help='The file path where the actual screenshot of the emulator should be stored. Default: "./screenshots/screenshot.png"')
 		self.parser.add_argument('-x1', '--x1', required=True, help='The X coordinate of the top left corner of the region to compare')
 		self.parser.add_argument('-y1', '--y1', required=True, help='The Y coordinate of the top left corner of the region to compare')
 		self.parser.add_argument('-x2', '--x2', required=True, help='The X coordinate of the bottom right corner of the region to compare')
 		self.parser.add_argument('-y2', '--y2', required=True, help='The Y coordinate of the bottom right corner of the region to compare')
-		self.parser.add_argument('-c', '--command', required=True,
+		self.parser.add_argument('-cmd', '--command', required=True,
 								 help='The command which should be executed. Several commands can be provided by splitting them with a semicolon `;`')
 		self.parser.add_argument('-d', '--duration', required=False, default=500,
 								 help='The frequency of how often this command should check whether the regions match. Default: 500 ms')
-		self.parser.add_argument('-asp', '--actual_screenshot_path', required=False, default='./screenshots/screenshot.png',
-								 help='The file path where the actual screenshot of the emulator should be stored. Default: "./screenshots/screenshot.png"')
 		self.parser.add_argument('-co', '--cutoff', required=False, default=5,
 								 help='The cutoff for the comparison. This value decides how similar the regions must be to be considered equal. Lower values mean stricter comparison, higher values will match less similar screenshots. Default: 5')
 
@@ -42,34 +44,37 @@ class ExecuteCommandAsLongAsRegionMatches:
 		only_args = shlex.split(args)[1:]
 		parsed_args = self.parser.parse_args(only_args)
 
-		os.makedirs(os.path.dirname(parsed_args.filename), exist_ok=True)
-		os.makedirs(os.path.dirname(parsed_args.actual_screenshot_path), exist_ok=True)
+		os.makedirs(os.path.dirname(parsed_args.template), exist_ok=True)
+		os.makedirs(os.path.dirname(parsed_args.actual), exist_ok=True)
 
 		start = time.time()
 
-		found = True
+		expect_found = parsed_args.mode == 'found'
+		print(f'Repeatedly executing command as long as region can {'' if expect_found else 'not '}be found')
 
-		while found:
+		fulfilled = False
+
+		while not fulfilled:
 			script_utils.execute(parsed_args.command, self.all_steps)
 
 			time.sleep(int(parsed_args.duration) / 1000.0)
 
-			print(f'Comparing screenshot "{parsed_args.actual_screenshot_path}" to base screenshot "{parsed_args.filename}" with cutoff {parsed_args.cutoff}.')
-			subprocess.run(f'{self.app_config.emulator_config.adb_path} exec-out screencap -p > {parsed_args.actual_screenshot_path}',
+			print(f'Comparing screenshot "{parsed_args.actual}" to base screenshot "{parsed_args.template}" with cutoff {parsed_args.cutoff}.')
+			subprocess.run(f'{self.app_config.emulator_config.adb_path} exec-out screencap -p > {parsed_args.actual}',
 						   shell=True,
 						   stdout=subprocess.PIPE,
 						   stderr=subprocess.PIPE)
 
-			found = self.compare(parsed_args.filename, parsed_args.actual_screenshot_path, parsed_args.x1, parsed_args.y1, parsed_args.x2, parsed_args.y2,
-								 parsed_args.cutoff, self.app_config.debug)
+			fulfilled = self.compare(parsed_args.template, parsed_args.actual, parsed_args.x1, parsed_args.y1, parsed_args.x2, parsed_args.y2,
+									 parsed_args.cutoff, expect_found, self.app_config.debug)
 
 		end = time.time()
 		print(f'Not found anymore after {(end - start):0.1f} seconds.')
 
-	def compare(self, filename, actual_screenshot_path, x1, y1, x2, y2, cutoff, debug):
+	def compare(self, template, actual, x1, y1, x2, y2, cutoff, expect_found, debug):
 		try:
-			base_image = Image.open(filename)
-			compare_image = Image.open(actual_screenshot_path)
+			base_image = Image.open(template)
+			compare_image = Image.open(actual)
 
 			base_cropped = base_image.crop((int(x1), int(y1), int(x2), int(y2)))
 			compare_image_cropped = compare_image.crop((int(x1), int(y1), int(x2), int(y2)))
@@ -79,11 +84,14 @@ class ExecuteCommandAsLongAsRegionMatches:
 
 			if self.app_config.debug:
 				print(f'hash #1: {hash0}, hash #2: {hash1}, difference: {hash1 - hash0}')
-				base_cropped.save(f'{filename}-cropped.png')
-				compare_image_cropped.save(f'{actual_screenshot_path}-cropped.png')
+				base_cropped.save(f'{template}-cropped.png')
+				compare_image_cropped.save(f'{actual}-cropped.png')
 
 			hash_diff = hash0 - hash1
 		except:
 			hash_diff = 1000
 
-		return hash_diff < int(cutoff)
+		if expect_found:
+			return hash_diff > int(cutoff)
+		else:
+			return hash_diff < int(cutoff)

@@ -5,7 +5,7 @@ import time
 from data.app_config import AppConfig
 
 
-class LongPressPowerButton:
+class PressPowerButtonLong:
 	def __init__(self, command_name, app_config: AppConfig):
 		self.command_name = command_name
 		self.app_config = app_config
