@@ -7,10 +7,10 @@ class S3sConfig:
 	def __init__(self,
 				 gtoken='{GTOKEN}',
 				 bullettoken='{BULLETTOKEN}',
-				 session_token='{SESSIONTOKEN}',
+				 session_token='skip',
 				 api_key='INSERT_STAT_INK_API_KEY_HERE',
 				 acc_loc='en-US|US',
-				 f_gen='https://api.imink.app/f'):
+				 f_gen='DUMMY_VALUE'):
 		self.gtoken = gtoken
 		self.bullettoken = bullettoken
 		self.session_token = session_token
