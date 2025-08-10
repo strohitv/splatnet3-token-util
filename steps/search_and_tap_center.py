@@ -10,6 +10,7 @@ import imagehash
 from data.app_config import AppConfig
 from steps.execute_while import ExecuteWhile
 from utils import script_utils
+from utils.step_doc_creator import get_arg_formatter
 
 
 class SearchAndTapCenter:
@@ -31,6 +32,7 @@ class SearchAndTapCenter:
 
 		self.parser = argparse.ArgumentParser(prog=self.command_name,
 											  description='Searches a given region on the emulator screen to contain a (smaller) region from the template screenshot provided. If it finds it, it will tap the center of it. Otherwise it will execute the provided command and search again',
+											  formatter_class=get_arg_formatter(),
 											  conflict_handler='resolve')
 		self.parser.add_argument('-h', '--help', required=False, help=argparse.SUPPRESS)
 		self.parser.add_argument('-template', '--template', required=True, help='The file path of the template screenshot which will be used for the comparison')

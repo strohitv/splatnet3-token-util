@@ -1,6 +1,7 @@
 import argparse
 
 from data.app_config import AppConfig
+from utils.step_doc_creator import get_arg_formatter
 
 
 class Echo:
@@ -10,6 +11,7 @@ class Echo:
 
 		self.parser = argparse.ArgumentParser(prog=self.command_name,
 											  description='Prints a given text to the console',
+											  formatter_class=get_arg_formatter(),
 											  conflict_handler='resolve')
 		self.parser.add_argument('-h', '--help', required=False, help=argparse.SUPPRESS)
 		self.parser.add_argument('TEXT', help='The text to be printed to console')

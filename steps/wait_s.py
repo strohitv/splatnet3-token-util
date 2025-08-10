@@ -3,6 +3,7 @@ import shlex
 import time
 
 from data.app_config import AppConfig
+from utils.step_doc_creator import get_arg_formatter
 
 
 class WaitS:
@@ -11,8 +12,9 @@ class WaitS:
 		self.app_config = app_config
 
 		self.parser = argparse.ArgumentParser(prog=self.command_name,
-									 description='Waits for the given amount of seconds',
-									 conflict_handler='resolve')
+											  description='Waits for the given amount of seconds',
+											  formatter_class=get_arg_formatter(),
+											  conflict_handler='resolve')
 		self.parser.add_argument('-h', '--help', required=False, help=argparse.SUPPRESS)
 		self.parser.add_argument('seconds', default=5, help='The amount of seconds to wait')
 

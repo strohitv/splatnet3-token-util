@@ -3,6 +3,7 @@ import subprocess
 import time
 
 from data.app_config import AppConfig
+from utils.step_doc_creator import get_arg_formatter
 
 
 class PressPowerButtonLong:
@@ -12,6 +13,7 @@ class PressPowerButtonLong:
 
 		self.parser = argparse.ArgumentParser(prog=self.command_name,
 											  description='Presses the power button for a long time',
+											  formatter_class=get_arg_formatter(),
 											  conflict_handler='resolve')
 		self.parser.add_argument('-h', '--help', required=False, help=argparse.SUPPRESS)
 

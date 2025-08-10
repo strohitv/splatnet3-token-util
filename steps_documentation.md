@@ -10,24 +10,28 @@ This command blocks the execution of the script until a specific region of the e
 
 ### Usage:
 ```
-usage: block_while -mode {found,not-found} -template TEMPLATE [-actual ACTUAL] -x1 X1 -y1 Y1 -x2 X2 -y2 Y2 [-d DURATION] [-co CUTOFF]
+usage: block_while -mode {found,not-found} -template TEMPLATE [-actual ACTUAL] -x1 X1 -y1 Y1 -x2 X2 -y2 Y2
+                   [-d DURATION] [-co CUTOFF]
 
-Blocks the execution of the script until a specific region on the screen (between points (X1, Y1) to (X2, Y2)) looks similar to the same region on a given template
+Blocks the execution of the script until a specific region on the screen (between points (X1, Y1) to (X2, Y2))
+looks similar to the same region on a given template
 
 options:
-  -mode, --mode {found,not-found}
-                        Decides whether this step should block as long as the region can be found or not, `found` = block as long as found, `not-found` = block until found
-  -template, --template TEMPLATE
-                        The file path of the template screenshot which will be used for the comparison
-  -actual, --actual ACTUAL
-                        The file path where the actual screenshot of the emulator should be stored. Default: "./screenshots/screenshot.png"
-  -x1, --x1 X1          The X coordinate of the top left corner of the region to compare
-  -y1, --y1 Y1          The Y coordinate of the top left corner of the region to compare
-  -x2, --x2 X2          The X coordinate of the bottom right corner of the region to compare
-  -y2, --y2 Y2          The Y coordinate of the bottom right corner of the region to compare
-  -d, --duration DURATION
-                        The frequency of how often this command should check whether the regions match. Default: 1000 ms
-  -co, --cutoff CUTOFF  The cutoff for the comparison. This value decides how similar the regions must be to be considered equal. Lower values mean stricter comparison, higher values will match less similar screenshots. Default: 5
+  -mode, --mode {found,not-found}  Decides whether this step should block as long as the region can be found
+                                   or not, `found` = block as long as found, `not-found` = block until found
+  -template, --template TEMPLATE   The file path of the template screenshot which will be used for the
+                                   comparison
+  -actual, --actual ACTUAL         The file path where the actual screenshot of the emulator should be stored.
+                                   Default: "./screenshots/screenshot.png"
+  -x1, --x1 X1                     The X coordinate of the top left corner of the region to compare
+  -y1, --y1 Y1                     The Y coordinate of the top left corner of the region to compare
+  -x2, --x2 X2                     The X coordinate of the bottom right corner of the region to compare
+  -y2, --y2 Y2                     The Y coordinate of the bottom right corner of the region to compare
+  -d, --duration DURATION          The frequency of how often this command should check whether the regions
+                                   match. Default: 1000 ms
+  -co, --cutoff CUTOFF             The cutoff for the comparison. This value decides how similar the regions
+                                   must be to be considered equal. Lower values mean stricter comparison,
+                                   higher values will match less similar screenshots. Default: 5
 
 ```
 
@@ -50,26 +54,31 @@ This command repeatedly executes a given command as long as a specific region of
 
 ### Usage:
 ```
-usage: execute_while -mode {found,not-found} -template TEMPLATE [-actual ACTUAL] -x1 X1 -y1 Y1 -x2 X2 -y2 Y2 -cmd COMMAND [-d DURATION] [-co CUTOFF]
+usage: execute_while -mode {found,not-found} -template TEMPLATE [-actual ACTUAL] -x1 X1 -y1 Y1 -x2 X2 -y2 Y2
+                     -cmd COMMAND [-d DURATION] [-co CUTOFF]
 
-Repeatedly executes a given command as long as a specific region on the screen (between points (X1, Y1) to (X2, Y2)) looks similar to the same region on a given template
+Repeatedly executes a given command as long as a specific region on the screen (between points (X1, Y1) to
+(X2, Y2)) looks similar to the same region on a given template
 
 options:
-  -mode, --mode {found,not-found}
-                        Decides whether this step should execute the command as long as the region can be found or not, `found` = execute as long as found, `not-found` = execute until found
-  -template, --template TEMPLATE
-                        The file path of the template screenshot which will be used for the comparison
-  -actual, --actual ACTUAL
-                        The file path where the actual screenshot of the emulator should be stored. Default: "./screenshots/screenshot.png"
-  -x1, --x1 X1          The X coordinate of the top left corner of the region to compare
-  -y1, --y1 Y1          The Y coordinate of the top left corner of the region to compare
-  -x2, --x2 X2          The X coordinate of the bottom right corner of the region to compare
-  -y2, --y2 Y2          The Y coordinate of the bottom right corner of the region to compare
-  -cmd, --command COMMAND
-                        The command which should be executed. Several commands can be provided by splitting them with a semicolon `;`
-  -d, --duration DURATION
-                        The frequency of how often this command should check whether the regions match. Default: 500 ms
-  -co, --cutoff CUTOFF  The cutoff for the comparison. This value decides how similar the regions must be to be considered equal. Lower values mean stricter comparison, higher values will match less similar screenshots. Default: 5
+  -mode, --mode {found,not-found}  Decides whether this step should execute the command as long as the region
+                                   can be found or not, `found` = execute as long as found, `not-found` =
+                                   execute until found
+  -template, --template TEMPLATE   The file path of the template screenshot which will be used for the
+                                   comparison
+  -actual, --actual ACTUAL         The file path where the actual screenshot of the emulator should be stored.
+                                   Default: "./screenshots/screenshot.png"
+  -x1, --x1 X1                     The X coordinate of the top left corner of the region to compare
+  -y1, --y1 Y1                     The Y coordinate of the top left corner of the region to compare
+  -x2, --x2 X2                     The X coordinate of the bottom right corner of the region to compare
+  -y2, --y2 Y2                     The Y coordinate of the bottom right corner of the region to compare
+  -cmd, --command COMMAND          The command which should be executed. Several commands can be provided by
+                                   splitting them with a semicolon `;`
+  -d, --duration DURATION          The frequency of how often this command should check whether the regions
+                                   match. Default: 500 ms
+  -co, --cutoff CUTOFF             The cutoff for the comparison. This value decides how similar the regions
+                                   must be to be considered equal. Lower values mean stricter comparison,
+                                   higher values will match less similar screenshots. Default: 5
 
 ```
 
@@ -91,39 +100,50 @@ Example: the prime example where this step is being used is searching for the Sp
 
 ### Usage:
 ```
-usage: search_and_tap_center -template TEMPLATE [-actual ACTUAL] -region_x1 REGION_X1 -region_y1 REGION_Y1 -region_x2 REGION_X2 -region_y2 REGION_Y2 -comparison_x1 COMPARISON_X1 -comparison_y1 COMPARISON_Y1 -comparison_x2 COMPARISON_X2
+usage: search_and_tap_center -template TEMPLATE [-actual ACTUAL] -region_x1 REGION_X1 -region_y1 REGION_Y1
+                             -region_x2 REGION_X2 -region_y2 REGION_Y2 -comparison_x1 COMPARISON_X1
+                             -comparison_y1 COMPARISON_Y1 -comparison_x2 COMPARISON_X2
                              -comparison_y2 COMPARISON_Y2 -cmd COMMAND [-d DURATION] [-co CUTOFF] [-step STEP]
 
-Searches a given region on the emulator screen to contain a (smaller) region from the template screenshot provided. If it finds it, it will tap the center of it. Otherwise it will execute the provided command and search again
+Searches a given region on the emulator screen to contain a (smaller) region from the template screenshot
+provided. If it finds it, it will tap the center of it. Otherwise it will execute the provided command and
+search again
 
 options:
-  -template, --template TEMPLATE
-                        The file path of the template screenshot which will be used for the comparison
-  -actual, --actual ACTUAL
-                        The file path where the actual screenshot of the emulator should be stored. Default: "./screenshots/screenshot.png"
-  -region_x1, --region_x1 REGION_X1
-                        The X coordinate of the top left corner of the region to search through
-  -region_y1, --region_y1 REGION_Y1
-                        The Y coordinate of the top left corner of the region to search through
-  -region_x2, --region_x2 REGION_X2
-                        The X coordinate of the bottom right corner of the region to search through
-  -region_y2, --region_y2 REGION_Y2
-                        The Y coordinate of the bottom right corner of the region to search through
-  -comparison_x1, --comparison_x1 COMPARISON_X1
-                        The X coordinate of the top left corner of the region from the template screenshot which should be searched for
-  -comparison_y1, --comparison_y1 COMPARISON_Y1
-                        The Y coordinate of the top left corner of the region from the template screenshot which should be searched for
-  -comparison_x2, --comparison_x2 COMPARISON_X2
-                        The X coordinate of the bottom right corner of the region from the template screenshot which should be searched for
-  -comparison_y2, --comparison_y2 COMPARISON_Y2
-                        The Y coordinate of the bottom right corner of the region from the template screenshot which should be searched for
-  -cmd, --command COMMAND
-                        The command which should be executed if the requested search can not be found. Several commands can be provided by splitting them with a semicolon `;`
-  -d, --duration DURATION
-                        The frequency of how often this command should check whether the regions match. Default: 500 ms
-  -co, --cutoff CUTOFF  The cutoff for the comparison. This value decides how similar the regions must be to be considered equal. Lower values mean stricter comparison, higher values will match less similar screenshots. Default: 5
-  -step, --step STEP    Decides how many pixels the region should be moved. Higher values are faster but a smaller part of the region is being screened and the target region could be missed for that reason. Default: 1 => search every possible
-                        position in the provided screen region
+  -template, --template TEMPLATE                 The file path of the template screenshot which will be used
+                                                 for the comparison
+  -actual, --actual ACTUAL                       The file path where the actual screenshot of the emulator
+                                                 should be stored. Default: "./screenshots/screenshot.png"
+  -region_x1, --region_x1 REGION_X1              The X coordinate of the top left corner of the region to
+                                                 search through
+  -region_y1, --region_y1 REGION_Y1              The Y coordinate of the top left corner of the region to
+                                                 search through
+  -region_x2, --region_x2 REGION_X2              The X coordinate of the bottom right corner of the region to
+                                                 search through
+  -region_y2, --region_y2 REGION_Y2              The Y coordinate of the bottom right corner of the region to
+                                                 search through
+  -comparison_x1, --comparison_x1 COMPARISON_X1  The X coordinate of the top left corner of the region from
+                                                 the template screenshot which should be searched for
+  -comparison_y1, --comparison_y1 COMPARISON_Y1  The Y coordinate of the top left corner of the region from
+                                                 the template screenshot which should be searched for
+  -comparison_x2, --comparison_x2 COMPARISON_X2  The X coordinate of the bottom right corner of the region
+                                                 from the template screenshot which should be searched for
+  -comparison_y2, --comparison_y2 COMPARISON_Y2  The Y coordinate of the bottom right corner of the region
+                                                 from the template screenshot which should be searched for
+  -cmd, --command COMMAND                        The command which should be executed if the requested search
+                                                 can not be found. Several commands can be provided by
+                                                 splitting them with a semicolon `;`
+  -d, --duration DURATION                        The frequency of how often this command should check whether
+                                                 the regions match. Default: 500 ms
+  -co, --cutoff CUTOFF                           The cutoff for the comparison. This value decides how similar
+                                                 the regions must be to be considered equal. Lower values mean
+                                                 stricter comparison, higher values will match less similar
+                                                 screenshots. Default: 5
+  -step, --step STEP                             Decides how many pixels the region should be moved. Higher
+                                                 values are faster but a smaller part of the region is being
+                                                 screened and the target region could be missed for that
+                                                 reason. Default: 1 => search every possible position in the
+                                                 provided screen region
 
 ```
 
@@ -134,15 +154,15 @@ This command will swipe from one position to another over the span of a given du
 ```
 usage: swipe -x1 X1 -y1 Y1 -x2 X2 -y2 Y2 [-d DURATION]
 
-Swipes from a given starting point (X1, Y1) to a given target point (X2, Y2) on the screen over the span of a given duration
+Swipes from a given starting point (X1, Y1) to a given target point (X2, Y2) on the screen over the span of a
+given duration
 
 options:
-  -x1, --x1 X1          The X coordinate of the starting position of the swipe
-  -y1, --y1 Y1          The Y coordinate of the starting position of the swipe
-  -x2, --x2 X2          The X coordinate of the target position of the swipe
-  -y2, --y2 Y2          The Y coordinate of the target position of the swipe
-  -d, --duration DURATION
-                        The duration how long the swipe should take. Default: 500 ms
+  -x1, --x1 X1             The X coordinate of the starting position of the swipe
+  -y1, --y1 Y1             The Y coordinate of the starting position of the swipe
+  -x2, --x2 X2             The X coordinate of the target position of the swipe
+  -y2, --y2 Y2             The Y coordinate of the target position of the swipe
+  -d, --duration DURATION  The duration how long the swipe should take. Default: 500 ms
 
 ```
 

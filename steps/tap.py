@@ -3,6 +3,7 @@ import subprocess
 import shlex
 
 from data.app_config import AppConfig
+from utils.step_doc_creator import get_arg_formatter
 
 
 class Tap:
@@ -11,8 +12,9 @@ class Tap:
 		self.app_config = app_config
 
 		self.parser = argparse.ArgumentParser(prog=self.command_name,
-									 description='Taps a given position (X, Y) on the screen once',
-									 conflict_handler='resolve')
+											  description='Taps a given position (X, Y) on the screen once',
+											  formatter_class=get_arg_formatter(),
+											  conflict_handler='resolve')
 		self.parser.add_argument('-h', '--help', required=False, help=argparse.SUPPRESS)
 		self.parser.add_argument('-x', '--x', required=True, help='The X coordinate of the position which should be tapped')
 		self.parser.add_argument('-y', '--y', required=True, help='The Y coordinate of the position which should be tapped')

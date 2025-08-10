@@ -11,8 +11,10 @@ from steps.wait_s import WaitS
 
 
 def get_steps(app_config: AppConfig):
-	steps = {'block_while': BlockWhile('block_while', app_config), 'echo': Echo('echo', app_config)}
+	steps = {}
 
+	steps['block_while'] = BlockWhile('block_while', app_config)
+	steps['echo'] = Echo('echo', app_config)
 	steps['execute_while'] = ExecuteWhile('execute_while', app_config, steps)
 	steps['press_power_button_long'] = PressPowerButtonLong('press_power_button_long', app_config)
 	steps['search_and_tap_center'] = SearchAndTapCenter('search_and_tap_center', app_config, steps)

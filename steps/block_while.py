@@ -8,6 +8,7 @@ from PIL import Image
 import imagehash
 
 from data.app_config import AppConfig
+from utils.step_doc_creator import get_arg_formatter
 
 
 class BlockWhile:
@@ -17,6 +18,7 @@ class BlockWhile:
 
 		self.parser = argparse.ArgumentParser(prog=self.command_name,
 											  description='Blocks the execution of the script until a specific region on the screen (between points (X1, Y1) to (X2, Y2)) looks similar to the same region on a given template',
+											  formatter_class=get_arg_formatter(),
 											  conflict_handler='resolve')
 		self.parser.add_argument('-h', '--help', required=False, help=argparse.SUPPRESS)
 		self.parser.add_argument('-mode', '--mode', required=True, choices=['found', 'not-found'],
