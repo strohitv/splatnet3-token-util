@@ -124,8 +124,8 @@ First, open the `./config/template.txt` file. Here, you need to set either one o
 1. Set your language and region properly using the `acc_loc` setting. The format is `language|region`, for example `en-US|US` is american english and someone living in the US. Similar, `de-DE|AT` would be "German German" and someone living in Austria.
 
 **The following two steps are OPTIONAL for people who only use Lean's Gear Seed Checker**:
-2. Enter your stat.ink api key into the `api_key` field. You can get the api key from your [stat.ink profile page](https://stat.ink/profile), it is the field called "API Token".
-3. If you plan to use s3s to upload battles to stat.ink, copy the `template.txt` file into the s3s directory and rename it to `config.txt`. Otherwise it will ask you for settings already contained in the `template.txt` file.
+1. Enter your stat.ink api key into the `api_key` field. You can get the api key from your [stat.ink profile page](https://stat.ink/profile), it is the field called "API Token".
+2. If you plan to use s3s to upload battles to stat.ink, copy the `template.txt` file into the s3s directory and rename it to `config.txt`. Otherwise it will ask you for settings already contained in the `template.txt` file.
 
 The other file which needs to be edited is the `./config_run_s3s.json` file. In this file, one setting must be changed and the others might need to be changed.
 1. Insert the location of the s3s directory into the `s3s_directory` config.
