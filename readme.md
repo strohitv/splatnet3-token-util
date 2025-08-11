@@ -9,7 +9,7 @@ An easy way to set up the script to work with s3s is described in [quickstart_s3
 
 ## Installation
 
-This chapter contains a short summary of what you need to do to install the 
+This chapter contains a short summary of what you need to do to download and install this project locally.
 
 ### Prerequisites
 

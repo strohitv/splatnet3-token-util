@@ -1,6 +1,6 @@
-# s3s quickstart tutorial - instructions on setting up s3s + stu to help with Lean's Seedchecker tool or stat.ink export
+# s3s quickstart tutorial - instructions on how to set up s3s + stu to use Lean's Gear Seed Checker or stat.ink export
 
-This file contains instructions on how to set up [s3s by frozenpandaman](https://github.com/frozenpandaman/s3s) in combination with SplatNet3 Token Util (stu) to either generate a seed file for Lean's Seedchecker or to use it to upload your battles to [stat.ink](https://stat.ink). For this to work, you will need s3s, stu and an Android Emulator set up in a specific way. This emulator will have the Nintendo Switch App installed which will be used to get the tokens necessary to use s3s.
+This file contains instructions on how to set up [s3s by frozenpandaman](https://github.com/frozenpandaman/s3s) in combination with SplatNet3 Token Util (stu) to either generate a seed file for [Lean's Gear Seed Checker](https://leanny.github.io/splat3seedchecker/#/) or to use it to upload your battles to [stat.ink](https://stat.ink). For this to work, you will need s3s, stu and an Android Emulator set up in a specific way. This emulator will have the Nintendo Switch App installed which will be used to get the tokens necessary to use s3s.
 
 The emulator used in this tutorial will be a Pixel 4 with Android API 30 (= Android 11) and Play Store activated. All relevant files will be found in various `pixel_4_api_30_play_store` subfolders throughout the project.
 
@@ -17,7 +17,8 @@ Please ensure you have these applications installed on your computer:
 
 If you are unsure on how to install the software listed here, usually a quick internet search similar to `Windows install Android Studio` will help. Of course, replace `Windows` with your operating system and `Android Studio` with the software you want to install.
 
-**IMPORTANT**: Android Studio does not run on ARM computers, which means very small computers like the Raspberry Pi are **not** supported! It might be possible to run splatnet3-token-util with a custom emulator on ARM computers, but it needs to support ADB and be bootable using a command line. The community would need to find a way to do that, I will not provide support for these kind of scenarios. If you find a way, feel free to open an issue or a Pull Request!
+**IMPORTANT NOTE**: Android Studio does not run on ARM computers, which means very small computers like the Raspberry Pi are currently **not** supported by this project! It might be possible to run splatnet3-token-util with a different emulator on ARM computers as long as this emulator supports ADB and is bootable using the command line. The community would need to find a way to do that, I will not provide support for these kind of scenarios. If you find a way, feel free to open an issue or a Pull Request!  
+Alternatively, you can use an x64 Mini PC. I use a Beelink S12 Pro with Fedora Linux for this project. These computers are slightly more expensive than a Raspberry Pi but work quite well.
 
 ## Clone the projects
 I recommend using a distinct directory on your computer and add both the s3s and stu directories in that folder. If you already have downloaded s3s, you can use this version and don't need to download s3s again. However, this tutorial requires s3s to be at least at version `0.7.0` or newer. If your version of s3s is older, please update it to at least `0.7.0`.
@@ -119,10 +120,10 @@ From the folder `./script-examples/config/pixel_4_api_30_playstore`, copy both `
 ### Configure s3s integration
 There are two files we need to edit to set up the s3s integration:
 
-First, open the `./config/template.txt` file. Here, you need to set either one or two options, depending on if you only use Lean's Seedchecker tool or also stat.ink.
+First, open the `./config/template.txt` file. Here, you need to set either one or two options, depending on if you only use Lean's Gear Seed Checker tool or also stat.ink.
 1. Set your language and region properly using the `acc_loc` setting. The format is `language|region`, for example `en-US|US` is american english and someone living in the US. Similar, `de-DE|AT` would be "German German" and someone living in Austria.
-2. **OPTIONAL for people who only use Lean's Seedchecker**: enter your stat.ink api key into the `api_key` field. You can get the api key from your [stat.ink profile page](https://stat.ink/profile), it is the field called "API Token".
-**IMPORTANT**: if you plan to use s3s to upload battles to stat.ink, copy the `template.txt` file into the s3s directory and rename it to `config.txt`
+2. **OPTIONAL for people who only use Lean's Gear Seed Checker**: enter your stat.ink api key into the `api_key` field. You can get the api key from your [stat.ink profile page](https://stat.ink/profile), it is the field called "API Token".
+3. **OPTIONAL for people who only use Lean's Gear Seed Checker**: if you plan to use s3s to upload battles to stat.ink, copy the `template.txt` file into the s3s directory and rename it to `config.txt`. Otherwise it will ask you for settings already contained in the `template.txt` file.
 
 The other file which needs to be edited is the `./config_run_s3s.json` file. In this file, one setting must be changed and the others might need to be changed.
 1. Insert the location of the s3s directory into the `s3s_directory` config.
@@ -145,7 +146,7 @@ It will boot the emulator and after a short while, you will be in the Android ma
 ### Activate Do Not Disturb
 During token extraction, the AVD will be controlled automatically. This control could be disturbed by notifications popping up. These notifications can be hidden by activating Do Not Disturb.
 
-<img src="./quickstart_images/Emulator_Do_Not_Disturb.png" alt="drawing" width="540"/>
+<img src="./quickstart_images/Emulator_Do_Not_Disturb.png" alt="drawing"  height="570"/>
 
 1. Swipe down to open the control menu for Android.
 2. Click on Do Not Disturb to activate the feature.
@@ -154,7 +155,7 @@ During token extraction, the AVD will be controlled automatically. This control 
 ### Open Play Store and log in with your Google Account
 Please open the Google Play Store by clicking on the Play Store app icon and login using your Google account credentials.
 
-<img src="./quickstart_images/Play_Store_Login.gif" alt="drawing" width="540"/>
+<img src="./quickstart_images/Play_Store_Login.gif" alt="drawing"  height="570"/>
 
 1. Click on `SIGN IN`
 2. Enter your mail address and click on `NEXT`
@@ -166,7 +167,7 @@ Please open the Google Play Store by clicking on the Play Store app icon and log
 ### Install Nintendo Switch App
 You are now in the Play Store main menu and can install the Nintendo Switch App.
 
-<img src="./quickstart_images/NSA_Download.gif" alt="drawing" width="540"/>
+<img src="./quickstart_images/NSA_Download.gif" alt="drawing"  height="570"/>
 
 1. Tap on the search bar
 2. Enter `Nintendo Switch App` into the search bar.
@@ -177,7 +178,7 @@ You are now in the Play Store main menu and can install the Nintendo Switch App.
 ### Sign in to your Nintendo Account
 The last thing you need to do to finish Android Emulator setup is to sign in to your Nintendo Account.
 
-<img src="./quickstart_images/NSA_Login.gif" alt="drawing" width="540"/>
+<img src="./quickstart_images/NSA_Login.gif" alt="drawing"  height="570"/>
 
 1. Tap on `Open` to open the NSA app
 2. Tap on `Sign In`
@@ -193,7 +194,7 @@ The last thing you need to do to finish Android Emulator setup is to sign in to 
 ### Close apps and shutdown emulator
 With this, everything is successfully set up, and we can do the first run of s3s + stu next. But first, we need to shut the emulator down real quick.
 
-<img src="./quickstart_images/Emulator_Shutdown.png" alt="drawing" height="1140"/>
+<img src="./quickstart_images/Emulator_Shutdown.png" alt="drawing" height="570"/>
 
 1. Press the task manager button in the bottom right corner
 2. Swipe from the left to the right until the `Clear all` button is visible
@@ -212,8 +213,8 @@ For example, you can do this:
 # print all available commands
 python run_s3s.py --help
 
-# Lean's Seedchecker
-# export a gear file which you can upload to Lean's Seedchecker
+# Lean's Gear Seed Checker
+# export a gear file which you can upload to Lean's Gear Seed Checker
 python run_s3s.py --getseed
 
 # stat.ink export
