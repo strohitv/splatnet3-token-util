@@ -10,8 +10,8 @@ You can also watch a [video tutorial](https://www.youtube.com/playlist?list=PLm5
 Please ensure you have these applications installed on your computer:
 - Android Studio
 - git
-- python3
-- pip3 - this usually is a part of python3
+- python in version 3.11 or higher
+- pip - this usually is a part of python
 - cURL
 - additional software required by s3s. As of now (August 2025), s3s does not need any additional software to run.
 
