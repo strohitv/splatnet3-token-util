@@ -101,7 +101,7 @@ From this step on, we don't need Android Studio anymore. Keep in installed on yo
 Open a command line terminal in the SplatNet3-token-util folder and run these two commands:
 ```shell
 python main.py
-python run-s3s.py
+python run_s3s.py
 ```
 
 When ran in a freshly downloaded directory, these commands will generate a few config files and exit afterward without doing something else.

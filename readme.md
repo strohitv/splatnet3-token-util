@@ -16,8 +16,8 @@ This chapter contains a short summary of what you need to do to download and ins
 Please install this software to use this script on your computer:
 - an Android Emulator (I use Android Studio)
 - git
-- python3
-- pip3 - this usually is a part of python3
+- python in version 3.11 or higher
+- pip - this usually is a part of python
 - cURL
 
 ### Download & Create dependencies
