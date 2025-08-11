@@ -5,134 +5,90 @@ The tokens get stored into a file which can be freely configured, however this p
 
 ## QUICK START: running s3s with the provided example files
 
-Here are instructions for the most common use case: extracting the tokens and using them to run [s3s](https://github.com/frozenpandaman/s3s) by frozenpandaman. While splatnet3-token-util is designed to be highly configurable, example files for an easy setup and chaining to s3s are provided for user comfort. This quick start guide will show you how to set up everything quickly using the example files.
+An easy way to set up the script to work with s3s is described in [quickstart_s3s_tutorial.md](quickstart_s3s_tutorial.md). Please head there if you want to either use this project in combination with s3s.
 
-The first step is to install several required dependencies (pip dependencies, Android Studio, s3s) and setting up the emulator to be in a state that the app can use.
+## Installation
 
-### OPTIONAL: install Miniconda
-You should to install miniconda first. Miniconda allows you to split your python installation into several environments, each with their own dependencies installed. If you use multiple python applications each with their own dependencies, you can create an environment for each of them and you will never have conflicts because two apps require different versions of the same dependency.
+This chapter contains a short summary of what you need to do to install the 
 
-After miniconda has been installed, create a new environment and set it to be the active one with these commands:
+### Prerequisites
+
+Please install this software to use this script on your computer:
+- an Android Emulator (I use Android Studio)
+- git
+- python3
+- pip3 - this usually is a part of python3
+- cURL
+
+### Download & Create dependencies
+
+These 3 commands will set up the script and prepare it for use:
 ```shell
-conda env create --name splatnet3-token-util anaconda::pip
-conda activate splatnet3-token-util
-```
-(you can give the environment another name, splatnet3-token-util is just recommended because it's the name of this project)
+# clone project
+git clone git@github.com:strohitv/splatnet3-token-util.git
 
-### Install dependencies with pip
-
-To install or update the dependencies, use this command:
-```shell
+# install python requirements
 pip install -r requirements.txt
+
+# this will generate the configuration files in the ./config directory if they don't exist yet.
+python main.py
 ```
+After running them, you're good to go and can use the script.
 
-On some operating systems, pip might not be a known command. In this case, usually something like this works:
+## Token extraction workflow
+Once everything is set up, running `main.py` will start the token extraction. Here's a short summary on what is going to happen step by step:
+1. Boot an emulator with the requested AVD (Android Virtual Device = the emulated phone)
+2. Once the boot is complete, run the  `./config/boot.txt`. This file contains step-by-step instructions on how to control the emulator until SplatNet3 is opened
+3. As soon as SplatNet3 is open, a snapshot will be created. This snapshot contains a dump of the entire emulator RAM which should also contain tokens.
+4. Next is to shut down the emulator again. This is done similar to step 2, but the steps required to close all apps and initiate the shutdown are in `./config/cleanup.txt`.
+5. After the emulator has been shut down, the script will locate and open the RAM dump and search for the gToken and bullettoken. It can also search for the session token but this is disabled by default because it's not as stable as the other two.
+6. If it finds all tokens, it will open `./config/template.txt` and replace these placeholders with the found values:
+   - `{GTOKEN}` will be replaced with the gToken
+   - `{BULLETTOKEN}` will be replaced with the gToken
+   - `{SESSIONTOKEN}` will be replaced with the gToken
+7. The final file will be written to `./config.txt` and can be used by other applications.
+
+Most of these settings can be changed in `./config/config.json` which gets generated the first time the script is started.
+
+## Important parts of the project
+Here is a list of some important files and directories of the project structure
+
+### Main files, documentation files and configuration files
+- `main.py`: this is the main script which will be used to start the token extraction. Use `python main.py --help` to get the available arguments
+- `run_s3s.py`: this script manages the integration with s3s. Unlike main.py, this script does not have its own help command because it redirects all arguments directly to s3s. Please use refer to [quickstart_s3s_tutorial.md](quickstart_s3s_tutorial.md) for additional documentation.
+- `quickstart_s3s_tutortial.md`: this markdown file contains a documentation on how to connect splatnet3-token-util and s3s to add a local automatic token refresh to s3s.
+- `config` directory: this directory contains configuration files for `main.py`
+  - `config/config.json`: this configuration file gets created on first use and contains the configuration for `main.py`
+  - `config/boot.txt`: this file contains the steps required to open SplatNet3 in the freshly opened emulator.
+  - `config/cleanup.txt`: this file contains the steps required to close SplatNet3 and shut the emulator down once the tokens have been extracted.
+  - `config/template.txt`: this file contains the the template file with placeholders. These placeholders will be replaced with the tokens and be written to `config.txt`.
+- `config.txt`: the final generated file with all tokens added
+- `steps_documentation.md`: this markdown file contains an automatically generated documentation of all steps you can use to control the emulator in `boot.txt` and `cleanup.txt`
+- `script-examples` directory: this directory contains useful example files to help with setting up the project
+  - `script-examples/config` contains sample configuration files. The `template.txt` file works with s3s and the `pixel_4_api_30_play_store` directory contains sample `boot.txt` and `cleanup.txt` files which work with a Pixel 4 API 30 AVD. These files are used in the [quickstart_s3s_tutorial.md](quickstart_s3s_tutorial.md).
+  - `script-examples/systemd` contains sample systemd configuration files. These files can be used on a Linux computer to make the token extraction run based on a timer.
+- `screenshots` directory: the emulator gets controlled mostly by matching a screenshot of the current emulator screen with template screenshots. If they match, something will be done and if they don't, something else will be done. The `screenshots` directory contains the template screenshots used for the comparison.
+
+### Code files
+- `main.py`: this is the main script which will be used to start the token extraction. Use `python main.py --help` to get the available arguments
+- `run_s3s.py`: this script manages the integration with s3s. Unlike main.py, this script does not have its own help command because it redirects all arguments directly to s3s. Please use refer to [quickstart_s3s_tutorial.md](quickstart_s3s_tutorial.md) for additional documentation.
+- `data` directory: this directory contains code to load and parse the `config/config.json` file to get the settings for `main.py`
+- `steps` directory: this directory contains the implementation for the steps available in `config/boot.txt` and `config/cleanup.txt`. For usage documentation, please refer to `steps_documentation.md`.
+- `utils` directory: this directory contains util files which are used throughout the project
+  - `utils/config_utils.py`: methods which are used to load and generate the configuration files in the `config` directory
+  - `utils/emulator_utils.py`: methods which control the emulator by calling `emulator` and `adb` applications (these apps are installed when installing the Android emulator)
+  - `utils/script_utils.py`: this file contains all methods required for parsing and executing `boot.txt` and `cleanup.txt`
+  - `utils/snapshot_utils.py`: this file is responsible for extracting the tokens from the RAM dump file
+  - `utils/splatnet3_utils.py`: this file is used to check whether the tokens are valid by calling the SplatNet3 homepage
+  - `utils/stats_utils.py`: this file is responsible for generating a statistics file which tracks duration and success of executions of the `main.py` script. This feature is not active by default and needs to be enabled in the `config/config.json` file first.
+  - `utils/step_doc_creator.py`: this file generates the `steps_documentation.md` documentation file
+  - `utils/template_utils.py`: this file fills the `config/template.txt` file with found tokens and stores it to `config.txt`
+
+## main.py basic commands
+Currently, `main.py` offers three main commands you can execute: 
 ```shell
-pip3 install -r requirements.txt
-python -m pip install -r requirements.txt
-python3 -m pip install -r requirements.txt
-```
-
-If none of these work either, please resort to a search on the internet to find out how to use pip on python on your operating system.
-
-### Create the config files
-The app gets controlled by config files stored in the `./config` directory. To create them, run this command:
-```shell
-python main.py -r
-```
-
-Afterwards, copy `boot.txt`, `cleanup.txt` and `template.txt` from `./script-examples/config` into the freshly created `./config` directory.
-
-In `template.txt`, replace `INSERT_YOUR_STAT_INK_API_KEY_HERE` with your stat.ink api key found on the [profile page](https://stat.ink/profile). Change the language setting if necessary.  
-**DO NOT** put a real URL into the `f_gen` setting. This application is thought to be an alternative to the f generation apis. Please do not flood them with weird requests should errors occur.
-
-We don't need to edit `config.json` yet. 
-
-Now that this step is completed, you can use the following commands later in section [Install Android Studio](### Install Android Studio) to run emulator and adb commands:
-```shell
-# boot emulator (blocks until emulator shuts down)
-python main.py --emu
-
-# run adb command to control emulator
-python main.py --adb="COMMAND ARGUMENTS"
-# example: python main.py -adb="shell input tap X Y" to tap on position (X, Y) on the screen
-```
-
-### Install s3s
-Please install [s3s](https://github.com/frozenpandaman/s3s) by frozenpandaman. For installation instructions, read the readme.md of the s3s project.
-
-### Install Android Studio
-This application was written to be compatible with the Android emulator included in Android Studio. Please install Android Studio on your operating system, usually there are good guides if you search for them on the internet. Afterwards, follow the [initial steps](### Initial Steps) to create and set up the emulator.
-
-Continue here once the initial steps are done.
-
-### Edit config.json
-Open `./config/config.json` and check that all settings are correct:
-- First,ensure that `adb_path`, `emulator_path` and `snapshot_dir` exist. If they don't, search them on your drive or look up the default path for your operating system on the internet.
-- `show_window` should probably remain `true` - on all my computers setting it to `false` crashes the script
-- keep `extract_session_token` on `false` - we won't let s3s refresh the tokens by itself so a session token is not necessary.
-- keep `debug` on `false` unless you know what you're doing and if you really need to get debug logs.
-- if you want an "Excel" file containing a small summary of all runs, set `log_stats_csv` to `true`
-- `max_attempt_duration_seconds` sets how many seconds the script is allowed to use to boot the emulator, open SplatNet3, create the snapshot and shut the emulator down again. If it takes longer, a HARD reset will be done, forcing it to start all over again. This is to prevent the script from getting stuck (for example because it accidentially did something which it wasn't supposed to be doing and now it's in the wrong menu)
-- `max_run_duration_minutes` sets how many minutes may pass until the script does not retry again and gives up instead. If it takes that long to find the token, something is probably broken and needs to be fixed.
-
-### Run splatnet3-token-util and s3s
-This repository contains a wrapper script, `run_s3s.py`, which runs s3s and uses splatnet3-token-util to refresh the tokens whenever the tokens are not valid.
-
-First, you need to run the script without any parameters to create the configuration for it:
-```shell
-# one of these depending on your python installation
-python run_s3s.py
-python3 run_s3s.py
-```
-During the run, a file called 'config_run_s3s.json' will be created. Edit this file and fill in the directory of your s3s.
-
-The other settings are usually fine. If you've set up splatnet3-token-util to not write the generated file as config.txt, change it accordingly. If any of the required tools (git, python, pip) need to be called differently, edit the calls as well. If update_s3s or update_stu is set, it will execute a `git pull` followed by a `pip install` the first time the script is executed before running either s3s or splatnet3-token-util.
-
-**IMPORTANT FOR WINDOWS USERS**: for file paths, make sure to use double backslashes `\\` instead of single backslashes `\`, for example: `C:\\Users\\someone` instead of `C:\Users\someone`.
-
-`python run_s3s.py` simply forwards the command line arguments to s3s which means you can use it the same way you would normally use s3s:
-```shell
-# these uses of s3s...
-python s3s.py -M -r
-python3 s3s.py -M -r
-
-# ... both translate to these use of run_s3s.py with added automatic token refresh:
-python run_s3s.py -M -r
-python3 run_s3s.py -M -r
-
-# run either of these commands to get a list of s3s commands (which are all supported by run_s3s.py)
-python run_s3s.py 
-python run_s3s.py -h
-python run_s3s.py --help
-
-python3 run_s3s.py 
-python3 run_s3s.py -h
-python3 run_s3s.py --help
-```
-
-`run_s3s.py` will try to execute s3s with the given parameters. If s3s exits with return code 0 or an error code (usually RC 1), run_s3s.py will exit with the same result.
-
-It behaves different if s3s finishes with the "outdated tokens" `--norefresh` return code (default: 42): once the tokens are outdated, splatnet3-token-util will be called to refresh the tokens. The newly created `config.txt` file with valid tokens will be copied into the s3s directory and afterwards the run_s3s.py will automatically restart to call s3s again.
-
-If s3s gets called with monitoring mode (`-M`), the script will switch between s3s monitoring mode and token refresh indefinitely until it gets manually stopped by using `CTRL` + `C`.
-
-**IMPORTANT**: the script ensures that a token refresh will only happen if s3s does not find valid tokens. The bullet_token is valid for 2 hours so there is no need to refresh the tokens earlier. **DO NOT** change to code to act differently and **DO NOT** flood Nintendo with token refreshes!
-
-## Usage
-The application will create default configs in the `./config/` folder at first launch.
-
-Once that is done, edit the `./config/boot.txt` and `./config/cleanup.txt` files to mimic user behaviour when accessing the NSA SplatNet3 app via the emulator.
-
-Examples of boot and cleanup scripts are located in the `./script-examples` folder while basic screenshots for comparison are provided in the `./screenshots` folder.
-
-## Command line parameters
-```shell
-# deletes and creates the config files anew. This option is used to FORCE the deletion and recreation, config files will automatically be generated without this flag should one missing.
-python main.py -r 
-
-# file path of the config file. Since all other settings are stored in the config file, this parameter can be used to create different runs (for example if different emulators for different switch accounts should be started).
-python main.py -c [CONFIG]
+# run token extraction
+python main.py
 
 # boot emulator (blocks until emulator shuts down)
 python main.py --emu
@@ -142,45 +98,20 @@ python main.py --adb="COMMAND ARGUMENTS"
 # example: python main.py -adb="shell input tap X Y" to tap on position (X, Y) on the screen
 ```
 
-
-## Steps required to set up token extraction
-There's initial steps required to do once. Once the emu is set up, it needs to be brought to a state where you can extract the tokens from RAM, then a snapshot needs to be done. Finally, the RAM dump needs to be analysed.
-
-Note: The name of the example Emulator used in this tutorial is `SN3`, so everywhere this name appears it's the name of the emulated device.
-
-### Initial steps
-1. Install Android Studio (only possible with an x64 architecture)
-2. Create an Emulator, choose a newer Android version with Google Play installed. **QUICK START**: use Pixel 8 with Android API level 30 (Android 11). Set `SN3` as name and set it to cold boot.
-3. After creation, close Android Studio and don't use it anymore. Changes done to the android system while hosting the emulator in Android Studio won't always reflect to the status of the emulator this script will use. To avoid this, boot the emulator via command line with the command `python main.py --emu`. **DO NOT USE ANDROID STUDIO FROM HERE ON, USE THE COMMAND LINE COMMANDS ONLY**
-4. [optional / required for **QUICK START**] Once the emulator is started, open Settings -> Accessibility -> System Controls -> Change `System Navigation` to `3 buttons` and also System -> Gestures -> Press & hold power button -> Set to `Power menu` so that holding the the power button will bring up the power menu
-5. Open Google Play Store and do the login with your Google Account. Select "No" for "Back up device data"
-6. Install the Nintendo Switch App (NSA) via Google Play
-7. Open NSA, don't allow sending usage data and do the Login using your Nintendo account. If Chrome asks whether you want to use your gmail account, disallow ("Use without an account")
-8. Once you're logged in on NSA, open SplatNet3 once to ensure it's working fine. It's ok if it displays an error message, the token extraction will still work as long as you can get to the greyish SplatNet3 design.
-9. Close all apps via task manager
-10. Tap and Hold the NSA app until the menu opens. Then drag it to the main screen on the left side directly below the clock, as it can be seen on the [main menu snapshot image](./screenshots/template-emulator-main-menu.png).
-11. Go to Play Store -> Profile -> Manage apps & device -> Manage tab -> Tap on NSA app -> Tap on the three dots on the top right corner -> check "Enable Auto Update"
-12. Close all apps via task manager
-13. Shut down the emulator by using the control panel window to simulate a long power button press and then select 'Power Off'. If you're following the **QUICK START** instructions, skip steps 14-16 and head back to the guide above.
-14. **OPTIONAL from here on** If you're creating your own boot.txt and cleanup.txt scripts: Slowly simulate the clicks required to open the NSA app + SplatNet 3 main menu by slowly doing taps and write down the screen positions (X and Y) at the top screen everytime you do a tap (write down start and end positions for swipes). Also pay attention to how long each screen loads - that wait time should be at least double. Ideally, opening SplatNet3 should only be three taps if the NSA app is located on the default main screen.
-15. You can also use ADB (see commands below) via `python main.py -adb="COMMAND"` to store screenshots of every step to take an image comparison to be more certain on where you are right now.
-16. At the end, close all apps via task manager and shut down the emulator again.
-
-This should be everything required. Next up is the automation
-
-### Automation - Commands
+### further command examples
 PLEASE NOTE: this script does not work when several emulators are booted at the same time. If you do that and want to use the ADB commands, add `-s EMULATOR-NAME` to the adb command, for example `python main.py --adb="-s emulator-5554 shell input tap X Y"`
 
 - start emulator: `python main.py --emu`
 - do a tap on the emulator: `python main.py --adb="shell input tap X Y"`
 - do a swipe on the emulator: `python main.py --adb="shell input swipe X1 Y1 X2 Y2 duration(ms)"`
 - list all devices + ports: `python main.py --adb="devices"`
-- save a screenshot: `python main.py --adb="exec-out screencap -p > FILENAME.png"` - this needs to be done using CMD cause Powereshell messes up the filename. FILENAME can freely be chosen
-- save a snapshot: `python main.py --adb="emu avd snapshot save SNAPSHOT_NAME"` where SNAPSHOT_NAME can be chosen as the user pleases. Snapshots will be saved to `$HOME/.android/avd/SN3.avd\snapshots`, RAM dump is in the `ram.bin` file
+- save a screenshot: `python main.py --adb="exec-out screencap -p > FILENAME.png"` - this needs to be done using CMD because Powershell messes up the filename. FILENAME can freely be chosen
+- save a snapshot: `python main.py --adb="emu avd snapshot save SNAPSHOT_NAME"` where SNAPSHOT_NAME can be freely chosen. Snapshots will be saved to `$HOME/.android/avd/{AVD_NAME}.avd/snapshots`, a dump of the RAM is in the `ram.bin` file
 - force shutdown the emulator: `python main.py --adb="emu kill"`
-- **IMPORTANT**: to ensure it's always reloading the app from scratch, it needs to be closed before the emulator gets shut down!
 
-### ram.bin file
+**IMPORTANT**: to ensure the emulator is always reloading the NSA app from scratch, it needs to be closed before the emulator gets shut down!
+
+## ram.bin file
 - use a hex editor (recommendation: Linux: gHex, Windows: HxD) to search through the RAM
 - not all Snapshots contain all Tokens sadly
 - gtoken: search for `_gtoken=ey`
@@ -188,7 +119,7 @@ PLEASE NOTE: this script does not work when several emulators are booted at the 
 - sessionToken: search for `SessionToken">ey`, better string: `eyJhbGciOiJIUzI1NiJ9` (which usually is the first part of the session token)
 
 # Contribution
-If you want to add a feature or fix a bug, please fork the project and send a pull request once you're done. I appreciate all help!
+If you want to add a feature or fix a bug, please fork the project and send a pull request once your code is ready to be merged. Please use "Conventional Commits" to create the commit message if possible. Additionally, please set your IDE up to respect the settings from the `.editorconfig` file. I appreciate all help! 
 
 Should you need help with using the application or stumble across an error, please open an issue.
 

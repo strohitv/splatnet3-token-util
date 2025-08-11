@@ -20,7 +20,7 @@ If you are unsure on how to install the software listed here, usually a quick in
 **IMPORTANT**: Android Studio does not run on ARM computers, which means very small computers like the Raspberry Pi are **not** supported! It might be possible to run splatnet3-token-util with a custom emulator on ARM computers, but it needs to support ADB and be bootable using a command line. The community would need to find a way to do that, I will not provide support for these kind of scenarios. If you find a way, feel free to open an issue or a Pull Request!
 
 ## Clone the projects
-I recommend using a distinct directory on your computer and add both the s3s and stu directories in that folder. If you already have downloaded s3s, you can use this version and don't need to download s3s again. However, this tutorial requires s3s to be at least at version `0.7.0` or newer.
+I recommend using a distinct directory on your computer and add both the s3s and stu directories in that folder. If you already have downloaded s3s, you can use this version and don't need to download s3s again. However, this tutorial requires s3s to be at least at version `0.7.0` or newer. If your version of s3s is older, please update it to at least `0.7.0`.
 
 ### Clone STU
 Open a Terminal/Command line and head to the directory you wish to download stu to and run this command:
@@ -111,6 +111,8 @@ We are interested in the `./config/config.json` file which contains the main con
 1. You don't need to change a setting under the `token_config` and `run_config` sections.
 2. On the `emulator_config` section, make sure that `avd_name` is set to the name you gave the AVD when you set it up earlier. If you have installed Android Studio into the default directories, everything else should be correct.
 
+**IMPORTANT FOR WINDOWS USERS**: if you need to edit file paths, make sure to use double backslashes `\\` instead of single backslashes `\` in all `.json` files, for example: `C:\\Users\\someone` instead of `C:\Users\someone`.
+
 ### Copy Pixel 4 files
 From the folder `./script-examples/config/pixel_4_api_30_playstore`, copy both `boot.txt` and `cleanup.txt` into the `./config` directory. You can override the existing `boot.txt` and `cleanup.txt` files, they only contain dummy text.
 
@@ -120,6 +122,7 @@ There are two files we need to edit to set up the s3s integration:
 First, open the `./config/template.txt` file. Here, you need to set either one or two options, depending on if you only use Lean's Seedchecker tool or also stat.ink.
 1. Set your language and region properly using the `acc_loc` setting. The format is `language|region`, for example `en-US|US` is american english and someone living in the US. Similar, `de-DE|AT` would be "German German" and someone living in Austria.
 2. **OPTIONAL for people who only use Lean's Seedchecker**: enter your stat.ink api key into the `api_key` field. You can get the api key from your [stat.ink profile page](https://stat.ink/profile), it is the field called "API Token".
+**IMPORTANT**: if you plan to use s3s to upload battles to stat.ink, copy the `template.txt` file into the s3s directory and rename it to `config.txt`
 
 The other file which needs to be edited is the `./config_run_s3s.json` file. In this file, one setting must be changed and the others might need to be changed.
 1. Insert the location of the s3s directory into the `s3s_directory` config.
@@ -174,7 +177,7 @@ You are now in the Play Store main menu and can install the Nintendo Switch App.
 ### Sign in to your Nintendo Account
 The last thing you need to do to finish Android Emulator setup is to sign in to your Nintendo Account.
 
-<img src="./quickstart_images/NSA_Download.gif" alt="drawing" width="540"/>
+<img src="./quickstart_images/NSA_Login.gif" alt="drawing" width="540"/>
 
 1. Tap on `Open` to open the NSA app
 2. Tap on `Sign In`
@@ -209,11 +212,13 @@ For example, you can do this:
 # print all available commands
 python run_s3s.py --help
 
-# upload recent battles to stat.ink
-python run_s3s.py -r 
-
+# Lean's Seedchecker
 # export a gear file which you can upload to Lean's Seedchecker
 python run_s3s.py --getseed
+
+# stat.ink export
+# upload recent battles to stat.ink
+python run_s3s.py -r 
 
 # upload recent battles to stat.ink and activate monitoring mode
 python run_s3s.py -r -M
