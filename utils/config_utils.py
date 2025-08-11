@@ -53,7 +53,7 @@ def load_config(args):
 
 		if not os.path.exists(emulator_path):
 			print(f'Standard emulator path "{emulator_path}" does not exist, searching $PATH')
-			emulator_path_new = __search_path(find_app_command, f'emulator{'.exe' if os_name == 'Windows' else ''}')
+			emulator_path_new = __search_path(find_app_command, f'emulator{".exe" if os_name == "Windows" else ""}')
 
 			if os.path.exists(emulator_path_new):
 				emulator_path = emulator_path_new
@@ -63,7 +63,7 @@ def load_config(args):
 
 		if not os.path.exists(adb_path):
 			print(f'Standard adb path "{adb_path}" does not exist, searching $PATH')
-			adb_path_new = __search_path(find_app_command, f'adb{'.exe' if os_name == 'Windows' else ''}')
+			adb_path_new = __search_path(find_app_command, f'adb{".exe" if os_name == "Windows" else ""}')
 
 			if os.path.exists(adb_path_new):
 				adb_path = adb_path_new
@@ -76,8 +76,8 @@ def load_config(args):
 			android_home = os.getenv('ANDROID_HOME')
 
 			if android_home:
-				emulator_path_new = os.path.join(android_home, 'emulator', f'emulator{'.exe' if os_name == 'Windows' else ''}')
-				adb_path_new = os.path.join(android_home, 'platform-tools', f'adb{'.exe' if os_name == 'Windows' else ''}')
+				emulator_path_new = os.path.join(android_home, 'emulator', f'emulator{".exe" if os_name == "Windows" else ""}')
+				adb_path_new = os.path.join(android_home, 'platform-tools', f'adb{".exe" if os_name == "Windows" else ""}')
 
 				if os.path.exists(emulator_path_new) and os.path.exists(adb_path_new):
 					emulator_path = emulator_path_new

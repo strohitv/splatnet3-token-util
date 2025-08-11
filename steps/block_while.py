@@ -48,7 +48,7 @@ class BlockWhile:
 		start = time.time()
 
 		expect_found = parsed_args.mode == 'found'
-		print(f'Blocking as long as region can {'' if expect_found else 'not '}be found')
+		print(f'Blocking as long as region can {"" if expect_found else "not "}be found')
 
 		fulfilled = False
 

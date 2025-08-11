@@ -66,24 +66,24 @@ def main():
 		print('###########')
 		print()
 
-		print(f'Running s3s with command "{config['python_command']} {os.path.join(config['s3s_directory'], 's3s.py')} {s3s_args}"')
+		print(f'Running s3s with command "{config["python_command"]} {os.path.join(config["s3s_directory"], "s3s.py")} {s3s_args}"')
 		print()
 
 		if config['s3s_update']:
-			print(f'1/2 Running s3s update with command "{config['git_command']} pull"')
-			subprocess.run(f'{config['git_command']} pull',
+			print(f'1/2 Running s3s update with command "{config["git_command"]} pull"')
+			subprocess.run(f'{config["git_command"]} pull',
 						   cwd=config['s3s_directory'],
 						   shell=True)
 			print()
-			print(f'2/2 Running s3s update with command "{config['pip_command']} install -r requirements.txt"')
-			subprocess.run(f'{config['pip_command']} install -r requirements.txt',
+			print(f'2/2 Running s3s update with command "{config["pip_command"]} install -r requirements.txt"')
+			subprocess.run(f'{config["pip_command"]} install -r requirements.txt',
 						   cwd=config['s3s_directory'],
 						   shell=True)
 			print()
 			config['s3s_update'] = False
 
 		# 2. run s3s and store return code
-		s3s_proc = subprocess.run(f'{config['python_command']} {os.path.join(config['s3s_directory'], 's3s.py')} {s3s_args}',
+		s3s_proc = subprocess.run(f'{config["python_command"]} {os.path.join(config["s3s_directory"], "s3s.py")} {s3s_args}',
 								  cwd=config['s3s_directory'],
 								  shell=True)
 
@@ -111,18 +111,18 @@ def main():
 		print()
 
 		if config['stu_update']:
-			print(f'1/2 Running splatnet3-token-util update with command "{config['git_command']} pull"')
-			subprocess.run(f'{config['git_command']} pull',
+			print(f'1/2 Running splatnet3-token-util update with command "{config["git_command"]} pull"')
+			subprocess.run(f'{config["git_command"]} pull',
 						   shell=True)
 			print()
-			print(f'2/2 Running splatnet3-token-util update with command "{config['pip_command']} install -r requirements.txt"')
-			subprocess.run(f'{config['pip_command']} install -r requirements.txt',
+			print(f'2/2 Running splatnet3-token-util update with command "{config["pip_command"]} install -r requirements.txt"')
+			subprocess.run(f'{config["pip_command"]} install -r requirements.txt',
 						   shell=True)
 			print()
 			config['stu_update'] = False
 
 		# 4. run splatnet3-token-util and act according to result
-		stu_proc = subprocess.run(f'{config['python_command']} main.py',
+		stu_proc = subprocess.run(f'{config["python_command"]} main.py',
 								  shell=True)
 
 		print()

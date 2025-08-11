@@ -52,7 +52,7 @@ class ExecuteWhile:
 		start = time.time()
 
 		expect_found = parsed_args.mode == 'found'
-		print(f'Repeatedly executing command as long as region can {'' if expect_found else 'not '}be found')
+		print(f'Repeatedly executing command as long as region can {"" if expect_found else "not "}be found')
 
 		fulfilled = False
 
