@@ -1,5 +1,5 @@
 import argparse
-import multiprocessing
+import multiprocess
 import os
 import signal
 import sys
@@ -142,9 +142,9 @@ def main():
 		print()
 
 		extraction_process = None
-		emulator_pid = multiprocessing.Value('i', 0)
+		emulator_pid = multiprocess.Value('i', 0)
 		try:
-			extraction_process = multiprocessing.Process(target=run_token_extraction,
+			extraction_process = multiprocess.Process(target=run_token_extraction,
 														 args=(app_config, all_available_steps, start_time, start_datetime, attempt, emulator_pid))
 			extraction_process.start()
 

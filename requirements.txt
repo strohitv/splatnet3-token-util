@@ -2,6 +2,7 @@ certifi==2025.6.15
 charset-normalizer==3.4.2
 idna==3.10
 ImageHash==4.3.2
+multiprocess==0.70.18
 numpy==2.3.1
 pillow==11.3.0
 pyperclip==1.9.0
