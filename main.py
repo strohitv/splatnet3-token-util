@@ -109,8 +109,8 @@ def main():
 		print('ERROR: adb_path in config does not exist. Please edit the config file and insert a valid adb_path. Exiting now.')
 		sys.exit(INPUT_VALIDATION_FAILED)
 
-	if not os.path.exists(app_config.emulator_config.get_snapshot_dir()):
-		print('ERROR: snapshot_dir in config does not exist. Please edit the config file and insert a valid snapshot_dir. Exiting now.')
+	if not os.path.exists(os.path.dirname(app_config.emulator_config.get_snapshot_dir())):
+		print('ERROR: parent directory of snapshot_dir in config does not exist. Please edit the config file and insert a valid snapshot_dir. Exiting now.')
 		sys.exit(INPUT_VALIDATION_FAILED)
 
 	if not os.path.exists(app_config.run_config.boot_script_path):
@@ -131,29 +131,29 @@ def main():
 	start_time = time.time()
 	prepare_stats(app_config.run_config.log_stats_csv, app_config.run_config.stats_csv_path)
 
-	last_allowed_attempt_start_time = start_time + app_config.run_config.max_run_duration_minutes * 60
+	last_allowed_attempt_start_time = start_time + max(5, app_config.run_config.max_run_duration_minutes) * 60
 	attempt = 0
 	while time.time() < last_allowed_attempt_start_time:
 		attempt += 1
 
 		print(f'### Attempt {attempt} ###')
 		print()
-		print(f'Expecting this attempt to take {app_config.run_config.max_attempt_duration_seconds} seconds at worst.')
+		print(f'Expecting this attempt to take {max(60, app_config.run_config.max_attempt_duration_seconds)} seconds at worst.')
 		print()
 
 		extraction_process = None
 		emulator_pid = multiprocess.Value('i', 0)
 		try:
 			extraction_process = multiprocess.Process(target=run_token_extraction,
-														 args=(app_config, all_available_steps, start_time, start_datetime, attempt, emulator_pid))
+													  args=(app_config, all_available_steps, start_time, start_datetime, attempt, emulator_pid))
 			extraction_process.start()
 
-			targeted_end_time = time.time() + app_config.run_config.max_attempt_duration_seconds
+			targeted_end_time = time.time() + max(60, app_config.run_config.max_attempt_duration_seconds)
 			while time.time() < targeted_end_time and extraction_process.is_alive():
 				time.sleep(1)
 
 			if extraction_process.is_alive():
-				raise Exception(f'Extraction did not finish in time ({app_config.run_config.max_attempt_duration_seconds} seconds), forcing restart...')
+				raise Exception(f'Extraction did not finish in time ({max(60, app_config.run_config.max_attempt_duration_seconds)} seconds), forcing restart...')
 			elif extraction_process.exitcode is not None and extraction_process.exitcode == 0:
 				sys.exit(SUCCESS)
 
@@ -186,7 +186,7 @@ def main():
 	elapsed = ended - start_time
 
 	write_stats(app_config.run_config.log_stats_csv, app_config.run_config.stats_csv_path, start_datetime, False, attempt, elapsed)
-	print(f'Could not find all three tokens in {attempt} attempts, application will stop now.\nPlease try again.\nBye!')
+	print(f'Could not find all requested tokens in {attempt} attempts, application will stop now.\nPlease fix potential errors and try again.\nBye!')
 	print()
 	sys.exit(NOT_ALL_TOKENS_FOUND)
 
