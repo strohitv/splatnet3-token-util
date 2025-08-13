@@ -217,6 +217,7 @@ python run_s3s.py --help
 
 # Lean's Gear Seed Checker
 # export a gear file which you can upload to Lean's Gear Seed Checker
+# IMPORTANT: please read next section if --getseed fails
 python run_s3s.py --getseed
 
 # stat.ink export
@@ -225,4 +226,19 @@ python run_s3s.py -r
 
 # upload recent battles to stat.ink and activate monitoring mode
 python run_s3s.py -r -M
+```
+
+## workaround for the `--getseed` bug
+As of now, there is a bug that `--getseed` in s3s will **never** work while the tokens are not valid. This also applies to the automatic token refresh using the integration with splatnet3-token-util. I sent frozenpandaman a bugfix but as of now (August 13th 2025), it is not yet integrated into s3s. You can monitor the status of [PR 215](https://github.com/frozenpandaman/s3s/pull/215) to find out whether the bug still applies (PR is marked as `Open`) or if s3s got fixed (PR is marked as `Merged`). Once it's `Merged`, please refresh s3s to make `python run_s3s.py --getseed` work without any further issues.
+
+Luckily, there is a workaround which allows us to still use `--getseed`:
+```shell
+# refresh tokens if required
+# DO THIS COMMAND AS LONG AS PR 215 IS OPEN
+python run_s3s.py -r -t 
+# should you be asked for a stat.ink token, enter "skip"
+
+# after the command has succeeded, your tokens will be refreshed (nothing else has happened)
+# you can now run the --getseed command successfully
+python run_s3s.py --getseed
 ```
