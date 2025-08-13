@@ -238,7 +238,7 @@ Luckily, there is a workaround which allows us to still use `--getseed`:
 python run_s3s.py -r -t 
 # should you be asked for a stat.ink token, enter "skip"
 
-# after the command has succeeded, your tokens will be refreshed (nothing else has happened)
+# after the command has succeeded, your tokens will be valid (nothing else has happened)
 # you can now run the --getseed command successfully
 python run_s3s.py --getseed
 ```
