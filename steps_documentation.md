@@ -104,6 +104,7 @@ usage: search_and_tap_center -template TEMPLATE [-actual ACTUAL] -region_x1 REGI
                              -region_x2 REGION_X2 -region_y2 REGION_Y2 -comparison_x1 COMPARISON_X1
                              -comparison_y1 COMPARISON_Y1 -comparison_x2 COMPARISON_X2
                              -comparison_y2 COMPARISON_Y2 -cmd COMMAND [-d DURATION] [-co CUTOFF] [-step STEP]
+                             [-ei]
 
 Searches a given region on the emulator screen to contain a (smaller) region from the template screenshot
 provided. If it finds it, it will tap the center of it. Otherwise it will execute the provided command and
@@ -144,6 +145,11 @@ options:
                                                  screened and the target region could be missed for that
                                                  reason. Default: 1 => search every possible position in the
                                                  provided screen region
+  -ei, --execute_immediately                     Usually, this command checks whether the given template
+                                                 comparison image can be found already BEFORE executing the
+                                                 -cmd arg. If the -ei arg is provided, the order will switch
+                                                 and the -cmd will be executed immediately instead of doing
+                                                 one image comparison first
 
 ```
 
@@ -178,6 +184,20 @@ Taps a given position (X, Y) on the screen once
 options:
   -x, --x X  The X coordinate of the position which should be tapped
   -y, --y Y  The Y coordinate of the position which should be tapped
+
+```
+
+## type
+This command will type a given text on the android keyboard.
+
+### Usage:
+```
+usage: type -t TEXT
+
+Types a given text on the android keyboard
+
+options:
+  -t, --text TEXT  The text to type
 
 ```
 

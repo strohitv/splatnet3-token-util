@@ -58,6 +58,10 @@ class SearchAndTapCenter:
 								 help='The cutoff for the comparison. This value decides how similar the regions must be to be considered equal. Lower values mean stricter comparison, higher values will match less similar screenshots. Default: 5')
 		self.parser.add_argument('-step', '--step', required=False, default=1,
 								 help='Decides how many pixels the region should be moved. Higher values are faster but a smaller part of the region is being screened and the target region could be missed for that reason. Default: 1 => search every possible position in the provided screen region')
+		self.parser.add_argument('-ei', '--execute_immediately', required=False,
+								 help='Usually, this command checks whether the given template comparison image can be found already BEFORE executing the -cmd arg. If the -ei arg is provided, the order will switch and the -cmd will be executed immediately instead of doing one image comparison first',
+								 default=False,
+								 action='store_true')
 
 		self.description = self.parser.format_help()
 		self.introduction = 'This command scans a given region on the emulator screen and looks if that region contains a given smaller image taken from the template screenshot. If it finds it, it will tap the center of it until something happens. If it cannot find it, it will execute the provided command and restart.\n\nExample: the prime example where this step is being used is searching for the SplatNet3 app icon inside the Nintendo Switch App. It will search for it through all app icons and if it finds it, will open SplatNet3. Otherwise, SplatNet 3 is probably further back in the list, so it will scroll a bit and search again until it finds it.'
@@ -66,6 +70,8 @@ class SearchAndTapCenter:
 		only_args = shlex.split(args)[1:]
 		parsed_args = self.parser.parse_args(only_args)
 		self.parsed_args = parsed_args
+
+		execute_immediately = False if parsed_args.execute_immediately is None else parsed_args.execute_immediately
 
 		os.makedirs(os.path.dirname(parsed_args.template), exist_ok=True)
 		os.makedirs(os.path.dirname(parsed_args.actual), exist_ok=True)
@@ -78,32 +84,35 @@ class SearchAndTapCenter:
 				(int(parsed_args.comparison_x1), int(parsed_args.comparison_y1), int(parsed_args.comparison_x2), int(parsed_args.comparison_y2)))
 
 			while True:
-				print(
-					f'Searching for image from base screenshot "{parsed_args.template}" in screenshot "{parsed_args.actual}" with cutoff {parsed_args.cutoff}.')
-				subprocess.run(f'{self.app_config.emulator_config.adb_path} exec-out screencap -p > {parsed_args.actual}',
-							   shell=True,
-							   stdout=subprocess.PIPE,
-							   stderr=subprocess.PIPE)
+				if not execute_immediately:
+					print(
+						f'Searching for image from base screenshot "{parsed_args.template}" in screenshot "{parsed_args.actual}" with cutoff {parsed_args.cutoff}.')
+					subprocess.run(f'{self.app_config.emulator_config.adb_path} exec-out screencap -p > {parsed_args.actual}',
+								   shell=True,
+								   stdout=subprocess.PIPE,
+								   stderr=subprocess.PIPE)
 
-				compare_image = Image.open(parsed_args.actual)
+					compare_image = Image.open(parsed_args.actual)
 
-				result = self.compare(
-					base_cropped,
-					compare_image,
-					int(parsed_args.comparison_x1),
-					int(parsed_args.comparison_y1),
-					int(parsed_args.comparison_x2),
-					int(parsed_args.comparison_y2),
-					int(parsed_args.region_x1),
-					int(parsed_args.region_y1),
-					int(parsed_args.region_x2),
-					int(parsed_args.region_y2),
-					int(parsed_args.cutoff),
-					int(parsed_args.step),
-					self.app_config.debug)
+					result = self.compare(
+						base_cropped,
+						compare_image,
+						int(parsed_args.comparison_x1),
+						int(parsed_args.comparison_y1),
+						int(parsed_args.comparison_x2),
+						int(parsed_args.comparison_y2),
+						int(parsed_args.region_x1),
+						int(parsed_args.region_y1),
+						int(parsed_args.region_x2),
+						int(parsed_args.region_y2),
+						int(parsed_args.cutoff),
+						int(parsed_args.step),
+						self.app_config.debug)
 
-				if result is not None:
-					break
+					if result is not None:
+						break
+
+				execute_immediately = False
 
 				script_utils.execute(parsed_args.command, self.all_steps)
 
