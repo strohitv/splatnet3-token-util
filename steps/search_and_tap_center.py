@@ -58,6 +58,11 @@ class SearchAndTapCenter:
 								 help='The cutoff for the comparison. This value decides how similar the regions must be to be considered equal. Lower values mean stricter comparison, higher values will match less similar screenshots. Default: 5')
 		self.parser.add_argument('-step', '--step', required=False, default=1,
 								 help='Decides how many pixels the region should be moved. Higher values are faster but a smaller part of the region is being screened and the target region could be missed for that reason. Default: 1 => search every possible position in the provided screen region')
+		self.parser.add_argument('-h_step', '--h_step', required=False,
+								 help='Decides how many pixels the region should be moved ONLY HORIZONTALLY. This value overrides the -step parameter for horizontal steps. Higher values are faster but a smaller part of the region is being screened and the target region could be missed for that reason. Default: 1 => search every possible position in the provided screen region')
+		self.parser.add_argument('-v_step', '--v_step', required=False,
+								 help='Decides how many pixels the region should be moved ONLY VERTICALLY. This value overrides the -step parameter for vertical steps. Higher values are faster but a smaller part of the region is being screened and the target region could be missed for that reason. Default: 1 => search every possible position in the provided screen region')
+
 		self.parser.add_argument('-ei', '--execute_immediately', required=False,
 								 help='Usually, this command checks whether the given template comparison image can be found already BEFORE executing the -cmd arg. If the -ei arg is provided, the order will switch and the -cmd will be executed immediately instead of doing one image comparison first',
 								 default=False,
@@ -75,6 +80,14 @@ class SearchAndTapCenter:
 
 		os.makedirs(os.path.dirname(parsed_args.template), exist_ok=True)
 		os.makedirs(os.path.dirname(parsed_args.actual), exist_ok=True)
+
+		h_step = v_step = parsed_args.step
+
+		if parsed_args.h_step is not None:
+			h_step = parsed_args.h_step
+
+		if parsed_args.v_step is not None:
+			v_step = parsed_args.v_step
 
 		start = time.time()
 
@@ -106,7 +119,8 @@ class SearchAndTapCenter:
 						int(parsed_args.region_x2),
 						int(parsed_args.region_y2),
 						int(parsed_args.cutoff),
-						int(parsed_args.step),
+						int(h_step),
+						int(v_step),
 						self.app_config.debug)
 
 					if result is not None:
@@ -135,15 +149,16 @@ class SearchAndTapCenter:
 			print(f'ERROR occured, stopping.')
 			print(e)
 
-	def compare(self, base_cropped, compare_image, comparison_x1, comparison_y1, comparison_x2, comparison_y2, region_x1, region_y1, region_x2, region_y2, cutoff, step,
+	def compare(self, base_cropped, compare_image, comparison_x1, comparison_y1, comparison_x2, comparison_y2, region_x1, region_y1, region_x2, region_y2, cutoff, h_step,
+				v_step,
 				debug):
 		width = comparison_x2 - comparison_x1
 		height = comparison_y2 - comparison_y1
 
-		for x_diff in range(0, max(1, region_x2 - region_x1 - width), max(1, step)):
+		for x_diff in range(0, max(1, region_x2 - region_x1 - width), max(1, h_step)):
 			start_x = region_x1 + x_diff
 
-			for y_diff in range(0, max(1, region_y2 - region_y1 - height), max(1, step)):
+			for y_diff in range(0, max(1, region_y2 - region_y1 - height), max(1, v_step)):
 				start_y = region_y1 + y_diff
 				result = self.compare_region(base_cropped, compare_image, start_x, start_y, width, height, cutoff)
 

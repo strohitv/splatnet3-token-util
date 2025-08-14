@@ -104,7 +104,7 @@ usage: search_and_tap_center -template TEMPLATE [-actual ACTUAL] -region_x1 REGI
                              -region_x2 REGION_X2 -region_y2 REGION_Y2 -comparison_x1 COMPARISON_X1
                              -comparison_y1 COMPARISON_Y1 -comparison_x2 COMPARISON_X2
                              -comparison_y2 COMPARISON_Y2 -cmd COMMAND [-d DURATION] [-co CUTOFF] [-step STEP]
-                             [-ei]
+                             [-h_step H_STEP] [-v_step V_STEP] [-ei]
 
 Searches a given region on the emulator screen to contain a (smaller) region from the template screenshot
 provided. If it finds it, it will tap the center of it. Otherwise it will execute the provided command and
@@ -145,6 +145,18 @@ options:
                                                  screened and the target region could be missed for that
                                                  reason. Default: 1 => search every possible position in the
                                                  provided screen region
+  -h_step, --h_step H_STEP                       Decides how many pixels the region should be moved ONLY
+                                                 HORIZONTALLY. This value overrides the -step parameter for
+                                                 horizontal steps. Higher values are faster but a smaller part
+                                                 of the region is being screened and the target region could
+                                                 be missed for that reason. Default: 1 => search every
+                                                 possible position in the provided screen region
+  -v_step, --v_step V_STEP                       Decides how many pixels the region should be moved ONLY
+                                                 VERTICALLY. This value overrides the -step parameter for
+                                                 vertical steps. Higher values are faster but a smaller part
+                                                 of the region is being screened and the target region could
+                                                 be missed for that reason. Default: 1 => search every
+                                                 possible position in the provided screen region
   -ei, --execute_immediately                     Usually, this command checks whether the given template
                                                  comparison image can be found already BEFORE executing the
                                                  -cmd arg. If the -ei arg is provided, the order will switch

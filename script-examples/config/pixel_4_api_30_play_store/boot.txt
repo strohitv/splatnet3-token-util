@@ -10,7 +10,7 @@ echo '########'
 echo
 
 wait_s 1
-search_and_tap_center -template ./screenshots/pixel_4_api_30_play_store/template-nintendo-search.png -region_x1 50 -region_y1 880 -region_x2 1035 -region_y2 1420 -comparison_x1 55 -comparison_y1 950 -comparison_x2 220 -comparison_y2 1110 -d 500 -actual ./screenshots/pixel_4_api_30_play_store/actual/actual-nintendo-searched.png -cmd "tap -x 541 -y 2215; swipe -x1 500 -y1 2000 -x2 500 -y2 200 -d 200; tap -x 520 -y 250; type -t 'Nintendo Switch App'" -co 5 -s 2 -ei
+search_and_tap_center -template ./screenshots/pixel_4_api_30_play_store/template-app-menu.png -region_x1 70 -region_y1 417 -region_x2 1050 -region_y2 2180 -comparison_x1 472 -comparison_y1 1011 -comparison_x2 606 -comparison_y2 1145 -d 500 -actual ./screenshots/pixel_4_api_30_play_store/actual/actual-app-menu.png -cmd "swipe -x1 500 -y1 2000 -x2 500 -y2 500 -d 200" -co 1 -h_step 201 -v_step 297 -ei
 block_while -mode not-found -template ./screenshots/pixel_4_api_30_play_store/template-nsa-shown.png -x1 41 -y1 232 -x2 549 -y2 284 -d 300 -actual ./screenshots/pixel_4_api_30_play_store/actual/actual-nsa-shown.png
 block_while -mode found -template ./screenshots/pixel_4_api_30_play_store/template-nsa-shown.png -x1 44 -y1 917 -x2 527 -y2 1400 -d 300 -actual ./screenshots/pixel_4_api_30_play_store/actual/actual-nsa-loaded.png
 
