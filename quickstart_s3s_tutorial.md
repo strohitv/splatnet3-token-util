@@ -121,11 +121,10 @@ From the folder `./script-examples/config/pixel_4_api_30_playstore`, copy both `
 There are two files we need to edit to set up the s3s integration:
 
 First, open the `./config/template.txt` file. Here, you need to set either one or two options, depending on if you only use Lean's Gear Seed Checker tool or also stat.ink.
-1. Set your language and region properly using the `acc_loc` setting. The format is `language|region`, for example `en-US|US` is american english and someone living in the US. Similar, `de-DE|AT` would be "German German" and someone living in Austria.
-
-**The following two steps are OPTIONAL for people who only use Lean's Gear Seed Checker**:
-1. Enter your stat.ink api key into the `api_key` field. You can get the api key from your [stat.ink profile page](https://stat.ink/profile), it is the field called "API Token".
-2. If you plan to use s3s to upload battles to stat.ink, copy the `template.txt` file into the s3s directory and rename it to `config.txt`. Otherwise it will ask you for settings already contained in the `template.txt` file.
+1. Set your language and region properly using the `acc_loc` setting. The format is `language|region`, for example `en-US|US` is US-American English and someone living in the US. Similar, `de-DE|AT` would be "German German" and someone living in Austria.
+2. **If you ONLY want to use Lean's Gear Seed Checker**: Enter `skip` into the `api_key` field.
+3. **If you (also) want to upload battles to stat.ink**: Enter your stat.ink api key into the `api_key` field. You can get the api key from your [stat.ink profile page](https://stat.ink/profile), it is the field called "API Token".
+4. **Always do this**: Copy the `template.txt` file into the s3s directory and rename it to `config.txt`. Otherwise, it will ask you for settings you've already entered into the `template.txt` file.
 
 The other file which needs to be edited is the `./config_run_s3s.json` file. In this file, one setting must be changed and the others might need to be changed.
 1. Insert the location of the s3s directory into the `s3s_directory` config.
@@ -236,7 +235,6 @@ Luckily, there is a workaround which allows us to still use `--getseed`:
 # refresh tokens if required
 # DO THIS COMMAND AS LONG AS PR 215 IS OPEN
 python run_s3s.py -r -t 
-# should you be asked for a stat.ink token, enter "skip"
 
 # after the command has succeeded, your tokens will be valid (nothing else has happened)
 # you can now run the --getseed command successfully
