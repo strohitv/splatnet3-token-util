@@ -80,7 +80,11 @@ def main():
 
 	regenerated, app_config = load_config(args)
 	all_available_steps = all_steps.get_steps(app_config)
-	create_step_doc(all_available_steps)
+
+	export_step_doc_env = os.environ.get('STU_EXPORT_STEP_DOC_ENV')
+	if export_step_doc_env is not None and export_step_doc_env.lower().strip() == 'true':
+		print('$STU_EXPORT_STEP_DOC_ENV environment variable is set to "true", (re-)creating steps_documentation.md')
+		create_step_doc(all_available_steps)
 
 	regenerated |= ensure_scripts_exist(args, app_config)
 	regenerated |= ensure_template_exists(args, app_config)
