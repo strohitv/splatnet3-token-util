@@ -1,10 +1,10 @@
-# s3s quickstart tutorial - instructions on how to set up s3s + stu to use Lean's Gear Seed Checker or stat.ink export
+# s3s quickstart guide - instructions on how to set up s3s + splatnet3-token-util (stu) to use Lean's Gear Seed Checker or stat.ink export
 
 This file contains instructions on how to set up [s3s by frozenpandaman](https://github.com/frozenpandaman/s3s) in combination with SplatNet3 Token Util (stu) to either generate a seed file for [Lean's Gear Seed Checker](https://leanny.github.io/splat3seedchecker/#/) or to use it to upload your battles to [stat.ink](https://stat.ink). For this to work, you will need s3s, stu and an Android Emulator set up in a specific way. This emulator will have the Nintendo Switch App installed which will be used to get the tokens necessary to use s3s.
 
 The emulator used in this tutorial will be a Pixel 4 with Android API 30 (= Android 11) and Play Store activated. All relevant files will be found in various `pixel_4_api_30_play_store` subfolders throughout the project.
 
-You can also watch a [video tutorial](https://www.youtube.com/playlist?list=PLm5B9FzOsaWeRbzPTuyTZ3qK2f2GibFP_) walking through the steps of this tutorial but keep in mind that this file is the "truth". Whenever the video tutorial and this file are different, this file with be correct and the video tutorial will be wrong/outdated.
+You can also watch a [video tutorial](https://www.youtube.com/watch?v=dWTUF2UtPi0) walking through the steps of this tutorial but keep in mind that this text file here is the "truth". Whenever the video tutorial and this file are different, this file with be correct and the video tutorial will be wrong/outdated.
 
 ## Prerequisites
 Please ensure you have these applications installed on your computer:

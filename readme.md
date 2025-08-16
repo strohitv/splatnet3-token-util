@@ -3,9 +3,9 @@ This project contains an application which can be used to extract the gToken and
 
 The tokens get stored into a file which can be freely configured, however this project was created specifically to be compatible with [s3s](https://github.com/frozenpandaman/s3s) by frozenpandaman. For this reason, the example template file included here is compatible with the s3s config.txt file.
 
-## QUICK START: running s3s with the provided example files
+## QUICK START GUIDE: running s3s with the provided example files
 
-An easy way to set up the script to work with s3s is described in [quickstart_s3s_tutorial.md](quickstart_s3s_tutorial.md). Please head there if you want to either use this project in combination with s3s.
+An easy way to set up the script to work with s3s is described in [quickstart_s3s_guide.md](quickstart_s3s_guide.md). Please head there if you want to use this project in combination with s3s.
 
 ## Installation
 
@@ -55,7 +55,7 @@ Here is a list of some important files and directories of the project structure
 
 ### Main files, documentation files and configuration files
 - `main.py`: this is the main script which will be used to start the token extraction. Use `python main.py --help` to get the available arguments
-- `run_s3s.py`: this script manages the integration with s3s. Unlike main.py, this script does not have its own help command because it redirects all arguments directly to s3s. Please use refer to [quickstart_s3s_tutorial.md](quickstart_s3s_tutorial.md) for additional documentation.
+- `run_s3s.py`: this script manages the integration with s3s. Unlike main.py, this script does not have its own help command because it redirects all arguments directly to s3s. Please use refer to [quickstart_s3s_guide.md](quickstart_s3s_guide.md) for additional documentation.
 - `quickstart_s3s_tutortial.md`: this markdown file contains a documentation on how to connect splatnet3-token-util and s3s to add a local automatic token refresh to s3s.
 - `config` directory: this directory contains configuration files for `main.py`
   - `config/config.json`: this configuration file gets created on first use and contains the configuration for `main.py`
@@ -65,13 +65,13 @@ Here is a list of some important files and directories of the project structure
 - `config.txt`: the final generated file with all tokens added
 - `steps_documentation.md`: this markdown file contains an automatically generated documentation of all steps you can use to control the emulator in `boot.txt` and `cleanup.txt`
 - `script-examples` directory: this directory contains useful example files to help with setting up the project
-  - `script-examples/config` contains sample configuration files. The `template.txt` file works with s3s and the `pixel_4_api_30_play_store` directory contains sample `boot.txt` and `cleanup.txt` files which work with a Pixel 4 API 30 AVD. These files are used in the [quickstart_s3s_tutorial.md](quickstart_s3s_tutorial.md).
+  - `script-examples/config` contains sample configuration files. The `template.txt` file works with s3s and the `pixel_4_api_30_play_store` directory contains sample `boot.txt` and `cleanup.txt` files which work with a Pixel 4 API 30 AVD. These files are used in the [quickstart_s3s_guide.md](quickstart_s3s_guide.md).
   - `script-examples/systemd` contains sample systemd configuration files. These files can be used on a Linux computer to make the token extraction run based on a timer.
 - `screenshots` directory: the emulator gets controlled mostly by matching a screenshot of the current emulator screen with template screenshots. If they match, something will be done and if they don't, something else will be done. The `screenshots` directory contains the template screenshots used for the comparison.
 
 ### Code files
 - `main.py`: this is the main script which will be used to start the token extraction. Use `python main.py --help` to get the available arguments
-- `run_s3s.py`: this script manages the integration with s3s. Unlike main.py, this script does not have its own help command because it redirects all arguments directly to s3s. Please use refer to [quickstart_s3s_tutorial.md](quickstart_s3s_tutorial.md) for additional documentation.
+- `run_s3s.py`: this script manages the integration with s3s. Unlike main.py, this script does not have its own help command because it redirects all arguments directly to s3s. Please use refer to [quickstart_s3s_guide.md](quickstart_s3s_guide.md) for additional documentation.
 - `data` directory: this directory contains code to load and parse the `config/config.json` file to get the settings for `main.py`
 - `steps` directory: this directory contains the implementation for the steps available in `config/boot.txt` and `config/cleanup.txt`. For usage documentation, please refer to `steps_documentation.md`.
 - `utils` directory: this directory contains util files which are used throughout the project
