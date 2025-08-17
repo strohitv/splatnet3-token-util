@@ -3,9 +3,12 @@ This project contains an application which can be used to extract the gToken and
 
 The tokens get stored into a file which can be freely configured, however this project was created specifically to be compatible with [s3s](https://github.com/frozenpandaman/s3s) by frozenpandaman. For this reason, the example template file included here is compatible with the s3s config.txt file.
 
-## QUICK START GUIDE: running s3s with the provided example files
+## QUICK START GUIDE FOR USERS: running s3s with the provided example files
 
 An easy way to set up the script to work with s3s is described in [quickstart_s3s_guide.md](quickstart_s3s_guide.md). Please head there if you want to use this project in combination with s3s.
+
+## For developers: Integration into other applications
+If you are a developer and want to integrate splatnet3-token-util into your app, please refer to the [developer notes](./developer_notes.md) for a first introduction in how to do it. If you have any questions, feel free to open an issue, I'll get to it as soon as possible.
 
 ## Installation
 
