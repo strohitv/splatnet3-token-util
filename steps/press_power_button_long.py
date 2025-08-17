@@ -5,9 +5,13 @@ import time
 from data.app_config import AppConfig
 from utils.step_doc_creator import get_arg_formatter
 
+import logging
+
 
 class PressPowerButtonLong:
 	def __init__(self, command_name, app_config: AppConfig):
+		self.logger = logging.getLogger(PressPowerButtonLong.__name__)
+
 		self.command_name = command_name
 		self.app_config = app_config
 
@@ -21,7 +25,7 @@ class PressPowerButtonLong:
 		self.introduction = 'This command presses the power button for a long time, which usually opens the power menu.'
 
 	def execute(self, args):
-		print(f'Pressing the power button for a long time.')
+		self.logger.info(f'Pressing the power button for a long time.')
 		subprocess.run(f'{self.app_config.emulator_config.adb_path} shell input keyevent --longpress KEYCODE_POWER',
 					   shell=True,
 					   stdout=subprocess.PIPE,

@@ -7,6 +7,10 @@ import uncurl
 
 from data.app_config import AppConfig
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def read_in_chunks(file_object, chunk_size=10 * 1024 * 1024):
 	while True:
@@ -32,7 +36,7 @@ def search_for_tokens(app_config: AppConfig):
 	session_token = None if app_config.token_config.extract_session_token else 'skip'
 
 	# analyse snapshot and find values
-	print(f'Searching for tokens...')
+	logger.info(f'Searching for tokens...')
 	with open(snapshot_path, 'rb') as f:
 		for piece in read_in_chunks(f):
 			# _gtoken search
@@ -59,12 +63,12 @@ def search_for_tokens(app_config: AppConfig):
 							if 200 <= response.status_code < 300:
 								bullet_token = response.json()['bulletToken']
 							else:
-								print('ERROR: did not receive a 2xx response when loading bullet_token with gtoken')
+								logger.info('ERROR: did not receive a 2xx response when loading bullet_token with gtoken')
 								if app_config.token_config.validate_g_token:
 									gtoken = None
 						except Exception as e:
-							print('ERROR: exception occurred when loading bullet_token with gtoken')
-							print(e)
+							logger.info('ERROR: exception occurred when loading bullet_token with gtoken')
+							logger.info(e)
 							bullet_token = None
 							if app_config.token_config.validate_g_token:
 								gtoken = None
@@ -84,13 +88,14 @@ def search_for_tokens(app_config: AppConfig):
 					session_token = None
 
 			if app_config.debug:
-				print('next chunk done')
+				logger.info('next chunk done')
 
-	print('Result:')
-	print('- SKIPPED\tgToken' if gtoken == 'NO_G_TOKEN_EXTRACTED' else '- SUCCESS\tgToken' if gtoken is not None else '- FAIL\t\tgToken')
-	print('- SKIPPED\tbulletToken' if bullet_token == 'NO_BULLET_TOKEN_EXTRACTED' else '- SUCCESS\tbulletToken' if bullet_token is not None else '- FAIL\t\tbulletToken')
-	print('- SKIPPED\tsessionToken' if session_token == 'skip' else '- SUCCESS\tsessionToken' if session_token is not None else '- FAIL\t\tsessionToken')
-	print()
+	logger.info('Result:')
+	logger.info('- SKIPPED\tgToken' if gtoken == 'NO_G_TOKEN_EXTRACTED' else '- SUCCESS\tgToken' if gtoken is not None else '- FAIL\t\tgToken')
+	logger.info(
+		'- SKIPPED\tbulletToken' if bullet_token == 'NO_BULLET_TOKEN_EXTRACTED' else '- SUCCESS\tbulletToken' if bullet_token is not None else '- FAIL\t\tbulletToken')
+	logger.info('- SKIPPED\tsessionToken' if session_token == 'skip' else '- SUCCESS\tsessionToken' if session_token is not None else '- FAIL\t\tsessionToken')
+	logger.info('')
 
 	if gtoken is not None:
 		gtoken = re.sub(r'[^0-9a-zA-Z.=\-_]+', '*', gtoken)

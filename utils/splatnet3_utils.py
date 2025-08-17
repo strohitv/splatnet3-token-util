@@ -2,6 +2,10 @@ import json
 
 import requests
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def create_headers(bullet_token):
 	lang = 'en-US'
@@ -25,7 +29,7 @@ def create_headers(bullet_token):
 
 
 def is_homepage_reachable(g_token, bullet_token):
-	print(f'Trying to access SplatNet 3 homepage')
+	logger.info(f'Trying to access SplatNet 3 homepage')
 
 	headers = create_headers(bullet_token)
 
@@ -35,10 +39,10 @@ def is_homepage_reachable(g_token, bullet_token):
 	result = requests.post('https://api.lp1.av5ja.srv.nintendo.net/api/graphql', data=json.dumps(body), headers=headers, cookies={'_gtoken': g_token})
 
 	if result.status_code < 300:
-		print(f'SplatNet 3 homepage could be reached, tokens are valid')
+		logger.info(f'SplatNet 3 homepage could be reached, tokens are valid')
 	else:
-		print(f'SplatNet 3 homepage returned status code {result.status_code}, tokens are invalid')
+		logger.info(f'SplatNet 3 homepage returned status code {result.status_code}, tokens are invalid')
 
-	print()
+	logger.info('')
 
 	return result.status_code < 300

@@ -9,9 +9,13 @@ from time import sleep
 
 from data.app_config import AppConfig
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def boot_emulator(app_config: AppConfig):
-	print('Booting emulator...')
+	logger.info('Booting emulator...')
 	emulator_proc = Popen(
 		f'{app_config.emulator_config.emulator_path} {app_config.emulator_config.get_emulator_boot_args()}',
 		shell=True,
@@ -20,7 +24,7 @@ def boot_emulator(app_config: AppConfig):
 
 	for line in io.TextIOWrapper(emulator_proc.stdout, encoding="utf-8"):
 		if app_config.debug:
-			print(line.strip())
+			logger.info(line.strip())
 
 		if not line:
 			break
@@ -33,8 +37,8 @@ def boot_emulator(app_config: AppConfig):
 	# don't wait here cause the required time depends on HW. Should be part of boot script
 	# time.sleep(20.0)
 
-	print('Emulator booted successfully!')
-	print()
+	logger.info('Emulator booted successfully!')
+	logger.info('')
 
 	return emulator_proc
 
@@ -47,7 +51,7 @@ def get_emulator_name(app_config: AppConfig):
 	emulator_name = 'emulator-5554'
 	for line in io.TextIOWrapper(emulator_devices_proc.stdout, encoding="utf-8"):
 		if app_config.debug:
-			print(line.strip())
+			logger.info(line.strip())
 
 		if not line:
 			break
@@ -63,7 +67,7 @@ def get_emulator_name(app_config: AppConfig):
 
 
 def run_adb(app_config: AppConfig, command: str):
-	print(f'Running adb command "{command}"...\n')
+	logger.info(f'Running adb command "{command}"...\n')
 	# get emulator name
 	emulator_name = get_emulator_name(app_config)
 
@@ -72,12 +76,12 @@ def run_adb(app_config: AppConfig, command: str):
 				   shell=True,
 				   stderr=sys.stderr,
 				   stdout=sys.stdout)
-	print(f'Command execution finished')
-	print()
+	logger.info(f'Command execution finished')
+	logger.info('')
 
 
 def create_snapshot(app_config: AppConfig):
-	print(f'Creating snapshot...')
+	logger.info(f'Creating snapshot...')
 	# get emulator name
 	emulator_name = get_emulator_name(app_config)
 
@@ -86,8 +90,8 @@ def create_snapshot(app_config: AppConfig):
 				   shell=True,
 				   stdout=subprocess.PIPE,
 				   stderr=subprocess.PIPE)
-	print(f'Snapshot created!')
-	print()
+	logger.info(f'Snapshot created!')
+	logger.info('')
 
 
 def delete_snapshot(app_config: AppConfig):
@@ -97,7 +101,7 @@ def delete_snapshot(app_config: AppConfig):
 
 
 def request_emulator_shutdown(app_config: AppConfig):
-	print(f'Requesting emulator shutdown...')
+	logger.info(f'Requesting emulator shutdown...')
 	# get emulator name
 	emulator_name = get_emulator_name(app_config)
 
@@ -108,19 +112,19 @@ def request_emulator_shutdown(app_config: AppConfig):
 				   stderr=subprocess.PIPE)
 
 	sleep_time = 5
-	print(f'Requested emulator shutdown! Giving the emulator a grace period of {sleep_time} seconds to shut down...')
+	logger.info(f'Requested emulator shutdown! Giving the emulator a grace period of {sleep_time} seconds to shut down...')
 	sleep(sleep_time)
-	print(f'{sleep_time} seconds passed.')
-	print()
+	logger.info(f'{sleep_time} seconds passed.')
+	logger.info('')
 
 
 def wait_for_shutdown(emulator_proc):
-	print(f'Waiting for emulator to shut down...')
+	logger.info(f'Waiting for emulator to shut down...')
 
 	result = None
 	while result is None:
 		result = emulator_proc.poll()
 		time.sleep(1.0)
 
-	print(f'Emulator shut down!')
-	print()
+	logger.info(f'Emulator shut down!')
+	logger.info('')

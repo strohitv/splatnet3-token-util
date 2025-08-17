@@ -1,3 +1,8 @@
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 def execute(line, all_available_steps):
 	# split line into different statements
 	commands = ['']
@@ -55,7 +60,7 @@ def analyse_line_break_elligibility(line):
 
 
 def execute_script(all_available_steps, script_location, script_name, is_debug):
-	print(f'Executing {script_name} script...')
+	logger.info(f'Executing {script_name} script...')
 	with open(script_location, 'r') as boot_script:
 		while True:
 			line = boot_script.readline()
@@ -81,8 +86,8 @@ def execute_script(all_available_steps, script_location, script_name, is_debug):
 			line = line.strip()
 
 			if is_debug:
-				print(line)
+				logger.info(line)
 
 			execute(line, all_available_steps)
-	print(f'Finished {script_name} script execution.')
-	print()
+	logger.info(f'Finished {script_name} script execution.')
+	logger.info('')

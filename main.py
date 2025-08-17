@@ -1,4 +1,6 @@
 import argparse
+import json
+
 import multiprocess
 import os
 import signal
@@ -17,13 +19,18 @@ from utils.stats_utils import prepare_stats, write_stats
 from utils.step_doc_creator import create_step_doc
 from utils.template_utils import create_target_file
 
+import logging
+
+logging.basicConfig(format='%(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 SUCCESS = 0
 INPUT_VALIDATION_FAILED = 1
 NOT_ALL_TOKENS_FOUND = 2
 INVALID_TOKENS_FOUND = 3
 
 
-def run_token_extraction(app_config: AppConfig, all_available_steps, start, started_at, attempt, emulator_pid):
+def run_token_extraction(app_config: AppConfig, all_available_steps, print_to_console, start, started_at, attempt, emulator_pid):
 	# run emulator and create RAM dump
 	emulator_proc = boot_emulator(app_config)
 	emulator_pid.value = emulator_proc.pid
@@ -45,8 +52,8 @@ def run_token_extraction(app_config: AppConfig, all_available_steps, start, star
 			and app_config.token_config.extract_bullet_token and app_config.token_config.validate_bullet_token):
 
 			if not is_homepage_reachable(g_token, bullet_token):
-				print('tokens were found but are invalid, attempt did not work')
-				print()
+				logger.info('tokens were found but are invalid, attempt did not work')
+				logger.info('')
 				sys.exit(INVALID_TOKENS_FOUND)
 
 		# export tokens to target file
@@ -55,12 +62,19 @@ def run_token_extraction(app_config: AppConfig, all_available_steps, start, star
 
 		create_target_file(app_config, g_token, bullet_token, session_token)
 		write_stats(app_config.run_config.log_stats_csv, app_config.run_config.stats_csv_path, started_at, True, attempt, elapsed)
-		print(f'Done after {attempt} attempts and {elapsed:0.1f} seconds total. Application will exit now. Bye!')
+		logger.info(f'Done after {attempt} attempts and {elapsed:0.1f} seconds total. Application will exit now. Bye!')
+
+		if print_to_console:
+			print(json.dumps({
+				'g_token': g_token,
+				'bullet_token': bullet_token,
+				'session_token': session_token,
+			}))
 
 		sys.exit(SUCCESS)
 	else:
-		print('not all tokens could be found, attempt did not work')
-		print()
+		logger.info('not all tokens could be found, attempt did not work')
+		logger.info('')
 		sys.exit(NOT_ALL_TOKENS_FOUND)
 
 
@@ -68,6 +82,9 @@ def main():
 	parser = argparse.ArgumentParser(prog='main.py',
 									 description='SplatNet3 Emulator Token Utility application to extract NSA SplatNet3 tokens from a controlled Android Studio emulator process')
 	parser.add_argument('-c', '--config', required=False, help='Path to configuration file', default='./config/config.json')
+	parser.add_argument('-cout', '--console-out', required=False,
+						help='Prints the tokens to stdout. It will still save the tokens to the file. Format: `{"g_token": "{GTOKEN}", "bullet_token": "{BULLETTOKEN}", "session_token": "{SESSIONTOKEN}"}`', default=False,
+						action='store_true')
 	parser.add_argument('-r', '--reinitialize-configs', required=False,
 						help='Regenerates the configuration file (and overwrites existing ones)', default=False,
 						action='store_true')
@@ -83,54 +100,54 @@ def main():
 
 	export_step_doc_env = os.environ.get('STU_EXPORT_STEP_DOC_ENV')
 	if export_step_doc_env is not None and export_step_doc_env.lower().strip() == 'true':
-		print('$STU_EXPORT_STEP_DOC_ENV environment variable is set to "true", (re-)creating steps_documentation.md')
+		logger.info('$STU_EXPORT_STEP_DOC_ENV environment variable is set to "true", (re-)creating steps_documentation.md')
 		create_step_doc(all_available_steps)
 
 	regenerated |= ensure_scripts_exist(args, app_config)
 	regenerated |= ensure_template_exists(args, app_config)
 
 	if regenerated:
-		print('Configs were regenerated, application will exit. Bye!')
-		print()
+		logger.info('Configs were regenerated, application will exit. Bye!')
+		logger.info('')
 		sys.exit(SUCCESS)
 
 	if args.boot_emulator:
 		emulator_proc = boot_emulator(app_config)
 		wait_for_shutdown(emulator_proc)
-		print('Emulator was shut down, application will exit. Bye!')
+		logger.info('Emulator was shut down, application will exit. Bye!')
 		sys.exit(SUCCESS)
 
 	if args.ADB_COMMAND is not None:
 		run_adb(app_config, args.ADB_COMMAND)
-		print('Command execution finished, application will exit. Bye!')
+		logger.info('Command execution finished, application will exit. Bye!')
 		sys.exit(SUCCESS)
 
 	if not os.path.exists(app_config.emulator_config.emulator_path):
-		print('ERROR: emulator_path in config does not exist. Please edit the config file and insert a valid emulator_path. Exiting now.')
+		logger.info('ERROR: emulator_path in config does not exist. Please edit the config file and insert a valid emulator_path. Exiting now.')
 		sys.exit(INPUT_VALIDATION_FAILED)
 
 	if not os.path.exists(app_config.emulator_config.adb_path):
-		print('ERROR: adb_path in config does not exist. Please edit the config file and insert a valid adb_path. Exiting now.')
+		logger.info('ERROR: adb_path in config does not exist. Please edit the config file and insert a valid adb_path. Exiting now.')
 		sys.exit(INPUT_VALIDATION_FAILED)
 
 	if not os.path.exists(os.path.dirname(app_config.emulator_config.get_snapshot_dir())):
-		print('ERROR: parent directory of snapshot_dir in config does not exist. Please edit the config file and insert a valid snapshot_dir. Exiting now.')
+		logger.info('ERROR: parent directory of snapshot_dir in config does not exist. Please edit the config file and insert a valid snapshot_dir. Exiting now.')
 		sys.exit(INPUT_VALIDATION_FAILED)
 
 	if not os.path.exists(app_config.run_config.boot_script_path):
-		print('ERROR: boot_script_path in config does not exist. Please edit the config file and insert a valid boot_script_path. Exiting now.')
+		logger.info('ERROR: boot_script_path in config does not exist. Please edit the config file and insert a valid boot_script_path. Exiting now.')
 		sys.exit(INPUT_VALIDATION_FAILED)
 
 	if not os.path.exists(app_config.run_config.cleanup_script_path):
-		print('ERROR: cleanup_script_path in config does not exist. Please edit the config file and insert a valid cleanup_script_path. Exiting now.')
+		logger.info('ERROR: cleanup_script_path in config does not exist. Please edit the config file and insert a valid cleanup_script_path. Exiting now.')
 		sys.exit(INPUT_VALIDATION_FAILED)
 
 	if not os.path.exists(app_config.run_config.template_path):
-		print('ERROR: template_path in config does not exist. Please edit the config file and insert a valid template_path. Exiting now.')
+		logger.info('ERROR: template_path in config does not exist. Please edit the config file and insert a valid template_path. Exiting now.')
 		sys.exit(INPUT_VALIDATION_FAILED)
 
 	start_datetime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-	print(f'### Script started at {start_datetime} ###')
+	logger.info(f'### Script started at {start_datetime} ###')
 
 	start_time = time.time()
 	prepare_stats(app_config.run_config.log_stats_csv, app_config.run_config.stats_csv_path)
@@ -140,16 +157,16 @@ def main():
 	while time.time() < last_allowed_attempt_start_time:
 		attempt += 1
 
-		print(f'### Attempt {attempt} ###')
-		print()
-		print(f'Expecting this attempt to take {max(60, app_config.run_config.max_attempt_duration_seconds)} seconds at worst.')
-		print()
+		logger.info(f'### Attempt {attempt} ###')
+		logger.info('')
+		logger.info(f'Expecting this attempt to take {max(60, app_config.run_config.max_attempt_duration_seconds)} seconds at worst.')
+		logger.info('')
 
 		extraction_process = None
 		emulator_pid = multiprocess.Value('i', 0)
 		try:
 			extraction_process = multiprocess.Process(target=run_token_extraction,
-													  args=(app_config, all_available_steps, start_time, start_datetime, attempt, emulator_pid))
+													  args=(app_config, all_available_steps, args.console_out, start_time, start_datetime, attempt, emulator_pid))
 			extraction_process.start()
 
 			targeted_end_time = time.time() + max(60, app_config.run_config.max_attempt_duration_seconds)
@@ -162,17 +179,17 @@ def main():
 				sys.exit(SUCCESS)
 
 		except Exception as e:
-			print(f'### Exception ###')
-			print(e)
-			print()
+			logger.info(f'### Exception ###')
+			logger.info(e)
+			logger.info('')
 
 			if extraction_process is not None and extraction_process.is_alive():
-				print(f'Terminating extraction process...')
+				logger.info(f'Terminating extraction process...')
 				extraction_process.terminate()
 				time.sleep(10)
 				extraction_process.kill()
-				print('Process terminated.')
-				print()
+				logger.info('Process terminated.')
+				logger.info('')
 
 			# ensure a potentially created snapshot has been deleted.
 			delete_snapshot(app_config)
@@ -180,18 +197,18 @@ def main():
 
 			if emulator_pid.value is not None and emulator_pid.value > 0:
 				try:
-					print('Emulator process might still be alive, sending KILL signal...')
-					print()
+					logger.info('Emulator process might still be alive, sending KILL signal...')
+					logger.info('')
 					os.kill(emulator_pid.value, signal.SIGKILL)
 				except Exception as e2:
-					print(e2)
+					logger.info(e2)
 
 	ended = time.time()
 	elapsed = ended - start_time
 
 	write_stats(app_config.run_config.log_stats_csv, app_config.run_config.stats_csv_path, start_datetime, False, attempt, elapsed)
-	print(f'Could not find all requested tokens in {attempt} attempts, application will stop now.\nPlease fix potential errors and try again.\nBye!')
-	print()
+	logger.info(f'Could not find all requested tokens in {attempt} attempts, application will stop now.\nPlease fix potential errors and try again.\nBye!')
+	logger.info('')
 	sys.exit(NOT_ALL_TOKENS_FOUND)
 
 

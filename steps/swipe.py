@@ -5,9 +5,13 @@ import subprocess
 from data.app_config import AppConfig
 from utils.step_doc_creator import get_arg_formatter
 
+import logging
+
 
 class Swipe:
 	def __init__(self, command_name, app_config: AppConfig):
+		self.logger = logging.getLogger(Swipe.__name__)
+
 		self.command_name = command_name
 		self.app_config = app_config
 
@@ -29,7 +33,7 @@ class Swipe:
 		only_args = shlex.split(args)[1:]
 		parsed_args = self.parser.parse_args(only_args)
 
-		print(f'Swiping from position ({parsed_args.x1}, {parsed_args.y1}) to ({parsed_args.x2}, {parsed_args.y2}) in {parsed_args.duration} milliseconds.')
+		self.logger.info(f'Swiping from position ({parsed_args.x1}, {parsed_args.y1}) to ({parsed_args.x2}, {parsed_args.y2}) in {parsed_args.duration} milliseconds.')
 		subprocess.run(
 			f'{self.app_config.emulator_config.adb_path} shell input swipe {parsed_args.x1} {parsed_args.y1} {parsed_args.x2} {parsed_args.y2} {parsed_args.duration}',
 			shell=True,

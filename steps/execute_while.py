@@ -11,9 +11,13 @@ from data.app_config import AppConfig
 from utils import script_utils
 from utils.step_doc_creator import get_arg_formatter
 
+import logging
+
 
 class ExecuteWhile:
 	def __init__(self, command_name, app_config: AppConfig, all_steps):
+		self.logger = logging.getLogger(ExecuteWhile.__name__)
+
 		self.command_name = command_name
 		self.app_config = app_config
 		self.all_steps = all_steps
@@ -52,7 +56,7 @@ class ExecuteWhile:
 		start = time.time()
 
 		expect_found = parsed_args.mode == 'found'
-		print(f'Repeatedly executing command as long as region can {"" if expect_found else "not "}be found')
+		self.logger.info(f'Repeatedly executing command as long as region can {"" if expect_found else "not "}be found')
 
 		fulfilled = False
 
@@ -61,7 +65,7 @@ class ExecuteWhile:
 
 			time.sleep(int(parsed_args.duration) / 1000.0)
 
-			print(f'Comparing screenshot "{parsed_args.actual}" to base screenshot "{parsed_args.template}" with cutoff {parsed_args.cutoff}.')
+			self.logger.info(f'Comparing screenshot "{parsed_args.actual}" to base screenshot "{parsed_args.template}" with cutoff {parsed_args.cutoff}.')
 			subprocess.run(f'{self.app_config.emulator_config.adb_path} exec-out screencap -p > {parsed_args.actual}',
 						   shell=True,
 						   stdout=subprocess.PIPE,
@@ -71,7 +75,7 @@ class ExecuteWhile:
 									 parsed_args.cutoff, expect_found, self.app_config.debug)
 
 		end = time.time()
-		print(f'Not found anymore after {(end - start):0.1f} seconds.')
+		self.logger.info(f'Not found anymore after {(end - start):0.1f} seconds.')
 
 	def compare(self, template, actual, x1, y1, x2, y2, cutoff, expect_found, debug):
 		try:
@@ -85,7 +89,7 @@ class ExecuteWhile:
 			hash1 = imagehash.average_hash(compare_image_cropped)
 
 			if self.app_config.debug:
-				print(f'hash #1: {hash0}, hash #2: {hash1}, difference: {hash1 - hash0}')
+				self.logger.info(f'hash #1: {hash0}, hash #2: {hash1}, difference: {hash1 - hash0}')
 				base_cropped.save(f'{template}-cropped.png')
 				compare_image_cropped.save(f'{actual}-cropped.png')
 

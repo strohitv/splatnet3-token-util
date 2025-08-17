@@ -5,9 +5,13 @@ import shlex
 from data.app_config import AppConfig
 from utils.step_doc_creator import get_arg_formatter
 
+import logging
+
 
 class Tap:
 	def __init__(self, command_name, app_config: AppConfig):
+		self.logger = logging.getLogger(Tap.__name__)
+
 		self.command_name = command_name
 		self.app_config = app_config
 
@@ -26,7 +30,7 @@ class Tap:
 		only_args = shlex.split(args)[1:]
 		parsed_args = self.parser.parse_args(only_args)
 
-		print(f'Tapping position ({parsed_args.x}, {parsed_args.y}).')
+		self.logger.info(f'Tapping position ({parsed_args.x}, {parsed_args.y}).')
 		subprocess.run(f'{self.app_config.emulator_config.adb_path} shell input tap {parsed_args.x} {parsed_args.y}',
 					   shell=True,
 					   stdout=subprocess.PIPE,

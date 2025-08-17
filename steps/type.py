@@ -5,9 +5,13 @@ import shlex
 from data.app_config import AppConfig
 from utils.step_doc_creator import get_arg_formatter
 
+import logging
+
 
 class Type:
 	def __init__(self, command_name, app_config: AppConfig):
+		self.logger = logging.getLogger(Type.__name__)
+
 		self.command_name = command_name
 		self.app_config = app_config
 
@@ -25,7 +29,7 @@ class Type:
 		only_args = shlex.split(args)[1:]
 		parsed_args = self.parser.parse_args(only_args)
 
-		print(f'Typing text "{parsed_args.text}".')
+		self.logger.info(f'Typing text "{parsed_args.text}".')
 		subprocess.run(f'{self.app_config.emulator_config.adb_path} shell input text "{parsed_args.text.replace(" ", "%s")}"',
 					   shell=True,
 					   stdout=subprocess.PIPE,

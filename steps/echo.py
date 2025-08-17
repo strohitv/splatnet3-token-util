@@ -3,9 +3,13 @@ import argparse
 from data.app_config import AppConfig
 from utils.step_doc_creator import get_arg_formatter
 
+import logging
+
 
 class Echo:
 	def __init__(self, command_name, app_config: AppConfig):
+		self.logger = logging.getLogger(Echo.__name__)
+
 		self.command_name = command_name
 		self.app_config = app_config
 
@@ -25,4 +29,4 @@ class Echo:
 		if text.startswith('\'') and text.endswith('\'') or text.startswith('"') and text.endswith('"'):
 			text = text[1:-1]
 
-		print(text)
+		self.logger.info(text)

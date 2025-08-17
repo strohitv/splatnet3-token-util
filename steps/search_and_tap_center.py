@@ -12,9 +12,13 @@ from steps.execute_while import ExecuteWhile
 from utils import script_utils
 from utils.step_doc_creator import get_arg_formatter
 
+import logging
+
 
 class SearchAndTapCenter:
 	def __init__(self, command_name, app_config: AppConfig, all_steps):
+		self.logger = logging.getLogger(SearchAndTapCenter.__name__)
+
 		self.command_name = command_name
 		self.app_config = app_config
 		self.all_steps = all_steps
@@ -98,7 +102,7 @@ class SearchAndTapCenter:
 
 			while True:
 				if not execute_immediately:
-					print(
+					self.logger.info(
 						f'Searching for image from base screenshot "{parsed_args.template}" in screenshot "{parsed_args.actual}" with cutoff {parsed_args.cutoff}.')
 					subprocess.run(f'{self.app_config.emulator_config.adb_path} exec-out screencap -p > {parsed_args.actual}',
 								   shell=True,
@@ -137,17 +141,17 @@ class SearchAndTapCenter:
 			tap_x = int((x1 + x2) / 2)
 			tap_y = int((y1 + y2) / 2)
 
-			print(f'Found at: ({x1}, {y2}), tapping position ({tap_x}, {tap_y}) until something happens')
+			self.logger.info(f'Found at: ({x1}, {y2}), tapping position ({tap_x}, {tap_y}) until something happens')
 
 			script_utils.execute(
 				f'{self.execute_command_step.command_name} -mode found -template {parsed_args.template} -actual {parsed_args.actual}_tapped.png -x1 {x1} -y1 {y1} -x2 {x2} -y2 {y2} -d 500 -cmd "tap -x {tap_x} -y {tap_y}"',
 				self.all_steps)
 
 			end = time.time()
-			print(f'Finished {self.command_name} after {(end - start):0.1f} seconds.')
+			self.logger.info(f'Finished {self.command_name} after {(end - start):0.1f} seconds.')
 		except Exception as e:
-			print(f'ERROR occured, stopping.')
-			print(e)
+			self.logger.info(f'ERROR occured, stopping.')
+			self.logger.info(e)
 
 	def compare(self, base_cropped, compare_image, comparison_x1, comparison_y1, comparison_x2, comparison_y2, region_x1, region_y1, region_x2, region_y2, cutoff, h_step,
 				v_step,
@@ -177,7 +181,7 @@ class SearchAndTapCenter:
 			hash_diff = hash0 - hash1
 
 			if self.app_config.debug and hash_diff < cutoff:
-				print(f'hash #1: {hash0}, hash #2: {hash1}, difference: {hash1 - hash0}')
+				self.logger.info(f'hash #1: {hash0}, hash #2: {hash1}, difference: {hash1 - hash0}')
 				base_cropped.save(f'{self.parsed_args.template}-base-cropped.png')
 				compare_image_cropped.save(f'{self.parsed_args.actual}-image-cropped.png')
 

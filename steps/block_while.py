@@ -10,9 +10,13 @@ import imagehash
 from data.app_config import AppConfig
 from utils.step_doc_creator import get_arg_formatter
 
+import logging
+
 
 class BlockWhile:
 	def __init__(self, command_name, app_config: AppConfig):
+		self.logger = logging.getLogger(BlockWhile.__name__)
+
 		self.command_name = command_name
 		self.app_config = app_config
 
@@ -48,14 +52,14 @@ class BlockWhile:
 		start = time.time()
 
 		expect_found = parsed_args.mode == 'found'
-		print(f'Blocking as long as region can {"" if expect_found else "not "}be found')
+		self.logger.info(f'Blocking as long as region can {"" if expect_found else "not "}be found')
 
 		fulfilled = False
 
 		while not fulfilled:
 			time.sleep(int(parsed_args.duration) / 1000.0)
 
-			print(f'Comparing screenshot "{parsed_args.actual}" to base screenshot "{parsed_args.template}" with cutoff {parsed_args.cutoff}.')
+			self.logger.info(f'Comparing screenshot "{parsed_args.actual}" to base screenshot "{parsed_args.template}" with cutoff {parsed_args.cutoff}.')
 			subprocess.run(f'{self.app_config.emulator_config.adb_path} exec-out screencap -p > {parsed_args.actual}',
 						   shell=True,
 						   stdout=subprocess.PIPE,
@@ -66,9 +70,9 @@ class BlockWhile:
 
 		end = time.time()
 		if expect_found:
-			print(f'Not found anymore after {(end - start):0.1f} seconds.')
+			self.logger.info(f'Not found anymore after {(end - start):0.1f} seconds.')
 		else:
-			print(f'Found after {(end - start):0.1f} seconds.')
+			self.logger.info(f'Found after {(end - start):0.1f} seconds.')
 
 	def compare(self, template, actual, x1, y1, x2, y2, cutoff, expect_found, debug):
 		try:
@@ -82,7 +86,7 @@ class BlockWhile:
 			hash1 = imagehash.average_hash(compare_image_cropped)
 
 			if self.app_config.debug:
-				print(f'hash #1: {hash0}, hash #2: {hash1}, difference: {hash1 - hash0}')
+				self.logger.info(f'hash #1: {hash0}, hash #2: {hash1}, difference: {hash1 - hash0}')
 				base_cropped.save(f'{template}-cropped.png')
 				compare_image_cropped.save(f'{actual}-cropped.png')
 

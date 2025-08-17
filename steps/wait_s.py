@@ -5,9 +5,13 @@ import time
 from data.app_config import AppConfig
 from utils.step_doc_creator import get_arg_formatter
 
+import logging
+
 
 class WaitS:
 	def __init__(self, command_name, app_config: AppConfig):
+		self.logger = logging.getLogger(WaitS.__name__)
+
 		self.command_name = command_name
 		self.app_config = app_config
 
@@ -25,5 +29,5 @@ class WaitS:
 		only_args = shlex.split(args)[1:]
 		parsed_args = self.parser.parse_args(only_args)
 
-		print(f'Waiting for {parsed_args.seconds} seconds.')
+		self.logger.info(f'Waiting for {parsed_args.seconds} seconds.')
 		time.sleep(float(parsed_args.seconds))

@@ -4,6 +4,11 @@ import shutil
 import subprocess
 import sys
 
+import logging
+
+logging.basicConfig(format='%(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 # This script serves as a wrapper for s3s and automatically refreshes the tokens used by it if necessary
 
 DEFAULT_CONFIG = {
@@ -35,7 +40,7 @@ def load_and_check_config():
 		write_config_and_exit(config)
 
 	if not os.path.exists(config['s3s_directory']):
-		print('ERROR: s3s_directory does not exist, exiting.')
+		logger.info('ERROR: s3s_directory does not exist, exiting.')
 		sys.exit(3)
 
 	return config
@@ -45,7 +50,7 @@ def write_config_and_exit(config):
 	with open('config_run_s3s.json', 'w') as f:
 		json.dump(config, f, indent=4)
 
-	print('Saved config file "config_run_s3s.json". Please fill it according to your needs and restart this script afterwards. Exiting now.')
+	logger.info('Saved config file "config_run_s3s.json". Please fill it according to your needs and restart this script afterwards. Exiting now.')
 	sys.exit(0)
 
 
@@ -53,33 +58,33 @@ def main():
 	config = load_and_check_config()
 
 	if len(sys.argv[1:]) == 0:
-		print('Using "--help" as command line args since you did not provide any.')
+		logger.info('Using "--help" as command line args since you did not provide any.')
 		sys.argv += ['--help']
-		print()
+		logger.info('')
 
 	s3s_args = ' '.join(['--norefresh', config['s3s_refresh_rc']] + sys.argv[1:])
 
 	while True:
 		# 1. prepare s3s run
-		print('###########')
-		print('running s3s')
-		print('###########')
-		print()
+		logger.info('###########')
+		logger.info('running s3s')
+		logger.info('###########')
+		logger.info('')
 
-		print(f'Running s3s with command "{config["python_command"]} {os.path.join(config["s3s_directory"], "s3s.py")} {s3s_args}"')
-		print()
+		logger.info(f'Running s3s with command "{config["python_command"]} {os.path.join(config["s3s_directory"], "s3s.py")} {s3s_args}"')
+		logger.info('')
 
 		if config['s3s_update']:
-			print(f'1/2 Running s3s update with command "{config["git_command"]} pull"')
+			logger.info(f'1/2 Running s3s update with command "{config["git_command"]} pull"')
 			subprocess.run(f'{config["git_command"]} pull',
 						   cwd=config['s3s_directory'],
 						   shell=True)
-			print()
-			print(f'2/2 Running s3s update with command "{config["pip_command"]} install -r requirements.txt"')
+			logger.info('')
+			logger.info(f'2/2 Running s3s update with command "{config["pip_command"]} install -r requirements.txt"')
 			subprocess.run(f'{config["pip_command"]} install -r requirements.txt',
 						   cwd=config['s3s_directory'],
 						   shell=True)
-			print()
+			logger.info('')
 			config['s3s_update'] = False
 
 		# 2. run s3s and store return code
@@ -87,55 +92,55 @@ def main():
 								  cwd=config['s3s_directory'],
 								  shell=True)
 
-		print()
-		print(f's3s finished. Return code: {s3s_proc.returncode}')
+		logger.info('')
+		logger.info(f's3s finished. Return code: {s3s_proc.returncode}')
 
 		# stop script if s3s ran successfully
 		if s3s_proc.returncode == 0:
-			print('s3s finished successful -> exiting script.')
+			logger.info('s3s finished successful -> exiting script.')
 			sys.exit(0)
 
-		print()
+		logger.info('')
 
 		# stop script if s3s failed
 		if s3s_proc.returncode != int(config['s3s_refresh_rc']):
 			# ERROR: s3s failed
-			print('ERROR DURING s3s!!!')
-			print('exiting script.')
+			logger.info('ERROR DURING s3s!!!')
+			logger.info('exiting script.')
 			sys.exit(1)
 
 		# 3. token refresh required - prepare splatnet3-token-util run
-		print('###########################')
-		print('running splanet3-token-util')
-		print('###########################')
-		print()
+		logger.info('###########################')
+		logger.info('running splanet3-token-util')
+		logger.info('###########################')
+		logger.info('')
 
 		if config['stu_update']:
-			print(f'1/2 Running splatnet3-token-util update with command "{config["git_command"]} pull"')
+			logger.info(f'1/2 Running splatnet3-token-util update with command "{config["git_command"]} pull"')
 			subprocess.run(f'{config["git_command"]} pull',
 						   shell=True)
-			print()
-			print(f'2/2 Running splatnet3-token-util update with command "{config["pip_command"]} install -r requirements.txt"')
+			logger.info('')
+			logger.info(f'2/2 Running splatnet3-token-util update with command "{config["pip_command"]} install -r requirements.txt"')
 			subprocess.run(f'{config["pip_command"]} install -r requirements.txt',
 						   shell=True)
-			print()
+			logger.info('')
 			config['stu_update'] = False
 
 		# 4. run splatnet3-token-util and act according to result
 		stu_proc = subprocess.run(f'{config["python_command"]} main.py',
 								  shell=True)
 
-		print()
+		logger.info('')
 
 		if stu_proc.returncode == 0:
 			# copy config to s3s directory
 			shutil.copyfile(config['generated_config_filepath'], os.path.join(config['s3s_directory'], 'config.txt'))
-			print('config.txt written into s3s folder')
-			print()
+			logger.info('config.txt written into s3s folder')
+			logger.info('')
 		else:
 			# ERROR: splatnet3-token-util stopped after X failed attempts
-			print('ERROR DURING TOKEN EXTRACTION!!!')
-			print('exiting the script')
+			logger.info('ERROR DURING TOKEN EXTRACTION!!!')
+			logger.info('exiting the script')
 			sys.exit(2)
 
 
