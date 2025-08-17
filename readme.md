@@ -44,8 +44,8 @@ Once everything is set up, running `main.py` will start the token extraction. He
 5. After the emulator has been shut down, the script will locate and open the RAM dump and search for the gToken and bullettoken. It can also search for the session token but this is disabled by default because it's not as stable as the other two.
 6. If it finds all tokens, it will open `./config/template.txt` and replace these placeholders with the found values:
    - `{GTOKEN}` will be replaced with the gToken
-   - `{BULLETTOKEN}` will be replaced with the gToken
-   - `{SESSIONTOKEN}` will be replaced with the gToken
+   - `{BULLETTOKEN}` will be replaced with the bulletToken
+   - `{SESSIONTOKEN}` will be replaced with the sessionToken
 7. The final file will be written to `./config.txt` and can be used by other applications.
 
 Most of these settings can be changed in `./config/config.json` which gets generated the first time the script is started.
