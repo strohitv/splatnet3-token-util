@@ -1,5 +1,5 @@
 {
-	"acc_loc": "en-US|DE",
+	"acc_loc": "{APPLANGUAGE}|{NACOUNTRY}",
 	"api_key": "INSERT_YOUR_STAT_INK_API_KEY_HERE",
     "bullettoken": "{BULLETTOKEN}",
     "f_gen": "Never gonna give you up (dummy value)",

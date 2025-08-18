@@ -14,7 +14,7 @@ from utils.config_utils import load_config, ensure_scripts_exist, ensure_templat
 from utils.emulator_utils import boot_emulator, run_adb, wait_for_shutdown, create_snapshot, delete_snapshot, request_emulator_shutdown
 from utils.script_utils import execute_script
 from utils.snapshot_utils import search_for_tokens
-from utils.splatnet3_utils import is_homepage_reachable
+from utils.splatnet3_utils import is_homepage_reachable, download_splatnet3_main_js
 from utils.stats_utils import prepare_stats, write_stats
 from utils.step_doc_creator import create_step_doc
 from utils.template_utils import create_target_file
@@ -42,16 +42,16 @@ def run_token_extraction(app_config: AppConfig, all_available_steps, print_to_co
 	emulator_pid.value = 0
 
 	# extract tokens from RAM dump
-	g_token, bullet_token, session_token = search_for_tokens(app_config)
+	g_token, bullet_token, session_token, user_agent, web_view_version, na_country, na_language, app_language = search_for_tokens(app_config)
 	delete_snapshot(app_config)
 
-	if g_token is not None and bullet_token is not None and session_token is not None:
+	if g_token is not None and bullet_token is not None and session_token is not None and na_country is not None:
 		# do a webrequest to see whether they work
 		if (app_config.token_config.validate_splat3_homepage
 			and app_config.token_config.extract_g_token and app_config.token_config.validate_g_token
 			and app_config.token_config.extract_bullet_token and app_config.token_config.validate_bullet_token):
 
-			if not is_homepage_reachable(g_token, bullet_token):
+			if not is_homepage_reachable(g_token, bullet_token, user_agent, web_view_version, na_country, na_language, app_language):
 				logger.info('tokens were found but are invalid, attempt did not work')
 				logger.info('')
 				sys.exit(INVALID_TOKENS_FOUND)
@@ -60,7 +60,7 @@ def run_token_extraction(app_config: AppConfig, all_available_steps, print_to_co
 		end = time.time()
 		elapsed = end - start
 
-		create_target_file(app_config, g_token, bullet_token, session_token)
+		create_target_file(app_config, g_token, bullet_token, session_token, user_agent, web_view_version, na_country, na_language, app_language)
 		write_stats(app_config.run_config.log_stats_csv, app_config.run_config.stats_csv_path, started_at, True, attempt, elapsed)
 		logger.info(f'Done after {attempt} attempts and {elapsed:0.1f} seconds total. Application will exit now. Bye!')
 
@@ -69,6 +69,11 @@ def run_token_extraction(app_config: AppConfig, all_available_steps, print_to_co
 				'g_token': g_token,
 				'bullet_token': bullet_token,
 				'session_token': session_token,
+				'user_agent': user_agent,
+				'web_view_version': web_view_version,
+				'na_country': na_country,
+				'na_language': na_language,
+				'app_language': app_language
 			}))
 
 		sys.exit(SUCCESS)
@@ -83,7 +88,7 @@ def main():
 									 description='SplatNet3 Emulator Token Utility application to extract NSA SplatNet3 tokens from a controlled Android Studio emulator process')
 	parser.add_argument('-c', '--config', required=False, help='Path to configuration file', default='./config/config.json')
 	parser.add_argument('-cout', '--console-out', required=False,
-						help='Prints the tokens to stdout. It will still save the tokens to the file. Format: `{"g_token": "{GTOKEN}", "bullet_token": "{BULLETTOKEN}", "session_token": "{SESSIONTOKEN}"}`', default=False,
+						help='Prints the tokens to stdout. It will still save the tokens to the file. Format: `{"g_token": "{GTOKEN}", "bullet_token": "{BULLETTOKEN}", "session_token": "{SESSIONTOKEN}", "user_agent": "{USERAGENT}", "web_view_version": "{WEBVIEWVERSION}", "na_country": "{NACOUNTRY}", "na_language": "{NALANGUAGE}", "app_language": "{APPLANGUAGE}"}`', default=False,
 						action='store_true')
 	parser.add_argument('-r', '--reinitialize-configs', required=False,
 						help='Regenerates the configuration file (and overwrites existing ones)', default=False,

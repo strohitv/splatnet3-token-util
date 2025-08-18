@@ -8,7 +8,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def create_target_file(app_config: AppConfig, g_token, bullet_token, session_token):
+def create_target_file(app_config: AppConfig, g_token, bullet_token, session_token, user_agent, web_view_version, na_country, na_language, app_language):
 	logger.info(f'Reading the template file "{app_config.run_config.template_path}".')
 	with open(app_config.run_config.template_path, 'r') as template:
 		logger.info(f'Creating target file content from template.')
@@ -23,7 +23,14 @@ def create_target_file(app_config: AppConfig, g_token, bullet_token, session_tok
 				# issue caused by user, app is not able to resolve it -> stop here
 				sys.exit(2)
 
-		final_file = template_file.replace('{GTOKEN}', g_token).replace('{BULLETTOKEN}', bullet_token).replace('{SESSIONTOKEN}', session_token)
+		final_file = template_file.replace('{GTOKEN}', g_token)
+		final_file = final_file.replace('{BULLETTOKEN}', bullet_token)
+		final_file = final_file.replace('{SESSIONTOKEN}', session_token)
+		final_file = final_file.replace('{USERAGENT}', user_agent)
+		final_file = final_file.replace('{WEBVIEWVERSION}', web_view_version)
+		final_file = final_file.replace('{NACOUNTRY}', na_country)
+		final_file = final_file.replace('{NALANGUAGE}', na_language)
+		final_file = final_file.replace('{APPLANGUAGE}', app_language)
 
 		if app_config.token_config.validate_target_file_as_json:
 			try:

@@ -49,6 +49,11 @@ Once everything is set up, running `main.py` will start the token extraction. He
    - `{GTOKEN}` will be replaced with the gToken
    - `{BULLETTOKEN}` will be replaced with the bulletToken
    - `{SESSIONTOKEN}` will be replaced with the sessionToken
+   - `{USERAGENT}` will be replaced with the user agent the emulator used in the requests
+   - `{WEBVIEWVERSION}` will be replaced with the `x-web-view-ver` header
+   - `{NACOUNTRY}` will be replaced with the country of the nintendo account (`na_country`)
+   - `{NALANGUAGE}` will be replaced with the language of the nintendo account (`na_lang`)
+   - `{APPLANGUAGE}` will be replaced with the language of the app / phone (`lang`)
 7. The final file will be written to `./config.txt` and can be used by other applications.
 
 Most of these settings can be changed in `./config/config.json` which gets generated the first time the script is started.
