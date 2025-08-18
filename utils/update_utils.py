@@ -21,8 +21,8 @@ def check_for_update(app_config: AppConfig):
 		if not line:
 			break
 
-		# git fetch never prints something, thus any line should be considered an issue
-		fetch_errors += '\n' + line
+		if 'error' in line.lower():
+			fetch_errors += '\n' + line
 
 	if len(fetch_errors) > 0:
 		logger.error('')
@@ -113,10 +113,10 @@ def update(app_config: AppConfig):
 			if not line:
 				break
 
-			logger.info(line.strip())
-
 			if 'error' in line.lower():
 				update_error_command = current_command
 				logger.error(line.strip())
+			else:
+				logger.info(line.strip())
 
 	return update_error_command

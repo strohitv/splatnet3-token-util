@@ -107,6 +107,19 @@ def main():
 
 	all_available_steps = all_steps.get_steps(app_config)
 
+	export_step_doc_env = os.environ.get('STU_EXPORT_STEP_DOC_ENV')
+	if export_step_doc_env is not None and export_step_doc_env.lower().strip() == 'true':
+		logger.info('$STU_EXPORT_STEP_DOC_ENV environment variable is set to "true", (re-)creating steps_documentation.md')
+		create_step_doc(all_available_steps)
+
+	regenerated |= ensure_scripts_exist(args, app_config)
+	regenerated |= ensure_template_exists(args, app_config)
+
+	if regenerated:
+		logger.info('Configs were regenerated, application will exit. Bye!')
+		logger.info('')
+		sys.exit(SUCCESS)
+
 	if args.update:
 		error_command = update(app_config)
 
@@ -123,19 +136,6 @@ def main():
 		if check_for_update(app_config):
 			print_update_notification(app_config)
 			atexit.register(lambda: print_update_notification(app_config, prefix='\n'))
-
-	export_step_doc_env = os.environ.get('STU_EXPORT_STEP_DOC_ENV')
-	if export_step_doc_env is not None and export_step_doc_env.lower().strip() == 'true':
-		logger.info('$STU_EXPORT_STEP_DOC_ENV environment variable is set to "true", (re-)creating steps_documentation.md')
-		create_step_doc(all_available_steps)
-
-	regenerated |= ensure_scripts_exist(args, app_config)
-	regenerated |= ensure_template_exists(args, app_config)
-
-	if regenerated:
-		logger.info('Configs were regenerated, application will exit. Bye!')
-		logger.info('')
-		sys.exit(SUCCESS)
 
 	if args.boot_emulator:
 		emulator_proc = boot_emulator(app_config)
