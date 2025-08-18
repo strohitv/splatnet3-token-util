@@ -110,6 +110,7 @@ def main():
 	export_step_doc_env = os.environ.get('STU_EXPORT_STEP_DOC_ENV')
 	if export_step_doc_env is not None and export_step_doc_env.lower().strip() == 'true':
 		logger.info('$STU_EXPORT_STEP_DOC_ENV environment variable is set to "true", (re-)creating steps_documentation.md')
+		logger.info('')
 		create_step_doc(all_available_steps)
 
 	regenerated |= ensure_scripts_exist(args, app_config)

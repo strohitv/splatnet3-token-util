@@ -38,6 +38,25 @@ python main.py
 ```
 After running them, you're good to go and can use the script.
 
+## Updates
+From August 18th 2025 onwards, `python main.py` is able to search for updates and notify the user if it found one. The search can be configured in the `./config/config.json` file.
+
+If you downloaded the project before August 18th, please make sure to run the manual update once to download the updated version which can do update checks.
+
+There are two options to update the app:
+```shell
+# Letting the script update itself:
+python main.py --update
+# it will exit afterwards, with either rc 0 (success) or 4 (update failed)
+
+# Manual update:
+git pull
+pip install -r requirements.txt
+
+# Running main.py without update check:
+python main.py --disable-update-check
+```
+
 ## Token extraction workflow
 Once everything is set up, running `main.py` will start the token extraction. Here's a short summary on what is going to happen step by step:
 1. Boot an emulator with the requested AVD (Android Virtual Device = the emulated phone)
@@ -56,7 +75,7 @@ Once everything is set up, running `main.py` will start the token extraction. He
    - `{APPLANGUAGE}` will be replaced with the language of the app / phone (`lang`)
 7. The final file will be written to `./config.txt` and can be used by other applications.
 
-Most of these settings can be changed in `./config/config.json` which gets generated the first time the script is started.
+Most of these settings can be changed in `./config/config.json` which gets generated the first time the script is started. Please be aware that `./config/config.json` will be written to disk on each run, ensuring it always contains the current configuration settings. This means manual edits and fields will be overridden! 
 
 ## Important parts of the project
 Here is a list of some important files and directories of the project structure
@@ -91,6 +110,7 @@ Here is a list of some important files and directories of the project structure
   - `utils/stats_utils.py`: this file is responsible for generating a statistics file which tracks duration and success of executions of the `main.py` script. This feature is not active by default and needs to be enabled in the `config/config.json` file first.
   - `utils/step_doc_creator.py`: this file generates the `steps_documentation.md` documentation file
   - `utils/template_utils.py`: this file fills the `config/template.txt` file with found tokens and stores it to `config.txt`
+  - `utils/update_utils.py`: this file manages everything related to updating the project: update fetching, notifications and update execution
 
 ## main.py basic commands
 Currently, `main.py` offers three main commands you can execute: 
@@ -121,15 +141,30 @@ PLEASE NOTE: this script does not work when several emulators are booted at the 
 
 ## ram.bin file
 - use a hex editor (recommendation: Linux: gHex, Windows: HxD) to search through the RAM
-- not all Snapshots contain all Tokens sadly
+- not all Snapshots contain all Tokens. To find all tokens, good timing is required.
 - gtoken: search for `_gtoken=ey`
 - bullettoken: search for `"bulletToken":"`, if not found, search for `Bearer ` and afterwards a weird String with roughly 124 characters
 - sessionToken: search for `SessionToken">ey`, better string: `eyJhbGciOiJIUzI1NiJ9` (which usually is the first part of the session token)
+- userAgent: search for `Mozilla/5.0`, take a User Agent which looks normal and contains the Android Version and Safari Version
+- appLanguage: search for `api.lp1.av5ja.srv.nintendo.net/?lang=` and extract the value from the query parameters of the full url
+- naCountry: search for `api.lp1.av5ja.srv.nintendo.net/?lang=` and extract the value from the query parameters of the full url
+- naLanguage: search for `api.lp1.av5ja.srv.nintendo.net/?lang=` and extract the value from the query parameters of the full url
+- webViewVersion:
+  - **if SplatNet3 loads successfully**: search for `x-web-view-ver` until you find a position where some bytes later a string in the form of `{VERSION}-{HASH}` can be found. Example: `10.0.0-cba84fcd`
+  - **if SplatNet3 displays an error message**: sadly, this is a bit too complex for this readme. You would need to search for `"revision_info_not_set"` and build the webViewVersion yourself. The algorithm can be found in the `search_for_web_view_version_in_js(content)` method in [snapshot_utils](./utils/snapshot_utils.py).
 
 # Contribution
-If you want to add a feature or fix a bug, please fork the project and send a pull request once your code is ready to be merged. Please use "Conventional Commits" to create the commit message if possible. Additionally, please set your IDE up to respect the settings from the `.editorconfig` file. I appreciate all help! 
-
 Should you need help with using the application or stumble across an error, please open an issue.
+
+If you want to add a feature or fix a bug, please fork the project and send a pull request once your code is ready to be merged.
+
+Notes for pull requests:
+- Please direct the pull request towards the `preview` branch, which is the correct branch for new features which still need to be tested.
+- The `main` branch should only contain stable features.
+- Please use "Conventional Commits" to create the commit message if possible.
+- Please set your IDE up to respect the settings from the `.editorconfig` file.
+
+I appreciate all help! 
 
 # License
 This software is released under the Creative Commons BY-NC-SA 4.0 license. In short, this means:
