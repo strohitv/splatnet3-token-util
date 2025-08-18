@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from data.emulator_config import EmulatorConfig
 from data.run_config import RunConfig
 from data.token_config import TokenConfig
+from data.update_config import UpdateConfig
 
 
 @dataclass
@@ -14,6 +15,7 @@ class AppConfig:
 				 emulator_config=EmulatorConfig(),
 				 run_config=RunConfig(),
 				 token_config=TokenConfig(),
+				 update_config=UpdateConfig(),
 				 debug=False):
 		if isinstance(emulator_config, EmulatorConfig):
 			self.emulator_config = emulator_config
@@ -29,6 +31,11 @@ class AppConfig:
 			self.token_config = token_config
 		else:
 			self.token_config = TokenConfig(**token_config)
+
+		if isinstance(update_config, UpdateConfig):
+			self.update_config = update_config
+		else:
+			self.update_config = UpdateConfig(**update_config)
 
 		self.debug = debug
 

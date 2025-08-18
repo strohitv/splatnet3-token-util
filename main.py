@@ -1,4 +1,5 @@
 import argparse
+import atexit
 import json
 
 import multiprocess
@@ -14,12 +15,14 @@ from utils.config_utils import load_config, ensure_scripts_exist, ensure_templat
 from utils.emulator_utils import boot_emulator, run_adb, wait_for_shutdown, create_snapshot, delete_snapshot, request_emulator_shutdown
 from utils.script_utils import execute_script
 from utils.snapshot_utils import search_for_tokens
-from utils.splatnet3_utils import is_homepage_reachable, download_splatnet3_main_js
+from utils.splatnet3_utils import is_homepage_reachable
 from utils.stats_utils import prepare_stats, write_stats
 from utils.step_doc_creator import create_step_doc
 from utils.template_utils import create_target_file
 
 import logging
+
+from utils.update_utils import check_for_update, update, print_update_notification
 
 logging.basicConfig(format='%(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -28,6 +31,7 @@ SUCCESS = 0
 INPUT_VALIDATION_FAILED = 1
 NOT_ALL_TOKENS_FOUND = 2
 INVALID_TOKENS_FOUND = 3
+UPDATE_FAILED = 4
 
 
 def run_token_extraction(app_config: AppConfig, all_available_steps, print_to_console, start, started_at, attempt, emulator_pid):
@@ -88,20 +92,35 @@ def main():
 									 description='SplatNet3 Emulator Token Utility application to extract NSA SplatNet3 tokens from a controlled Android Studio emulator process')
 	parser.add_argument('-c', '--config', required=False, help='Path to configuration file', default='./config/config.json')
 	parser.add_argument('-cout', '--console-out', required=False,
-						help='Prints the tokens to stdout. It will still save the tokens to the file. Format: `{"g_token": "{GTOKEN}", "bullet_token": "{BULLETTOKEN}", "session_token": "{SESSIONTOKEN}", "user_agent": "{USERAGENT}", "web_view_version": "{WEBVIEWVERSION}", "na_country": "{NACOUNTRY}", "na_language": "{NALANGUAGE}", "app_language": "{APPLANGUAGE}"}`', default=False,
-						action='store_true')
+						help='Prints the tokens to stdout. It will still save the tokens to the file. Format: `{"g_token": "{GTOKEN}", "bullet_token": "{BULLETTOKEN}", "session_token": "{SESSIONTOKEN}", "user_agent": "{USERAGENT}", "web_view_version": "{WEBVIEWVERSION}", "na_country": "{NACOUNTRY}", "na_language": "{NALANGUAGE}", "app_language": "{APPLANGUAGE}"}`',
+						default=False, action='store_true')
 	parser.add_argument('-r', '--reinitialize-configs', required=False,
-						help='Regenerates the configuration file (and overwrites existing ones)', default=False,
-						action='store_true')
-	parser.add_argument('-b', '-emu', '--boot-emulator', '--emu', required=False,
-						help='Boots the emulator', default=False,
-						action='store_true')
-	parser.add_argument('-a', '-adb', '--run-adb', '--adb', dest='ADB_COMMAND', required=False,
-						help='Executes a command via android debug bridge (adb)')
+						help='Regenerates the configuration file (and overwrites existing ones)', default=False, action='store_true')
+	parser.add_argument('-b', '-emu', '--boot-emulator', '--emu', required=False, help='Boots the emulator', default=False, action='store_true')
+	parser.add_argument('-a', '-adb', '--run-adb', '--adb', dest='ADB_COMMAND', required=False, help='Executes a command via android debug bridge (adb)')
+	parser.add_argument('--disable-update-check', required=False, help='Disables update check for this single call', default=False, action='store_true')
+	parser.add_argument('-u', '-update', '--update', required=False, help='Updates the application', default=False, action='store_true')
 	args = parser.parse_args()
 
 	regenerated, app_config = load_config(args)
 	all_available_steps = all_steps.get_steps(app_config)
+
+	if args.update:
+		error_command = update(app_config)
+
+		if error_command is not None:
+			logger.info('')
+			logger.error(f'ERROR while executing command `{error_command}` during update')
+			sys.exit(UPDATE_FAILED)
+
+		logger.info('')
+		logger.info(f'Update successful. Please call `python main.py` again to use the application.')
+		sys.exit(SUCCESS)
+
+	if app_config.update_config.check_for_update and not args.disable_update_check:
+		if check_for_update(app_config):
+			print_update_notification(app_config)
+			atexit.register(lambda: print_update_notification(app_config, prefix='\n'))
 
 	export_step_doc_env = os.environ.get('STU_EXPORT_STEP_DOC_ENV')
 	if export_step_doc_env is not None and export_step_doc_env.lower().strip() == 'true':
