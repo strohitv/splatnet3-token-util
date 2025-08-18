@@ -210,6 +210,7 @@ def search_for_tokens(app_config: AppConfig):
 			if app_config.debug:
 				logger.info('next chunk done')
 
+	logger.info('')
 	logger.info('Tokens:')
 	logger.info('- SKIPPED\tgToken' if g_token == 'NO_G_TOKEN_EXTRACTED' else '- SUCCESS\tgToken' if g_token is not None else '- FAIL\t\tgToken')
 	logger.info(
