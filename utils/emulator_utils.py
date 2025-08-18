@@ -20,14 +20,14 @@ def boot_emulator(app_config: AppConfig):
 		f'{app_config.emulator_config.emulator_path} {app_config.emulator_config.get_emulator_boot_args()}',
 		shell=True,
 		stdout=subprocess.PIPE,
-		stderr=subprocess.PIPE)
+		stderr=subprocess.STDOUT)
 
 	for line in io.TextIOWrapper(emulator_proc.stdout, encoding="utf-8"):
-		if app_config.debug:
-			logger.info(line.strip())
-
 		if not line:
 			break
+
+		if app_config.debug:
+			logger.info(line.strip())
 
 		line = line.strip()
 		# todo compatibility with other emus
@@ -47,14 +47,14 @@ def get_emulator_name(app_config: AppConfig):
 	emulator_devices_proc = Popen(f'{app_config.emulator_config.adb_path} devices',
 								  shell=True,
 								  stdout=subprocess.PIPE,
-								  stderr=subprocess.PIPE)
+								  stderr=subprocess.STDOUT)
 	emulator_name = 'emulator-5554'
 	for line in io.TextIOWrapper(emulator_devices_proc.stdout, encoding="utf-8"):
-		if app_config.debug:
-			logger.info(line.strip())
-
 		if not line:
 			break
+
+		if app_config.debug:
+			logger.info(line.strip())
 
 		line = line.strip()
 
