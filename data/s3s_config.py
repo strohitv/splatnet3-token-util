@@ -9,7 +9,7 @@ class S3sConfig:
 				 bullettoken='{BULLETTOKEN}',
 				 session_token='skip',
 				 api_key='INSERT_STAT_INK_API_KEY_HERE',
-				 acc_loc='en-US|US',
+				 acc_loc='{APPLANGUAGE}|{NACOUNTRY}',
 				 f_gen='DUMMY_VALUE'):
 		self.gtoken = gtoken
 		self.bullettoken = bullettoken
@@ -24,7 +24,3 @@ class S3sConfig:
 			default=lambda o: o.__dict__,
 			sort_keys=True,
 			indent=4)
-
-	@classmethod
-	def from_json(cls, d):
-		return cls(**d)

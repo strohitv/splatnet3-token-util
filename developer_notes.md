@@ -14,7 +14,7 @@ The easiest way is to run `python main.py -cout`. When this arg is passed, splat
 
 Make sure to check for return code 0 before trying to read from stdout. All logs are on stderr so if the return code is not rc 0, nothing will be printed to stdout and your application will block indefinitely, should it not have a timeout.
 ```json
-{"g_token": "{GTOKEN}", "bullet_token": "{BULLETTOKEN}", "session_token": "{SESSIONTOKEN}"}
+{"g_token": "{GTOKEN}", "bullet_token": "{BULLETTOKEN}", "session_token": "{SESSIONTOKEN}", "user_agent": "{USERAGENT}", "web_view_version": "{WEBVIEWVERSION}", "na_country": "{NACOUNTRY}", "na_language": "{NALANGUAGE}", "app_language": "{APPLANGUAGE}"}
 ```
 Not that it will send the json without line breaks, so reading one line from stdout should be enough to receive the entire json.
 
@@ -23,6 +23,11 @@ If you omit the `-cout` argument and only run `python main.py`, you'll have to r
 - `{GTOKEN}` will be replaced with the gToken
 - `{BULLETTOKEN}` will be replaced with the bulletToken
 - `{SESSIONTOKEN}` will be replaced with the sessionToken
+- `{USERAGENT}` will be replaced with the user agent the emulator used in the requests
+- `{WEBVIEWVERSION}` will be replaced with the `x-web-view-ver` header
+- `{NACOUNTRY}` will be replaced with the country of the nintendo account (`na_country`)
+- `{NALANGUAGE}` will be replaced with the language of the nintendo account (`na_lang`)
+- `{APPLANGUAGE}` will be replaced with the language of the app / phone (`lang`)
 
 As always, wait for the application to exit with return code 0 and read the file from the location set in config.json.
 

@@ -111,6 +111,7 @@ When ran in a freshly downloaded directory, these commands will generate a few c
 We are interested in the `./config/config.json` file which contains the main configuration for the token extraction. Open it with a text editor (for example: Notepad++).
 1. You don't need to change a setting under the `token_config` and `run_config` sections.
 2. On the `emulator_config` section, make sure that `avd_name` is set to the name you gave the AVD when you set it up earlier. If you have installed Android Studio into the default directories, everything else should be correct.
+3. Change the settings in the `update_config` section according to your needs.
 
 **IMPORTANT FOR WINDOWS USERS**: if you need to edit file paths, make sure to use double backslashes `\\` instead of single backslashes `\` in all `.json` files, for example: `C:\\Users\\someone` instead of `C:\Users\someone`.
 
@@ -120,11 +121,10 @@ From the folder `./script-examples/config/pixel_4_api_30_playstore`, copy both `
 ### Configure s3s integration
 There are two files we need to edit to set up the s3s integration:
 
-First, open the `./config/template.txt` file. Here, you need to set either one or two options, depending on if you only use Lean's Gear Seed Checker tool or also stat.ink.
-1. Set your language and region properly using the `acc_loc` setting. The format is `language|region`, for example `en-US|US` is US-American English and someone living in the US. Similar, `de-DE|AT` would be "German German" and someone living in Austria.
-2. **If you ONLY want to use Lean's Gear Seed Checker**: Enter `skip` into the `api_key` field.
-3. **If you (also) want to upload battles to stat.ink**: Enter your stat.ink api key into the `api_key` field. You can get the api key from your [stat.ink profile page](https://stat.ink/profile), it is the field called "API Token".
-4. **Always do this**: Copy the `template.txt` file into the s3s directory and rename it to `config.txt`. Otherwise, it will ask you for settings you've already entered into the `template.txt` file.
+First, open the `./config/template.txt` file. Here, you need to set one value, depending on if you only use Lean's Gear Seed Checker tool or also stat.ink.
+1. **If you ONLY want to use Lean's Gear Seed Checker**: Enter `skip` into the `api_key` field.
+2. **If you (also) want to upload battles to stat.ink**: Enter your stat.ink api key into the `api_key` field. You can get the api key from your [stat.ink profile page](https://stat.ink/profile), it is the field called "API Token".
+3. **Always do this**: Copy the `./config/template.txt` file into the s3s directory and rename it to `config.txt`. Otherwise, it will ask you for settings you've already entered into the `template.txt` file.
 
 The other file which needs to be edited is the `./config_run_s3s.json` file. In this file, one setting must be changed and the others might need to be changed.
 1. Insert the location of the s3s directory into the `s3s_directory` config.
@@ -227,7 +227,7 @@ python run_s3s.py -r
 python run_s3s.py -r -M
 ```
 
-## workaround for the `--getseed` bug
+### workaround for the `--getseed` bug
 As of now, there is a bug that `--getseed` in s3s will **never** work while the tokens are not valid. This also applies to the automatic token refresh using the integration with splatnet3-token-util. I sent frozenpandaman a bugfix but as of now (August 13th 2025), it is not yet integrated into s3s. You can monitor the status of [PR 215](https://github.com/frozenpandaman/s3s/pull/215) to find out whether the bug still applies (PR is marked as `Open`) or if s3s got fixed (PR is marked as `Merged`). Once it's `Merged`, please refresh s3s to make `python run_s3s.py --getseed` work without any further issues.
 
 Luckily, there is a workaround which allows us to still use `--getseed`:
@@ -239,4 +239,15 @@ python run_s3s.py -r -t
 # after the command has succeeded, your tokens will be valid (nothing else has happened)
 # you can now run the --getseed command successfully
 python run_s3s.py --getseed
+```
+
+## Update the app
+The script does an update check on each run. Should it tell you about a new update, you can update it using this command:
+```shell
+# Automatic update
+python main.py --update
+
+# Manual method
+git pull
+pip install -r requirements.txt
 ```

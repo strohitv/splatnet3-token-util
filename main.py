@@ -1,4 +1,5 @@
 import argparse
+import atexit
 import json
 
 import multiprocess
@@ -10,7 +11,7 @@ import datetime
 
 from data.app_config import AppConfig
 from steps import all_steps
-from utils.config_utils import load_config, ensure_scripts_exist, ensure_template_exists
+from utils.config_utils import load_config, ensure_scripts_exist, ensure_template_exists, save_config
 from utils.emulator_utils import boot_emulator, run_adb, wait_for_shutdown, create_snapshot, delete_snapshot, request_emulator_shutdown
 from utils.script_utils import execute_script
 from utils.snapshot_utils import search_for_tokens
@@ -21,6 +22,8 @@ from utils.template_utils import create_target_file
 
 import logging
 
+from utils.update_utils import check_for_update, update, print_update_notification
+
 logging.basicConfig(format='%(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -28,6 +31,7 @@ SUCCESS = 0
 INPUT_VALIDATION_FAILED = 1
 NOT_ALL_TOKENS_FOUND = 2
 INVALID_TOKENS_FOUND = 3
+UPDATE_FAILED = 4
 
 
 def run_token_extraction(app_config: AppConfig, all_available_steps, print_to_console, start, started_at, attempt, emulator_pid):
@@ -42,16 +46,16 @@ def run_token_extraction(app_config: AppConfig, all_available_steps, print_to_co
 	emulator_pid.value = 0
 
 	# extract tokens from RAM dump
-	g_token, bullet_token, session_token = search_for_tokens(app_config)
+	g_token, bullet_token, session_token, user_agent, web_view_version, na_country, na_language, app_language = search_for_tokens(app_config)
 	delete_snapshot(app_config)
 
-	if g_token is not None and bullet_token is not None and session_token is not None:
+	if g_token is not None and bullet_token is not None and session_token is not None and na_country is not None:
 		# do a webrequest to see whether they work
 		if (app_config.token_config.validate_splat3_homepage
 			and app_config.token_config.extract_g_token and app_config.token_config.validate_g_token
 			and app_config.token_config.extract_bullet_token and app_config.token_config.validate_bullet_token):
 
-			if not is_homepage_reachable(g_token, bullet_token):
+			if not is_homepage_reachable(g_token, bullet_token, user_agent, web_view_version, na_country, na_language, app_language):
 				logger.info('tokens were found but are invalid, attempt did not work')
 				logger.info('')
 				sys.exit(INVALID_TOKENS_FOUND)
@@ -60,7 +64,7 @@ def run_token_extraction(app_config: AppConfig, all_available_steps, print_to_co
 		end = time.time()
 		elapsed = end - start
 
-		create_target_file(app_config, g_token, bullet_token, session_token)
+		create_target_file(app_config, g_token, bullet_token, session_token, user_agent, web_view_version, na_country, na_language, app_language)
 		write_stats(app_config.run_config.log_stats_csv, app_config.run_config.stats_csv_path, started_at, True, attempt, elapsed)
 		logger.info(f'Done after {attempt} attempts and {elapsed:0.1f} seconds total. Application will exit now. Bye!')
 
@@ -69,6 +73,11 @@ def run_token_extraction(app_config: AppConfig, all_available_steps, print_to_co
 				'g_token': g_token,
 				'bullet_token': bullet_token,
 				'session_token': session_token,
+				'user_agent': user_agent,
+				'web_view_version': web_view_version,
+				'na_country': na_country,
+				'na_language': na_language,
+				'app_language': app_language
 			}))
 
 		sys.exit(SUCCESS)
@@ -83,24 +92,25 @@ def main():
 									 description='SplatNet3 Emulator Token Utility application to extract NSA SplatNet3 tokens from a controlled Android Studio emulator process')
 	parser.add_argument('-c', '--config', required=False, help='Path to configuration file', default='./config/config.json')
 	parser.add_argument('-cout', '--console-out', required=False,
-						help='Prints the tokens to stdout. It will still save the tokens to the file. Format: `{"g_token": "{GTOKEN}", "bullet_token": "{BULLETTOKEN}", "session_token": "{SESSIONTOKEN}"}`', default=False,
-						action='store_true')
+						help='Prints the tokens to stdout. It will still save the tokens to the file. Format: `{"g_token": "{GTOKEN}", "bullet_token": "{BULLETTOKEN}", "session_token": "{SESSIONTOKEN}", "user_agent": "{USERAGENT}", "web_view_version": "{WEBVIEWVERSION}", "na_country": "{NACOUNTRY}", "na_language": "{NALANGUAGE}", "app_language": "{APPLANGUAGE}"}`',
+						default=False, action='store_true')
 	parser.add_argument('-r', '--reinitialize-configs', required=False,
-						help='Regenerates the configuration file (and overwrites existing ones)', default=False,
-						action='store_true')
-	parser.add_argument('-b', '-emu', '--boot-emulator', '--emu', required=False,
-						help='Boots the emulator', default=False,
-						action='store_true')
-	parser.add_argument('-a', '-adb', '--run-adb', '--adb', dest='ADB_COMMAND', required=False,
-						help='Executes a command via android debug bridge (adb)')
+						help='Regenerates the configuration file (and overwrites existing ones)', default=False, action='store_true')
+	parser.add_argument('-b', '-emu', '--boot-emulator', '--emu', required=False, help='Boots the emulator', default=False, action='store_true')
+	parser.add_argument('-a', '-adb', '--run-adb', '--adb', dest='ADB_COMMAND', required=False, help='Executes a command via android debug bridge (adb)')
+	parser.add_argument('--disable-update-check', required=False, help='Disables update check for this single call', default=False, action='store_true')
+	parser.add_argument('-u', '-update', '--update', required=False, help='Updates the application', default=False, action='store_true')
 	args = parser.parse_args()
 
 	regenerated, app_config = load_config(args)
+	save_config(args.config, app_config)
+
 	all_available_steps = all_steps.get_steps(app_config)
 
 	export_step_doc_env = os.environ.get('STU_EXPORT_STEP_DOC_ENV')
 	if export_step_doc_env is not None and export_step_doc_env.lower().strip() == 'true':
 		logger.info('$STU_EXPORT_STEP_DOC_ENV environment variable is set to "true", (re-)creating steps_documentation.md')
+		logger.info('')
 		create_step_doc(all_available_steps)
 
 	regenerated |= ensure_scripts_exist(args, app_config)
@@ -110,6 +120,23 @@ def main():
 		logger.info('Configs were regenerated, application will exit. Bye!')
 		logger.info('')
 		sys.exit(SUCCESS)
+
+	if args.update:
+		error_command = update(app_config)
+
+		if error_command is not None:
+			logger.info('')
+			logger.error(f'ERROR while executing command `{error_command}` during update. See logs above for details.')
+			sys.exit(UPDATE_FAILED)
+
+		logger.info('')
+		logger.info(f'Update successful. Please call `python main.py` again to use the application.')
+		sys.exit(SUCCESS)
+
+	if app_config.update_config.check_for_update and not args.disable_update_check:
+		if check_for_update(app_config):
+			print_update_notification(app_config)
+			atexit.register(lambda: print_update_notification(app_config, prefix='\n'))
 
 	if args.boot_emulator:
 		emulator_proc = boot_emulator(app_config)
