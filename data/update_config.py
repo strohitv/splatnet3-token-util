@@ -20,7 +20,3 @@ class UpdateConfig:
 			default=lambda o: o.__dict__,
 			sort_keys=True,
 			indent=4)
-
-	@classmethod
-	def from_json(cls, d):
-		return cls(**d)

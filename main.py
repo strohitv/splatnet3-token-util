@@ -11,7 +11,7 @@ import datetime
 
 from data.app_config import AppConfig
 from steps import all_steps
-from utils.config_utils import load_config, ensure_scripts_exist, ensure_template_exists
+from utils.config_utils import load_config, ensure_scripts_exist, ensure_template_exists, save_config
 from utils.emulator_utils import boot_emulator, run_adb, wait_for_shutdown, create_snapshot, delete_snapshot, request_emulator_shutdown
 from utils.script_utils import execute_script
 from utils.snapshot_utils import search_for_tokens
@@ -103,6 +103,8 @@ def main():
 	args = parser.parse_args()
 
 	regenerated, app_config = load_config(args)
+	save_config(args.config, app_config)
+
 	all_available_steps = all_steps.get_steps(app_config)
 
 	if args.update:
@@ -110,7 +112,7 @@ def main():
 
 		if error_command is not None:
 			logger.info('')
-			logger.error(f'ERROR while executing command `{error_command}` during update')
+			logger.error(f'ERROR while executing command `{error_command}` during update. See logs above for details.')
 			sys.exit(UPDATE_FAILED)
 
 		logger.info('')

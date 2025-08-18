@@ -15,12 +15,20 @@ def check_for_update(app_config: AppConfig):
 		stdout=subprocess.PIPE,
 		stderr=subprocess.STDOUT)
 
+	fetch_errors = ''
+
 	for line in io.TextIOWrapper(git_fetch_proc.stdout, encoding="utf-8"):
 		if not line:
 			break
 
 		# git fetch never prints something, thus any line should be considered an issue
-		logger.error(line.strip())
+		fetch_errors += '\n' + line
+
+	if len(fetch_errors) > 0:
+		logger.error('')
+		logger.error('ERROR while fetching git remote:')
+		logger.error(fetch_errors)
+		logger.error('')
 
 	git_status_proc = Popen(
 		f'{app_config.update_config.git_command} status -sb',
@@ -61,6 +69,7 @@ def print_update_notification(app_config: AppConfig, prefix=''):
 	logger.info('ʌʌʌʌʌʌ')
 	logger.info('!! UPDATE AVAILABLE !!')
 	logger.info('######')
+	logger.info('')
 
 
 def update(app_config: AppConfig):

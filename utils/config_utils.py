@@ -109,9 +109,7 @@ def load_config(args):
 		default_config.run_config.stats_csv_path = os.path.join('.', 'stats.csv')
 
 		os.makedirs(os.path.dirname(args.config), exist_ok=True)
-
-		with open(args.config, 'w') as f:
-			f.write(default_config.to_json())
+		save_config(args.config, default_config)
 
 		logger.info('')
 		logger.info(f'Generated config file at "{args.config}", please edit it to your needs and run the application again.')
@@ -124,6 +122,9 @@ def load_config(args):
 
 	return regenerated, app_config
 
+def save_config(path: str, app_config: AppConfig):
+	with open(path, 'w') as f:
+		f.write(app_config.to_json())
 
 def create_script_file(script_path, script_summary):
 	os.makedirs(os.path.dirname(script_path), exist_ok=True)
