@@ -102,7 +102,6 @@ def load_config(args):
 		default_config.emulator_config.adb_path = adb_path
 		default_config.emulator_config.snapshot_dir = snapshot_dir
 
-		default_config.run_config.example_config_path = os.path.join('.', 'script-examples', 'config', 'pixel_4_api_30_play_store')
 		default_config.run_config.boot_script_path = os.path.join('.', 'config', 'boot.txt')
 		default_config.run_config.cleanup_script_path = os.path.join('.', 'config', 'cleanup.txt')
 		default_config.run_config.template_path = os.path.join('.', 'config', 'template.txt')
@@ -152,7 +151,7 @@ def ensure_scripts_exist(args, app_config: AppConfig):
 						'# For a list of all supported commands, please open the `steps_documentation.md` file in the base directory.\n'
 						'# \n'
 						'# IMPORTANT NOTE:\n'
-						'# If you want to use this file, please set `"use_example_configs": false` in `./config/config.json`.\n'
+						'# If you want to use this file, please set `"use_example_scripts": false` in `./config/config.json`.\n'
 						'# This file will be ignored otherwise.\n'
 						'\n')
 
@@ -174,7 +173,7 @@ def ensure_scripts_exist(args, app_config: AppConfig):
 						   '# For a list of all supported commands, please open the `steps_documentation.md` file in the base directory.\n'
 						   '# \n'
 						   '# IMPORTANT NOTE:\n'
-						   '# If you want to use this file, please set `"use_example_configs": false` in `./config/config.json`.\n'
+						   '# If you want to use this file, please set `"use_example_scripts": false` in `./config/config.json`.\n'
 						   '# This file will be ignored otherwise.\n'
 						   '\n')
 

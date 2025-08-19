@@ -86,8 +86,8 @@ Here is a list of some important files and directories of the project structure
 - `quickstart_s3s_tutortial.md`: this markdown file contains a documentation on how to connect splatnet3-token-util and s3s to add a local automatic token refresh to s3s.
 - `config` directory: this directory contains configuration files for `main.py`
   - `config/config.json`: this configuration file gets created on first use and contains the configuration for `main.py`
-  - `config/boot.txt`: this file contains the steps required to open SplatNet3 in the freshly opened emulator. **IMPORTANT**: this file will be ignored if `"use_example_configs": true` is set in ./config/config.json.
-  - `config/cleanup.txt`: this file contains the steps required to close SplatNet3 and shut the emulator down once the tokens have been extracted. **IMPORTANT**: this file will be ignored if `"use_example_configs": true` is set in ./config/config.json.
+  - `config/boot.txt`: this file contains the steps required to open SplatNet3 in the freshly opened emulator. **IMPORTANT**: this file will be ignored if the config `"use_example_scripts": true` is set to `true` in ./config/config.json.
+  - `config/cleanup.txt`: this file contains the steps required to close SplatNet3 and shut the emulator down once the tokens have been extracted. **IMPORTANT**: this file will be ignored if the config `"use_example_scripts": true` is set to `true` in ./config/config.json.
   - `config/template.txt`: this file contains the the template file with placeholders. These placeholders will be replaced with the tokens and be written to `config.txt`.
 - `config.txt`: the final generated file with all tokens added
 - `steps_documentation.md`: this markdown file contains an automatically generated documentation of all steps you can use to control the emulator in `boot.txt` and `cleanup.txt`
