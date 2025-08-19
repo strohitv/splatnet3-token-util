@@ -84,6 +84,12 @@ def search_for_tokens(app_config: AppConfig):
 	app_language = None
 	user_agent = None
 
+	logger.info(f'')
+	logger.info(f'')
+	logger.info('################')
+	logger.info('TOKEN EXTRACTION')
+	logger.info('################')
+	logger.info(f'')
 	logger.info(f'Searching for metadata...')
 	with open(snapshot_path, 'rb') as f:
 		for piece in read_in_chunks(f):

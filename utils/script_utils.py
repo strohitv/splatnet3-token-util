@@ -60,6 +60,17 @@ def analyse_line_break_elligibility(line):
 
 
 def execute_script(all_available_steps, script_location, script_name, is_debug):
+	header = f'{script_name} SCRIPT'.upper()
+	header_line = ''
+	for _ in range(len(header)):
+		header_line += '#'
+
+	logger.info(f'')
+	logger.info(f'')
+	logger.info(header_line)
+	logger.info(header)
+	logger.info(header_line)
+	logger.info(f'')
 	logger.info(f'Executing {script_name} script...')
 	with open(script_location, 'r') as boot_script:
 		while True:

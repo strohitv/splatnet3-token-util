@@ -10,6 +10,8 @@ class RunConfig:
 				 template_path='./config/template.txt',
 				 target_path='./config.txt',
 				 boot_script_path='./config/boot.txt',
+				 use_example_scripts=True,
+				 example_scripts_directory='pixel_4_api_30_play_store',
 				 cleanup_script_path='./config/cleanup.txt',
 				 max_run_duration_minutes=50,
 				 max_attempt_duration_seconds=180,
@@ -17,10 +19,16 @@ class RunConfig:
 				 stats_csv_path='./stats.csv'):
 		self.template_path = template_path
 		self.target_path = target_path
+
+		self.use_example_scripts = use_example_scripts
+		self.example_scripts_directory = example_scripts_directory
+
 		self.boot_script_path = boot_script_path
 		self.cleanup_script_path = cleanup_script_path
+
 		self.max_run_duration_minutes = max_run_duration_minutes
 		self.max_attempt_duration_seconds = max_attempt_duration_seconds
+
 		self.log_stats_csv = log_stats_csv
 		self.stats_csv_path = stats_csv_path
 

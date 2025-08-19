@@ -35,6 +35,32 @@ options:
 
 ```
 
+## close_nsa
+This command forces the Nintendo Switch App to be closed..
+
+### Usage:
+```
+usage: close_nsa
+
+Closes the Nintendo Switch App
+
+```
+
+## create_screenshot
+This command creates a screenshot of the Emulator and saves it to the given location.
+
+### Usage:
+```
+usage: create_screenshot [-p PATH]
+
+Creates a screenshot of the Emulator
+
+options:
+  -p, -path, --path PATH  The file path where the screenshot of the emulator should be stored. Default:
+                          "./screenshots/screenshot.png"
+
+```
+
 ## echo
 This command prints a given text to the console.
 
@@ -79,6 +105,25 @@ options:
   -co, --cutoff CUTOFF             The cutoff for the comparison. This value decides how similar the regions
                                    must be to be considered equal. Lower values mean stricter comparison,
                                    higher values will match less similar screenshots. Default: 5
+
+```
+
+## open_splatnet3
+This command causes the Nintendo Switch App to open and loads SplatNet3 afterwards.
+
+### Usage:
+```
+usage: open_splatnet3 [--max-attempts MAX_ATTEMPTS] [--max-wait-secs MAX_WAIT_SECS] [-d DURATION]
+
+Opens the SplatNet3 app inside the Nintendo Switch App immediately.
+
+options:
+  --max-attempts MAX_ATTEMPTS    How often the step should attempt to open SplatNet3 before giving up.
+                                 Default: 3
+  --max-wait-secs MAX_WAIT_SECS  How long the step should wait for SplatNet3 to load before it considers the
+                                 attempt failed. Default: 15 seconds
+  -d, --duration DURATION        The frequency of how often this command should check whether SplatNet3 is
+                                 open. Default: 500 ms
 
 ```
 
@@ -162,6 +207,17 @@ options:
                                                  -cmd arg. If the -ei arg is provided, the order will switch
                                                  and the -cmd will be executed immediately instead of doing
                                                  one image comparison first
+
+```
+
+## shutdown_emu
+This command causes the Emulator to shut down.
+
+### Usage:
+```
+usage: shutdown_emu
+
+Triggers an emulator shutdown..
 
 ```
 

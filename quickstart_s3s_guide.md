@@ -116,7 +116,7 @@ We are interested in the `./config/config.json` file which contains the main con
 **IMPORTANT FOR WINDOWS USERS**: if you need to edit file paths, make sure to use double backslashes `\\` instead of single backslashes `\` in all `.json` files, for example: `C:\\Users\\someone` instead of `C:\Users\someone`.
 
 ### Copy Pixel 4 files
-From the folder `./script-examples/config/pixel_4_api_30_playstore`, copy both `boot.txt` and `cleanup.txt` into the `./config` directory. You can override the existing `boot.txt` and `cleanup.txt` files, they only contain dummy text.
+With the new version released on August 19th 2025, this step is not necessary anymore.
 
 ### Configure s3s integration
 There are two files we need to edit to set up the s3s integration:
@@ -216,7 +216,8 @@ python run_s3s.py --help
 
 # Lean's Gear Seed Checker
 # export a gear file which you can upload to Lean's Gear Seed Checker
-# IMPORTANT: please read next section if --getseed fails
+# IMPORTANT: please update s3s to a version released on August 19th 2025 or later if --getseed fails
+# the update can be done using `git pull` inside the s3s directory
 python run_s3s.py --getseed
 
 # stat.ink export
@@ -227,19 +228,10 @@ python run_s3s.py -r
 python run_s3s.py -r -M
 ```
 
-### workaround for the `--getseed` bug
-As of now, there is a bug that `--getseed` in s3s will **never** work while the tokens are not valid. This also applies to the automatic token refresh using the integration with splatnet3-token-util. I sent frozenpandaman a bugfix but as of now (August 13th 2025), it is not yet integrated into s3s. You can monitor the status of [PR 215](https://github.com/frozenpandaman/s3s/pull/215) to find out whether the bug still applies (PR is marked as `Open`) or if s3s got fixed (PR is marked as `Merged`). Once it's `Merged`, please refresh s3s to make `python run_s3s.py --getseed` work without any further issues.
+### outdated: workaround for the `--getseed` bug
+The `--getseed` bug in s3s has been fixed on August 19th 2025. A workaround is not necessary anymore after updating s3s.
 
-Luckily, there is a workaround which allows us to still use `--getseed`:
-```shell
-# refresh tokens if required
-# DO THIS COMMAND AS LONG AS PR 215 IS OPEN
-python run_s3s.py -r -t 
-
-# after the command has succeeded, your tokens will be valid (nothing else has happened)
-# you can now run the --getseed command successfully
-python run_s3s.py --getseed
-```
+**IMPORTANT**: Please be aware that the update was released without a new version number, so you'll need to execute a `git pull` in the s3s directory to download the bugfix.
 
 ## Update the app
 The script does an update check on each run. Should it tell you about a new update, you can update it using this command:

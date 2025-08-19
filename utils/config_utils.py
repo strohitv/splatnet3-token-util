@@ -122,9 +122,11 @@ def load_config(args):
 
 	return regenerated, app_config
 
+
 def save_config(path: str, app_config: AppConfig):
 	with open(path, 'w') as f:
 		f.write(app_config.to_json())
+
 
 def create_script_file(script_path, script_summary):
 	os.makedirs(os.path.dirname(script_path), exist_ok=True)
@@ -146,7 +148,12 @@ def ensure_scripts_exist(args, app_config: AppConfig):
 						'# \n'
 						'# Your goal for this script is to bring the freshly booted emulator to a state where the NSA app is opened and has entered SplatNet 3.\n'
 						'# \n'
-						'# For a list of all supported commands, please open the `steps_documentation.md` file in the base directory.\n\n')
+						'# For a list of all supported commands, please open the `steps_documentation.md` file in the base directory.\n'
+						'# \n'
+						'# IMPORTANT NOTE:\n'
+						'# If you want to use this file, please set `"use_example_scripts": false` in `./config/config.json`.\n'
+						'# This file will be ignored otherwise.\n'
+						'\n')
 
 		create_script_file(app_config.run_config.boot_script_path, boot_summary)
 
@@ -163,7 +170,12 @@ def ensure_scripts_exist(args, app_config: AppConfig):
 						   '# \n'
 						   '# Your goal for this script is to close the SplatNet 3 app and shut down the emulator.\n'
 						   '# \n'
-						   '# For a list of all supported commands, please open the `steps_documentation.md` file in the base directory.\n\n')
+						   '# For a list of all supported commands, please open the `steps_documentation.md` file in the base directory.\n'
+						   '# \n'
+						   '# IMPORTANT NOTE:\n'
+						   '# If you want to use this file, please set `"use_example_scripts": false` in `./config/config.json`.\n'
+						   '# This file will be ignored otherwise.\n'
+						   '\n')
 
 		create_script_file(app_config.run_config.cleanup_script_path, cleanup_summary)
 

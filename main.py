@@ -138,6 +138,18 @@ def main():
 			print_update_notification(app_config)
 			atexit.register(lambda: print_update_notification(app_config, prefix='\n'))
 
+	script_examples_config_dir = os.path.join('.', 'script-examples', 'config')
+	if app_config.run_config.use_example_scripts and app_config.run_config.example_scripts_directory is not None and os.path.exists(os.path.join(script_examples_config_dir, app_config.run_config.example_scripts_directory)):
+		chosen_example_scripts_path = os.path.join(script_examples_config_dir, app_config.run_config.example_scripts_directory)
+		logger.info(f'Using boot.txt and cleanup.txt from example config path: {chosen_example_scripts_path}.')
+
+		app_config.run_config.boot_script_path = os.path.join(chosen_example_scripts_path, 'boot.txt')
+		logger.info(f'Using example boot script: {app_config.run_config.boot_script_path}.')
+
+		app_config.run_config.cleanup_script_path = os.path.join(chosen_example_scripts_path, 'cleanup.txt')
+		logger.info(f'Using example cleanup script: {app_config.run_config.cleanup_script_path}.')
+		logger.info('')
+
 	if args.boot_emulator:
 		emulator_proc = boot_emulator(app_config)
 		wait_for_shutdown(emulator_proc)
