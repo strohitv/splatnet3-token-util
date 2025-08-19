@@ -6,10 +6,15 @@ block_while -mode not-found -template ./screenshots/pixel_4_api_30_play_store/te
 
 echo
 echo Open SplatNet3
-echo '###################'
+echo '##############'
 echo
 
 wait_s 1
-create_screenshot -p ./screenshots/pixel_4_api_30_play_store/actual/actual_emu_main_menu.png
-execute_while -mode found -cmd "open_splatnet3" -template ./screenshots/pixel_4_api_30_play_store/actual/actual_emu_main_menu.png -x1 0 -y1 0 -x2 1080 -y2 300 -d 2000 -actual ./screenshots/pixel_4_api_30_play_store/actual/actual-main-menu-gone.png
+open_splatnet3
+
+echo
+echo Wait for Splatnet3 to be fully loaded
+echo '#####################################'
+echo
+
 block_while -mode not-found -template ./screenshots/pixel_4_api_30_play_store/template-splatnet3-opened.png -x1 25 -y1 100 -x2 250 -y2 250 -d 300 -actual ./screenshots/pixel_4_api_30_play_store/actual/actual-splatnet3-opened.png -co 1

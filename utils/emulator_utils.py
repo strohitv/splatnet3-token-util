@@ -81,7 +81,13 @@ def run_adb(app_config: AppConfig, command: str):
 
 
 def create_snapshot(app_config: AppConfig):
-	logger.info(f'Creating snapshot...')
+	logger.info(f'')
+	logger.info(f'')
+	logger.info('#################')
+	logger.info('SNAPSHOT CREATION')
+	logger.info('#################')
+	logger.info(f'')
+	logger.info(f'Creating snapshot of emulator state...')
 	# get emulator name
 	emulator_name = get_emulator_name(app_config)
 
