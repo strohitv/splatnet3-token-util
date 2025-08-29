@@ -36,6 +36,8 @@ class BlockWhile:
 		self.parser.add_argument('-y2', '--y2', required=True, help='The Y coordinate of the bottom right corner of the region to compare')
 		self.parser.add_argument('-d', '--duration', required=False, default=1000,
 								 help='The frequency of how often this command should check whether the regions match. Default: 1000 ms')
+		self.parser.add_argument('-ca', '--continue-after', required=False, default=45,
+								 help='Optional arg which lets the script continue if the block cannot be resolved after X seconds. Default: 45')
 		self.parser.add_argument('-co', '--cutoff', required=False, default=5,
 								 help='The cutoff for the comparison. This value decides how similar the regions must be to be considered equal. Lower values mean stricter comparison, higher values will match less similar screenshots. Default: 5')
 
@@ -55,8 +57,13 @@ class BlockWhile:
 		self.logger.info(f'Blocking as long as region can {"" if expect_found else "not "}be found')
 
 		fulfilled = False
+		max_seconds = int(parsed_args.continue_after)
 
 		while not fulfilled:
+			if time.time() > start + max_seconds:
+				self.logger.warning(f'WARNING: Still blocking after {max_seconds} seconds, continuing script execution.')
+				return
+
 			time.sleep(int(parsed_args.duration) / 1000.0)
 
 			self.logger.info(f'Comparing screenshot "{parsed_args.actual}" to base screenshot "{parsed_args.template}" with cutoff {parsed_args.cutoff}.')
