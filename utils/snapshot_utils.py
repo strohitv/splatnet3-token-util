@@ -127,6 +127,36 @@ def search_for_tokens(app_config: AppConfig):
 				if result is None:
 					user_agent = None
 
+			if na_language is None and b'&na_lang=' in piece:
+				na_language = ''
+				index = piece.index(b'&na_lang=') + len(b'&na_lang=')
+				while index < len(piece):
+					next_piece = piece[index]
+					if chr(next_piece).upper() not in '-ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+						break
+					na_language += chr(next_piece)
+					index += 1
+
+				na_language_valid = re.search("^[a-z]{2}(-[A-Z]{2})?$", na_language)
+
+				if not na_language_valid:
+					na_language = None
+
+			if na_country is None and b'&na_country=' in piece:
+				na_country = ''
+				index = piece.index(b'&na_country=') + len(b'&na_country=')
+				while index < len(piece):
+					next_piece = piece[index]
+					if chr(next_piece).upper() not in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+						break
+					na_country += chr(next_piece)
+					index += 1
+
+				na_country_valid = re.search("^[A-Z]{2}$", na_country)
+
+				if not na_country_valid:
+					na_country = None
+
 			if (na_country is None or na_language is None or app_language is None) and b'api.lp1.av5ja.srv.nintendo.net/?lang=' in piece:
 				found_url = ''
 				index = piece.index(b'api.lp1.av5ja.srv.nintendo.net/?lang=')
@@ -140,20 +170,36 @@ def search_for_tokens(app_config: AppConfig):
 				try:
 					parsed_url = urlparse(found_url)
 					query_args = parse_qs(parsed_url.query)
+					if 'lang' in query_args:
+						app_language_found = query_args['lang'][0]
+						app_language_valid = re.search("^[a-z]{2}(-[A-Z]{2})?$", app_language_found)
 
-					if 'lang' in query_args and 'na_country' in query_args and 'na_lang' in query_args:
-						na_country = query_args['na_country'][0]
-						na_language = query_args['na_lang'][0]
-						app_language = query_args['lang'][0]
+						if app_language is None:
+							if app_language_valid:
+								app_language = app_language_found
+							else:
+								app_language = None
 
-						na_country_valid = re.search("^[A-Z]{2}$", na_country)
-						na_language_valid = re.search("^[a-z]{2}(-[A-Z]{2})?$", na_language)
-						app_language_valid = re.search("^[a-z]{2}(-[A-Z]{2})?$", app_language)
+					if 'na_country' in query_args:
+						na_country_found = query_args['na_country'][0]
+						na_country_valid = re.search("^[A-Z]{2}$", na_country_found)
 
-						if not na_country_valid or not na_language_valid or not app_language_valid:
-							na_country = None
-							na_language = None
-							app_language = None
+						if na_country is None:
+							if na_country_valid:
+								na_country = na_country_found
+							else:
+								na_country = None
+
+					if 'na_lang' in query_args:
+						na_language_found = query_args['na_lang'][0]
+						na_language_valid = re.search("^[a-z]{2}(-[A-Z]{2})?$", na_language_found)
+
+						if na_language is None:
+							if na_language_valid:
+								na_language = na_language_found
+							else:
+								na_language = None
+
 				except Exception as e:
 					pass
 
@@ -161,6 +207,9 @@ def search_for_tokens(app_config: AppConfig):
 		logger.info(f'web_view_version not found, searching in main.js as fallback...')
 		main_js = download_splatnet3_main_js('https://api.lp1.av5ja.srv.nintendo.net')
 		web_view_version = search_for_web_view_version_in_js(main_js)
+
+	if na_country is None and na_language is not None:
+		na_country = na_language.split('-')[1]
 
 	logger.info(f'Searching for tokens...')
 	with open(snapshot_path, 'rb') as f:
