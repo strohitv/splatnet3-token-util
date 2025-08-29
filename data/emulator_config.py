@@ -8,7 +8,7 @@ class EmulatorConfig:
 
 	def __init__(self,
 				 emulator_path='~/Android/Sdk/emulator/emulator',
-				 emulator_boot_args='-avd {AVD_NAME}',
+				 emulator_boot_args='-avd {AVD_NAME} -feature -Vulkan -no-snapshot-load',
 				 adb_path='~/Android/Sdk/platform-tools/adb',
 				 avd_name='NSA',
 				 snapshot_dir='~/.android/avd/{AVD_NAME}.avd/snapshots/',
