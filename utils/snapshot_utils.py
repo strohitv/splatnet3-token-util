@@ -93,6 +93,9 @@ def search_for_tokens(app_config: AppConfig):
 	logger.info(f'Searching for metadata...')
 	with open(snapshot_path, 'rb') as f:
 		for piece in read_in_chunks(f):
+			if web_view_version is not None and na_country is not None and na_language is not None and app_language is not None and user_agent is not None:
+				break
+
 			if web_view_version is None and b'x-web-view-ver' in piece:
 				web_view_version = ''
 				index = piece.index(b'x-web-view-ver') + len(b'x-web-view-ver')
@@ -214,6 +217,9 @@ def search_for_tokens(app_config: AppConfig):
 	logger.info(f'Searching for tokens...')
 	with open(snapshot_path, 'rb') as f:
 		for piece in read_in_chunks(f):
+			if g_token is not None and bullet_token is not None and session_token is not None:
+				break
+
 			# _gtoken search
 			if g_token is None and b'_gtoken=ey' in piece:
 				g_token = ''
