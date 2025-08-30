@@ -2,7 +2,7 @@
 # EXECUTE ON PIXEL 4 / ANDROID API LEVEL 30 WITH PLAY STORE EMULATOR
 #####
 
-block_while -mode not-found -template ./screenshots/pixel_4_api_30_play_store/template-emulator-booted.png -x1 831 -y1 2197 -x2 866 -y2 2231 -d 500 -actual ./screenshots/pixel_4_api_30_play_store/actual/actual-emulator-booted.png
+block_while -mode not-found -template ./screenshots/pixel_4_api_30_play_store/template-emulator-booted.png -x1 510 -y1 2185 -x2 570 -y2 2245 -d 500 -actual ./screenshots/pixel_4_api_30_play_store/actual/actual-emulator-booted.png
 
 echo
 echo Open SplatNet3
