@@ -106,8 +106,8 @@ options:
                                         by splitting them with a semicolon `;`
   -d, --duration DURATION               The frequency of how often this command should check whether the
                                         regions match. Default: 500 ms
-  -ca, --continue-after CONTINUE_AFTER  Optional arg which lets the script continue if the block cannot be
-                                        resolved after X seconds. Default: 45
+  -ca, --continue-after CONTINUE_AFTER  Optional arg which lets the script continue if the execution is still
+                                        active after X seconds. Default: 45
   -co, --cutoff CUTOFF                  The cutoff for the comparison. This value decides how similar the
                                         regions must be to be considered equal. Lower values mean stricter
                                         comparison, higher values will match less similar screenshots.
