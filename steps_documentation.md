@@ -40,13 +40,21 @@ options:
 ```
 
 ## close_nsa
-This command forces the Nintendo Switch App to be closed..
+This command attempts to close the Nintendo Switch App.
 
 ### Usage:
 ```
-usage: close_nsa
+usage: close_nsa [--max-attempts MAX_ATTEMPTS] [--max-wait-secs MAX_WAIT_SECS] [-d DURATION]
 
 Closes the Nintendo Switch App
+
+options:
+  --max-attempts MAX_ATTEMPTS    How often the step should attempt to close the Nintendo Switch App before
+                                 giving up. Default: 3
+  --max-wait-secs MAX_WAIT_SECS  How long the step should wait for the Nintendo Switch App to close before it
+                                 considers the attempt failed. Default: 45 seconds
+  -d, --duration DURATION        The frequency of how often this command should check whether the Nintendo
+                                 Switch App is closed. Default: 500 ms
 
 ```
 
@@ -116,7 +124,7 @@ options:
 ```
 
 ## open_splatnet3
-This command causes the Nintendo Switch App to open and loads SplatNet3 afterwards.
+This command attempts to open the Nintendo Switch App and load SplatNet3 afterwards.
 
 ### Usage:
 ```
@@ -128,7 +136,7 @@ options:
   --max-attempts MAX_ATTEMPTS    How often the step should attempt to open SplatNet3 before giving up.
                                  Default: 3
   --max-wait-secs MAX_WAIT_SECS  How long the step should wait for SplatNet3 to load before it considers the
-                                 attempt failed. Default: 15 seconds
+                                 attempt failed. Default: 45 seconds
   -d, --duration DURATION        The frequency of how often this command should check whether SplatNet3 is
                                  open. Default: 500 ms
 
@@ -222,9 +230,17 @@ This command causes the Emulator to shut down.
 
 ### Usage:
 ```
-usage: shutdown_emu
+usage: shutdown_emu [--max-attempts MAX_ATTEMPTS] [--max-wait-secs MAX_WAIT_SECS] [-d DURATION]
 
-Triggers an emulator shutdown..
+Triggers an emulator shutdown.
+
+options:
+  --max-attempts MAX_ATTEMPTS    How often the step should attempt to shut the emulator down before giving up.
+                                 Default: 3
+  --max-wait-secs MAX_WAIT_SECS  How long the step should wait for the emulator to shutdown before it
+                                 considers the attempt failed. Default: 30 seconds
+  -d, --duration DURATION        The frequency of how often this command should check whether the emulator is
+                                 still running. Default: 500 ms
 
 ```
 
@@ -276,17 +292,20 @@ options:
 
 ```
 
-## wait_s
-This command will block the execution of the script for the given amount of seconds.
+## wait_for_emulator_boot
+This command causes the script to wait until the emulator is ready.
 
 ### Usage:
 ```
-usage: wait_s seconds
+usage: wait_for_emulator_boot [--max-wait-secs MAX_WAIT_SECS] [-d DURATION]
 
-Waits for the given amount of seconds
+Waits until the emulator has been booted and is ready.
 
-positional arguments:
-  seconds  The amount of seconds to wait
+options:
+  --max-wait-secs MAX_WAIT_SECS  How long the step should wait for the emulator to boot before it considers
+                                 the boot failed. Default: 60 seconds
+  -d, --duration DURATION        The frequency of how often this command should check whether SplatNet3 is
+                                 open. Default: 500 ms
 
 ```
 
@@ -301,5 +320,19 @@ Waits for the given amount of milliseconds
 
 positional arguments:
   milliseconds  The amount of milliseconds to wait
+
+```
+
+## wait_s
+This command will block the execution of the script for the given amount of seconds.
+
+### Usage:
+```
+usage: wait_s seconds
+
+Waits for the given amount of seconds
+
+positional arguments:
+  seconds  The amount of seconds to wait
 
 ```

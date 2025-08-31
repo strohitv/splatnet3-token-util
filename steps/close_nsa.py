@@ -1,4 +1,6 @@
 import argparse
+import io
+import shlex
 import subprocess
 import time
 
@@ -20,14 +22,62 @@ class CloseNSA:
 											  formatter_class=get_arg_formatter(),
 											  conflict_handler='resolve')
 		self.parser.add_argument('-h', '--help', required=False, help=argparse.SUPPRESS)
+		self.parser.add_argument('--max-attempts', required=False, default=3,
+								 help='How often the step should attempt to close the Nintendo Switch App before giving up. Default: 3')
+		self.parser.add_argument('--max-wait-secs', required=False, default=45,
+								 help='How long the step should wait for the Nintendo Switch App to close before it considers the attempt failed. Default: 45 seconds')
+		self.parser.add_argument('-d', '--duration', required=False, default=500,
+								 help='The frequency of how often this command should check whether the Nintendo Switch App is closed. Default: 500 ms')
 
 		self.description = self.parser.format_help()
-		self.introduction = 'This command forces the Nintendo Switch App to be closed..'
+
+		self.description = self.parser.format_help()
+		self.introduction = 'This command attempts to close the Nintendo Switch App.'
 
 	def execute(self, args):
-		self.logger.info(f'Closing the Nintendo Switch App.')
-		subprocess.run(f'{self.app_config.emulator_config.adb_path} shell am force-stop com.nintendo.znca',
-					   shell=True,
-					   stdout=subprocess.PIPE,
-					   stderr=subprocess.PIPE)
-		time.sleep(1)
+		only_args = shlex.split(args)[1:]
+		parsed_args = self.parser.parse_args(only_args)
+
+		closed = False
+
+		for i in range(int(parsed_args.max_attempts)):
+			self.logger.info(f'Closing Nintendo Switch App - attempt {i + 1}/{parsed_args.max_attempts}')
+
+			subprocess.run(f'{self.app_config.emulator_config.adb_path} shell am force-stop com.nintendo.znca',
+						   shell=True,
+						   stdout=subprocess.PIPE,
+						   stderr=subprocess.PIPE)
+
+			start_time = time.time()
+
+			while not closed and time.time() - start_time < int(parsed_args.max_wait_secs):
+				time.sleep(int(parsed_args.duration) / 1000.0)
+
+				nsa_closed_proc = subprocess.Popen(f'{self.app_config.emulator_config.adb_path} shell dumpsys activity -p com.nintendo.znca activities',
+												   shell=True,
+												   stdout=subprocess.PIPE,
+												   stderr=subprocess.PIPE)
+
+				for line in io.TextIOWrapper(nsa_closed_proc.stdout, encoding="utf-8"):
+					if not line:
+						break
+
+					if self.app_config.debug:
+						self.logger.info(line.strip())
+
+					line = line.strip()
+
+					if '(nothing)' in line:
+						closed = True
+						break
+
+			if closed:
+				self.logger.info(f'Closing NSA - attempt {i + 1}/{parsed_args.max_attempts} success - done after {time.time() - start_time:.1f} seconds.')
+				break
+			else:
+				self.logger.info(f'Closing NSA - attempt {i + 1}/{parsed_args.max_attempts} failed.')
+
+		if not closed:
+			raise Exception(f'Could not close Nintendo Switch App in {parsed_args.max_attempts} attempts.')
+
+	# time.sleep(1)

@@ -11,6 +11,7 @@ from steps.swipe import Swipe
 from steps.search_and_tap_center import SearchAndTapCenter
 from steps.tap import Tap
 from steps.type import Type
+from steps.wait_for_emulator_boot import WaitForEmulatorBoot
 from steps.wait_ms import WaitMS
 from steps.wait_s import WaitS
 
@@ -30,7 +31,8 @@ def get_steps(app_config: AppConfig):
 	steps['swipe'] = Swipe('swipe', app_config)
 	steps['tap'] = Tap('tap', app_config)
 	steps['type'] = Type('type', app_config)
-	steps['wait_s'] = WaitS('wait_s', app_config)
+	steps['wait_for_emulator_boot'] = WaitForEmulatorBoot('wait_for_emulator_boot', app_config)
 	steps['wait_ms'] = WaitMS('wait_ms', app_config)
+	steps['wait_s'] = WaitS('wait_s', app_config)
 
 	return steps

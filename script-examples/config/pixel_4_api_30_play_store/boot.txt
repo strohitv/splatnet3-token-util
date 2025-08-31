@@ -2,19 +2,11 @@
 # EXECUTE ON PIXEL 4 / ANDROID API LEVEL 30 WITH PLAY STORE EMULATOR
 #####
 
-block_while -mode not-found -template ./screenshots/pixel_4_api_30_play_store/template-emulator-booted.png -x1 510 -y1 2185 -x2 570 -y2 2245 -d 500 -actual ./screenshots/pixel_4_api_30_play_store/actual/actual-emulator-booted.png
+wait_for_emulator_boot
 
 echo
 echo Open SplatNet3
 echo '##############'
 echo
 
-wait_s 1
 open_splatnet3
-
-echo
-echo Wait for Splatnet3 to be fully loaded
-echo '#####################################'
-echo
-
-block_while -mode not-found -template ./screenshots/pixel_4_api_30_play_store/template-splatnet3-opened.png -x1 25 -y1 100 -x2 250 -y2 250 -d 300 -actual ./screenshots/pixel_4_api_30_play_store/actual/actual-splatnet3-opened.png -co 1
