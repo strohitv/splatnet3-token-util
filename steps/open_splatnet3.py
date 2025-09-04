@@ -70,23 +70,32 @@ class OpenSplatNet3:
 					line = line.strip()
 
 					if '*APP*' in line and not is_splatnet_app and active_connections > 0:
+						if self.app_config.debug:
+							self.logger.info('All conditions for splatnet3 boot fulfilled')
 						found = active_connections <= 3 and game_web_activity_loaded
 						break
 
 					if 'com.nintendo.znca/.ui.gameweb.GameWebActivity' in line:
+						if self.app_config.debug:
+							self.logger.info('Found GameWebActivity')
 						game_web_activity_loaded = True
 						continue
 
 					if '*APP*' in line and not is_splatnet_app and 'com.nintendo.znca' in line:
+						if self.app_config.debug:
+							self.logger.info('Entered Nintendo Switch App section')
 						is_splatnet_app = True
-						found = True
 						continue
 
 					if '*APP*' in line and is_splatnet_app and not 'com.nintendo.znca' in line:
+						if self.app_config.debug:
+							self.logger.info('Left Nintendo Switch App section')
 						is_splatnet_app = False
 						continue
 
 					if '- ConnectionRecord{' in line and is_splatnet_app:
+						if self.app_config.debug:
+							self.logger.info('Found one active connection')
 						active_connections += 1
 						continue
 
