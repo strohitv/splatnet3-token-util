@@ -24,7 +24,7 @@ class OpenSplatNet3:
 		self.parser.add_argument('-h', '--help', required=False, help=argparse.SUPPRESS)
 		self.parser.add_argument('--max-attempts', required=False, default=3,
 								 help='How often the step should attempt to open SplatNet3 before giving up. Default: 3')
-		self.parser.add_argument('--max-wait-secs', required=False, default=45,
+		self.parser.add_argument('--max-wait-secs', required=False, default=60,
 								 help='How long the step should wait for SplatNet3 to load before it considers the attempt failed. Default: 45 seconds')
 		self.parser.add_argument('-d', '--duration', required=False, default=500,
 								 help='The frequency of how often this command should check whether SplatNet3 is open. Default: 500 ms')

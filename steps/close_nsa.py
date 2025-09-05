@@ -24,7 +24,7 @@ class CloseNSA:
 		self.parser.add_argument('-h', '--help', required=False, help=argparse.SUPPRESS)
 		self.parser.add_argument('--max-attempts', required=False, default=3,
 								 help='How often the step should attempt to close the Nintendo Switch App before giving up. Default: 3')
-		self.parser.add_argument('--max-wait-secs', required=False, default=45,
+		self.parser.add_argument('--max-wait-secs', required=False, default=15,
 								 help='How long the step should wait for the Nintendo Switch App to close before it considers the attempt failed. Default: 45 seconds')
 		self.parser.add_argument('-d', '--duration', required=False, default=500,
 								 help='The frequency of how often this command should check whether the Nintendo Switch App is closed. Default: 500 ms')
