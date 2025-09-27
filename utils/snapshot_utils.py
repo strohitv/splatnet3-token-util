@@ -7,10 +7,10 @@ import requests
 import uncurl
 
 from data.app_config import AppConfig
+from utils.splatnet3_utils import download_splatnet3_main_js
 
 import logging
 
-from utils.splatnet3_utils import download_splatnet3_main_js
 
 logger = logging.getLogger(__name__)
 

@@ -19,10 +19,10 @@ from utils.splatnet3_utils import is_homepage_reachable
 from utils.stats_utils import prepare_stats, write_stats
 from utils.step_doc_creator import create_step_doc
 from utils.template_utils import create_target_file
+from utils.update_utils import check_for_update, update, print_update_notification
 
 import logging
 
-from utils.update_utils import check_for_update, update, print_update_notification
 
 logging.basicConfig(format='%(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)

@@ -1,13 +1,9 @@
 import json
-import os
-import re
+import logging
 import sys
 from urllib.parse import urljoin
 
 import requests
-
-import logging
-
 from bs4 import BeautifulSoup
 
 logger = logging.getLogger(__name__)
