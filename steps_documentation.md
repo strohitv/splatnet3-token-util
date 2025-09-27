@@ -11,38 +11,50 @@ This command blocks the execution of the script until a specific region of the e
 ### Usage:
 ```
 usage: block_while -mode {found,not-found} -template TEMPLATE [-actual ACTUAL] -x1 X1 -y1 Y1 -x2 X2 -y2 Y2
-                   [-d DURATION] [-co CUTOFF]
+                   [-d DURATION] [-ca CONTINUE_AFTER] [-co CUTOFF]
 
 Blocks the execution of the script until a specific region on the screen (between points (X1, Y1) to (X2, Y2))
 looks similar to the same region on a given template
 
 options:
-  -mode, --mode {found,not-found}  Decides whether this step should block as long as the region can be found
-                                   or not, `found` = block as long as found, `not-found` = block until found
-  -template, --template TEMPLATE   The file path of the template screenshot which will be used for the
-                                   comparison
-  -actual, --actual ACTUAL         The file path where the actual screenshot of the emulator should be stored.
-                                   Default: "./screenshots/screenshot.png"
-  -x1, --x1 X1                     The X coordinate of the top left corner of the region to compare
-  -y1, --y1 Y1                     The Y coordinate of the top left corner of the region to compare
-  -x2, --x2 X2                     The X coordinate of the bottom right corner of the region to compare
-  -y2, --y2 Y2                     The Y coordinate of the bottom right corner of the region to compare
-  -d, --duration DURATION          The frequency of how often this command should check whether the regions
-                                   match. Default: 1000 ms
-  -co, --cutoff CUTOFF             The cutoff for the comparison. This value decides how similar the regions
-                                   must be to be considered equal. Lower values mean stricter comparison,
-                                   higher values will match less similar screenshots. Default: 5
+  -mode, --mode {found,not-found}       Decides whether this step should block as long as the region can be
+                                        found or not, `found` = block as long as found, `not-found` = block
+                                        until found
+  -template, --template TEMPLATE        The file path of the template screenshot which will be used for the
+                                        comparison
+  -actual, --actual ACTUAL              The file path where the actual screenshot of the emulator should be
+                                        stored. Default: "./screenshots/screenshot.png"
+  -x1, --x1 X1                          The X coordinate of the top left corner of the region to compare
+  -y1, --y1 Y1                          The Y coordinate of the top left corner of the region to compare
+  -x2, --x2 X2                          The X coordinate of the bottom right corner of the region to compare
+  -y2, --y2 Y2                          The Y coordinate of the bottom right corner of the region to compare
+  -d, --duration DURATION               The frequency of how often this command should check whether the
+                                        regions match. Default: 1000 ms
+  -ca, --continue-after CONTINUE_AFTER  Optional arg which lets the script continue if the block cannot be
+                                        resolved after X seconds. Default: 45
+  -co, --cutoff CUTOFF                  The cutoff for the comparison. This value decides how similar the
+                                        regions must be to be considered equal. Lower values mean stricter
+                                        comparison, higher values will match less similar screenshots.
+                                        Default: 5
 
 ```
 
 ## close_nsa
-This command forces the Nintendo Switch App to be closed..
+This command attempts to close the Nintendo Switch App.
 
 ### Usage:
 ```
-usage: close_nsa
+usage: close_nsa [--max-attempts MAX_ATTEMPTS] [--max-wait-secs MAX_WAIT_SECS] [-d DURATION]
 
 Closes the Nintendo Switch App
+
+options:
+  --max-attempts MAX_ATTEMPTS    How often the step should attempt to close the Nintendo Switch App before
+                                 giving up. Default: 3
+  --max-wait-secs MAX_WAIT_SECS  How long the step should wait for the Nintendo Switch App to close before it
+                                 considers the attempt failed. Default: 45 seconds
+  -d, --duration DURATION        The frequency of how often this command should check whether the Nintendo
+                                 Switch App is closed. Default: 500 ms
 
 ```
 
@@ -81,35 +93,38 @@ This command repeatedly executes a given command as long as a specific region of
 ### Usage:
 ```
 usage: execute_while -mode {found,not-found} -template TEMPLATE [-actual ACTUAL] -x1 X1 -y1 Y1 -x2 X2 -y2 Y2
-                     -cmd COMMAND [-d DURATION] [-co CUTOFF]
+                     -cmd COMMAND [-d DURATION] [-ca CONTINUE_AFTER] [-co CUTOFF]
 
 Repeatedly executes a given command as long as a specific region on the screen (between points (X1, Y1) to
 (X2, Y2)) looks similar to the same region on a given template
 
 options:
-  -mode, --mode {found,not-found}  Decides whether this step should execute the command as long as the region
-                                   can be found or not, `found` = execute as long as found, `not-found` =
-                                   execute until found
-  -template, --template TEMPLATE   The file path of the template screenshot which will be used for the
-                                   comparison
-  -actual, --actual ACTUAL         The file path where the actual screenshot of the emulator should be stored.
-                                   Default: "./screenshots/screenshot.png"
-  -x1, --x1 X1                     The X coordinate of the top left corner of the region to compare
-  -y1, --y1 Y1                     The Y coordinate of the top left corner of the region to compare
-  -x2, --x2 X2                     The X coordinate of the bottom right corner of the region to compare
-  -y2, --y2 Y2                     The Y coordinate of the bottom right corner of the region to compare
-  -cmd, --command COMMAND          The command which should be executed. Several commands can be provided by
-                                   splitting them with a semicolon `;`
-  -d, --duration DURATION          The frequency of how often this command should check whether the regions
-                                   match. Default: 500 ms
-  -co, --cutoff CUTOFF             The cutoff for the comparison. This value decides how similar the regions
-                                   must be to be considered equal. Lower values mean stricter comparison,
-                                   higher values will match less similar screenshots. Default: 5
+  -mode, --mode {found,not-found}       Decides whether this step should execute the command as long as the
+                                        region can be found or not, `found` = execute as long as found, `not-
+                                        found` = execute until found
+  -template, --template TEMPLATE        The file path of the template screenshot which will be used for the
+                                        comparison
+  -actual, --actual ACTUAL              The file path where the actual screenshot of the emulator should be
+                                        stored. Default: "./screenshots/screenshot.png"
+  -x1, --x1 X1                          The X coordinate of the top left corner of the region to compare
+  -y1, --y1 Y1                          The Y coordinate of the top left corner of the region to compare
+  -x2, --x2 X2                          The X coordinate of the bottom right corner of the region to compare
+  -y2, --y2 Y2                          The Y coordinate of the bottom right corner of the region to compare
+  -cmd, --command COMMAND               The command which should be executed. Several commands can be provided
+                                        by splitting them with a semicolon `;`
+  -d, --duration DURATION               The frequency of how often this command should check whether the
+                                        regions match. Default: 500 ms
+  -ca, --continue-after CONTINUE_AFTER  Optional arg which lets the script continue if the execution is still
+                                        active after X seconds. Default: 45
+  -co, --cutoff CUTOFF                  The cutoff for the comparison. This value decides how similar the
+                                        regions must be to be considered equal. Lower values mean stricter
+                                        comparison, higher values will match less similar screenshots.
+                                        Default: 5
 
 ```
 
 ## open_splatnet3
-This command causes the Nintendo Switch App to open and loads SplatNet3 afterwards.
+This command attempts to open the Nintendo Switch App and load SplatNet3 afterwards.
 
 ### Usage:
 ```
@@ -121,7 +136,7 @@ options:
   --max-attempts MAX_ATTEMPTS    How often the step should attempt to open SplatNet3 before giving up.
                                  Default: 3
   --max-wait-secs MAX_WAIT_SECS  How long the step should wait for SplatNet3 to load before it considers the
-                                 attempt failed. Default: 15 seconds
+                                 attempt failed. Default: 45 seconds
   -d, --duration DURATION        The frequency of how often this command should check whether SplatNet3 is
                                  open. Default: 500 ms
 
@@ -215,9 +230,17 @@ This command causes the Emulator to shut down.
 
 ### Usage:
 ```
-usage: shutdown_emu
+usage: shutdown_emu [--max-attempts MAX_ATTEMPTS] [--max-wait-secs MAX_WAIT_SECS] [-d DURATION]
 
-Triggers an emulator shutdown..
+Triggers an emulator shutdown.
+
+options:
+  --max-attempts MAX_ATTEMPTS    How often the step should attempt to shut the emulator down before giving up.
+                                 Default: 3
+  --max-wait-secs MAX_WAIT_SECS  How long the step should wait for the emulator to shutdown before it
+                                 considers the attempt failed. Default: 30 seconds
+  -d, --duration DURATION        The frequency of how often this command should check whether the emulator is
+                                 still running. Default: 500 ms
 
 ```
 
@@ -269,17 +292,20 @@ options:
 
 ```
 
-## wait_s
-This command will block the execution of the script for the given amount of seconds.
+## wait_for_emulator_boot
+This command causes the script to wait until the emulator is ready.
 
 ### Usage:
 ```
-usage: wait_s seconds
+usage: wait_for_emulator_boot [--max-wait-secs MAX_WAIT_SECS] [-d DURATION]
 
-Waits for the given amount of seconds
+Waits until the emulator has been booted and is ready.
 
-positional arguments:
-  seconds  The amount of seconds to wait
+options:
+  --max-wait-secs MAX_WAIT_SECS  How long the step should wait for the emulator to boot before it considers
+                                 the boot failed. Default: 60 seconds
+  -d, --duration DURATION        The frequency of how often this command should check whether SplatNet3 is
+                                 open. Default: 500 ms
 
 ```
 
@@ -294,5 +320,19 @@ Waits for the given amount of milliseconds
 
 positional arguments:
   milliseconds  The amount of milliseconds to wait
+
+```
+
+## wait_s
+This command will block the execution of the script for the given amount of seconds.
+
+### Usage:
+```
+usage: wait_s seconds
+
+Waits for the given amount of seconds
+
+positional arguments:
+  seconds  The amount of seconds to wait
 
 ```

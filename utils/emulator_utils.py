@@ -20,7 +20,7 @@ def boot_emulator(app_config: AppConfig):
 		f'{app_config.emulator_config.emulator_path} {app_config.emulator_config.get_emulator_boot_args()}',
 		shell=True,
 		stdout=subprocess.PIPE,
-		stderr=subprocess.STDOUT)
+		stderr=subprocess.PIPE)
 
 	for line in io.TextIOWrapper(emulator_proc.stdout, encoding="utf-8"):
 		if not line:
@@ -47,7 +47,7 @@ def get_emulator_name(app_config: AppConfig):
 	emulator_devices_proc = Popen(f'{app_config.emulator_config.adb_path} devices',
 								  shell=True,
 								  stdout=subprocess.PIPE,
-								  stderr=subprocess.STDOUT)
+								  stderr=subprocess.PIPE)
 	emulator_name = 'emulator-5554'
 	for line in io.TextIOWrapper(emulator_devices_proc.stdout, encoding="utf-8"):
 		if not line:
@@ -75,7 +75,7 @@ def run_adb(app_config: AppConfig, command: str):
 	subprocess.run(f'{app_config.emulator_config.adb_path} -s {emulator_name} {command}',
 				   shell=True,
 				   stderr=sys.stderr,
-				   stdout=sys.stdout)
+				   stdout=sys.stderr)
 	logger.info(f'Command execution finished')
 	logger.info('')
 
@@ -88,14 +88,22 @@ def create_snapshot(app_config: AppConfig):
 	logger.info('#################')
 	logger.info(f'')
 	logger.info(f'Creating snapshot of emulator state...')
-	# get emulator name
-	emulator_name = get_emulator_name(app_config)
 
-	# do snapshot
-	subprocess.run(f'{app_config.emulator_config.adb_path} -s {emulator_name} emu avd snapshot save {app_config.emulator_config.snapshot_name}',
-				   shell=True,
-				   stdout=subprocess.PIPE,
-				   stderr=subprocess.PIPE)
+	snapshot_path = os.path.expanduser(os.path.join(app_config.emulator_config.get_snapshot_dir(), app_config.emulator_config.snapshot_name, 'ram.bin'))
+
+	while not os.path.exists(snapshot_path):
+		# get emulator name
+		emulator_name = get_emulator_name(app_config)
+
+		# do snapshot
+		subprocess.run(f'{app_config.emulator_config.adb_path} -s {emulator_name} emu avd snapshot save {app_config.emulator_config.snapshot_name}',
+					   shell=True,
+					   stdout=sys.stderr,
+					   stderr=sys.stderr)
+
+		if not os.path.exists(snapshot_path):
+			sleep(1)
+
 	logger.info(f'Snapshot created!')
 	logger.info('')
 
@@ -114,8 +122,8 @@ def request_emulator_shutdown(app_config: AppConfig):
 	# do snapshot
 	subprocess.run(f'{app_config.emulator_config.adb_path} -s {emulator_name} emu kill',
 				   shell=True,
-				   stdout=subprocess.PIPE,
-				   stderr=subprocess.PIPE)
+				   stdout=sys.stderr,
+				   stderr=sys.stderr)
 
 	sleep_time = 5
 	logger.info(f'Requested emulator shutdown! Giving the emulator a grace period of {sleep_time} seconds to shut down...')

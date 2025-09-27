@@ -40,6 +40,8 @@ class ExecuteWhile:
 								 help='The command which should be executed. Several commands can be provided by splitting them with a semicolon `;`')
 		self.parser.add_argument('-d', '--duration', required=False, default=500,
 								 help='The frequency of how often this command should check whether the regions match. Default: 500 ms')
+		self.parser.add_argument('-ca', '--continue-after', required=False, default=45,
+								 help='Optional arg which lets the script continue if the execution is still active after X seconds. Default: 45')
 		self.parser.add_argument('-co', '--cutoff', required=False, default=5,
 								 help='The cutoff for the comparison. This value decides how similar the regions must be to be considered equal. Lower values mean stricter comparison, higher values will match less similar screenshots. Default: 5')
 
@@ -59,8 +61,13 @@ class ExecuteWhile:
 		self.logger.info(f'Repeatedly executing command as long as region can {"" if expect_found else "not "}be found')
 
 		fulfilled = False
+		max_seconds = int(parsed_args.continue_after)
 
 		while not fulfilled:
+			if time.time() > start + max_seconds:
+				self.logger.warning(f'WARNING: Still executing after {max_seconds} seconds, continuing script execution.')
+				return
+
 			script_utils.execute(parsed_args.command, self.all_steps)
 
 			time.sleep(int(parsed_args.duration) / 1000.0)

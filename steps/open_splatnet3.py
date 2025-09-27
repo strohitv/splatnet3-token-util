@@ -24,13 +24,13 @@ class OpenSplatNet3:
 		self.parser.add_argument('-h', '--help', required=False, help=argparse.SUPPRESS)
 		self.parser.add_argument('--max-attempts', required=False, default=3,
 								 help='How often the step should attempt to open SplatNet3 before giving up. Default: 3')
-		self.parser.add_argument('--max-wait-secs', required=False, default=15,
-								 help='How long the step should wait for SplatNet3 to load before it considers the attempt failed. Default: 15 seconds')
+		self.parser.add_argument('--max-wait-secs', required=False, default=60,
+								 help='How long the step should wait for SplatNet3 to load before it considers the attempt failed. Default: 45 seconds')
 		self.parser.add_argument('-d', '--duration', required=False, default=500,
 								 help='The frequency of how often this command should check whether SplatNet3 is open. Default: 500 ms')
 
 		self.description = self.parser.format_help()
-		self.introduction = 'This command causes the Nintendo Switch App to open and loads SplatNet3 afterwards.'
+		self.introduction = 'This command attempts to open the Nintendo Switch App and load SplatNet3 afterwards.'
 
 	def execute(self, args):
 		only_args = shlex.split(args)[1:]
@@ -51,10 +51,14 @@ class OpenSplatNet3:
 			while not found and time.time() - start_time < int(parsed_args.max_wait_secs):
 				time.sleep(int(parsed_args.duration) / 1000.0)
 
-				currently_opened_app_proc = subprocess.Popen(f'{self.app_config.emulator_config.adb_path} shell dumpsys activity recents',
+				currently_opened_app_proc = subprocess.Popen(f'{self.app_config.emulator_config.adb_path} shell dumpsys activity processes',
 															 shell=True,
 															 stdout=subprocess.PIPE,
 															 stderr=subprocess.PIPE)
+
+				is_splatnet_app = False
+				game_web_activity_loaded = False
+				active_connections = 0
 
 				for line in io.TextIOWrapper(currently_opened_app_proc.stdout, encoding="utf-8"):
 					if not line:
@@ -65,20 +69,41 @@ class OpenSplatNet3:
 
 					line = line.strip()
 
-					if 'Recent #1' in line:
+					if '*APP*' in line and not is_splatnet_app and active_connections > 0:
+						if self.app_config.debug:
+							self.logger.info('All conditions for splatnet3 boot fulfilled')
+						found = active_connections <= 3 and game_web_activity_loaded
 						break
 
-					if 'GameWebActivity' in line:
-						found = True
-						self.logger.info(f'SplatNet3 found after {time.time() - start_time:.1f} seconds during attempt {i + 1}/{parsed_args.max_attempts}')
-						break
+					if 'com.nintendo.znca/.ui.gameweb.GameWebActivity' in line:
+						if self.app_config.debug:
+							self.logger.info('Found GameWebActivity')
+						game_web_activity_loaded = True
+						continue
 
-			if found:
-				break
+					if '*APP*' in line and not is_splatnet_app and 'com.nintendo.znca' in line:
+						if self.app_config.debug:
+							self.logger.info('Entered Nintendo Switch App section')
+						is_splatnet_app = True
+						continue
+
+					if '*APP*' in line and is_splatnet_app and not 'com.nintendo.znca' in line:
+						if self.app_config.debug:
+							self.logger.info('Left Nintendo Switch App section')
+						is_splatnet_app = False
+						continue
+
+					if '- ConnectionRecord{' in line and is_splatnet_app:
+						if self.app_config.debug:
+							self.logger.info('Found one active connection')
+						active_connections += 1
+						continue
+
+			if not found:
+				self.logger.info(f'Opening SplatNet3 - attempt {i + 1}/{parsed_args.max_attempts} failed.')
 			else:
-				self.logger.info(f'Attempt {i + 1}/{parsed_args.max_attempts} failed.')
+				self.logger.info(f'Opening SplatNet3 - attempt {i + 1}/{parsed_args.max_attempts} success - done after {time.time() - start_time:.1f} seconds.')
+				break
 
 		if not found:
-			raise Exception(f'Could not find SplatNet3 app after {parsed_args.max_attempts} attempts.')
-
-		time.sleep(1)
+			raise Exception(f'Could not open SplatNet3 app in {parsed_args.max_attempts} attempts.')

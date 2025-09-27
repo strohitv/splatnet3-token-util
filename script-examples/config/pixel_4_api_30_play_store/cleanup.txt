@@ -7,14 +7,11 @@ echo Close NSA
 echo '#########'
 echo
 
-wait_s 1
-execute_while -mode found -cmd "close_nsa" -template ./screenshots/pixel_4_api_30_play_store/template-splatnet3-opened.png -x1 25 -y1 100 -x2 250 -y2 250 -d 500 -actual ./screenshots/pixel_4_api_30_play_store/actual/actual-splatnet3-gone.png
+close_nsa
 
 echo
 echo Shutdown emulator
 echo '#################'
 echo
 
-wait_s 1
 shutdown_emu
-wait_s 1
