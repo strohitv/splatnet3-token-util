@@ -128,17 +128,34 @@ This command attempts to open the Nintendo Switch App and load SplatNet3 afterwa
 
 ### Usage:
 ```
-usage: open_splatnet3 [--max-attempts MAX_ATTEMPTS] [--max-wait-secs MAX_WAIT_SECS] [-d DURATION]
+usage: open_splatnet3 [--max-attempts MAX_ATTEMPTS] [--max-wait-secs MAX_WAIT_SECS] [-d DURATION] [-c COLOR]
+                      [-actual ACTUAL] [-lb LOWER_BOUND] [-ub UPPER_BOUND] [-x1 X1] [-y1 Y1] [-x2 X2] [-y2 Y2]
 
-Opens the SplatNet3 app inside the Nintendo Switch App immediately.
+Opens the SplatNet3 app inside the Nintendo Switch App immediately and waits until a pixel with a specific
+color is found for a given ratio.
 
 options:
-  --max-attempts MAX_ATTEMPTS    How often the step should attempt to open SplatNet3 before giving up.
-                                 Default: 3
-  --max-wait-secs MAX_WAIT_SECS  How long the step should wait for SplatNet3 to load before it considers the
-                                 attempt failed. Default: 45 seconds
-  -d, --duration DURATION        The frequency of how often this command should check whether SplatNet3 is
-                                 open. Default: 500 ms
+  --max-attempts MAX_ATTEMPTS     How often the step should attempt to open SplatNet3 before giving up.
+                                  Default: 3
+  --max-wait-secs MAX_WAIT_SECS   How long the step should wait for SplatNet3 to load before it considers the
+                                  attempt failed. Default: 45 seconds
+  -d, --duration DURATION         The frequency of how often this command should check whether SplatNet3 is
+                                  open. Default: 500 ms
+  -c, --color COLOR               The color which should be searched as hex color. Default: "#292E35"
+  -actual, --actual ACTUAL        The file path where the actual screenshot of the emulator should be stored.
+                                  Default: "./screenshots/actual-nsa-opened.png"
+  -lb, --lower-bound LOWER_BOUND  The lower bound of the ratio of pixels in the area which must have the given
+                                  color. Default: 0.3
+  -ub, --upper-bound UPPER_BOUND  The upper bound of the ratio of pixels in the area which must have the given
+                                  color. Default: 0.7
+  -x1, --x1 X1                    The X coordinate of the upper left corner of the area which should be
+                                  checked. Default: 0
+  -y1, --y1 Y1                    The Y coordinate of the upper left corner of the area which should be
+                                  checked. Default: 1000
+  -x2, --x2 X2                    The X coordinate of the lower right corner of the area which should be
+                                  checked. Default: 1000
+  -y2, --y2 Y2                    The Y coordinate of the lower right corner of the area which should be
+                                  checked. Default: 1500
 
 ```
 
