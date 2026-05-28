@@ -112,11 +112,27 @@ Here is a list of some important files and directories of the project structure
   - `utils/template_utils.py`: this file fills the `config/template.txt` file with found tokens and stores it to `config.txt`
   - `utils/update_utils.py`: this file manages everything related to updating the project: update fetching, notifications and update execution
 
+## Interactive Mode
+Emulator settings and display can vary throughout different operating systems and installations. For this reason, the fully automated token generation might fail. Fixing these issues is difficult because I cannot reproduce them easily on my computer, where everyhing works fine.
+
+For this reason, Interactive Mode was added. It is the same as the regular extraction, however the user has to manually press the Enter key inside the Terminal as soon as SplatNet3 is fully loaded (which means either the main menu or an Error message is displayed). When triggered, a screenshot will be created and saved in the main directory. If you were experiencing issues with running the regular, automatic method before, please consider sending the screenshot to the developer via discord (strohkoenig) or an issue on GitHub.
+It can be triggered by adding `-im` to the command:
+```shell
+# run token extraction in interactive mode
+python main.py -im
+
+# let run_s3s.py start extraction in interactive mode if necessary
+python run_s3s.py -im [INSERT S3S ARGUMENTS HERE]
+```
+
 ## main.py basic commands
 Currently, `main.py` offers three main commands you can execute: 
 ```shell
 # run token extraction
 python main.py
+
+# run token extraction in interactive mode (= you have to press Enter once SplatNet3 is opened), see Interactive Mode section
+python main.py -im
 
 # boot emulator (blocks until emulator shuts down)
 python main.py --emu

@@ -214,6 +214,12 @@ For example, you can do this:
 # print all available commands
 python run_s3s.py --help
 
+# IF THE REGULAR EXTRACTION DOES NOT WORK, RUN INTERACTIVE MODE
+# SEE INFORMATION BELOW UNDER "Interactive Mode" SECTION
+python run_s3s.py -im
+python run_s3s.py -im --getseed
+python run_s3s.py -im -r -M
+
 # Lean's Gear Seed Checker
 # export a gear file which you can upload to Lean's Gear Seed Checker
 # IMPORTANT: please update s3s to a version released on August 19th 2025 or later if --getseed fails
@@ -227,6 +233,21 @@ python run_s3s.py -r
 # upload recent battles to stat.ink and activate monitoring mode
 python run_s3s.py -r -M
 ```
+
+## Interactive Mode
+Emulator settings and display can vary throughout different operating systems and installations. For this reason, the fully automated token generation might fail. Fixing these issues is difficult because I cannot reproduce them easily on my computer, where everyhing works fine.
+
+For this reason, Interactive Mode was added. It is the same as the regular extraction, however the user has to manually press the Enter key inside the Terminal as soon as SplatNet3 is fully loaded (which means either the main menu or an Error message is displayed). When triggered, a screenshot will be created and saved in the main directory. If you were experiencing issues with running the regular, automatic method before, please consider sending the screenshot to the developer via discord (strohkoenig) or an issue on GitHub.
+
+It can be triggered by adding `-im` to the command:
+```shell
+# run token extraction in interactive mode
+python main.py -im
+
+# let run_s3s.py start extraction in interactive mode if necessary
+python run_s3s.py -im [INSERT S3S ARGUMENTS HERE]
+```
+
 
 ### outdated: workaround for the `--getseed` bug
 The `--getseed` bug in s3s has been fixed on August 19th 2025. A workaround is not necessary anymore after updating s3s.
