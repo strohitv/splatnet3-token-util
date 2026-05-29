@@ -1,6 +1,8 @@
 import argparse
 import atexit
 import json
+import subprocess
+from time import sleep
 
 import multiprocess
 import os
@@ -11,6 +13,8 @@ import datetime
 
 from data.app_config import AppConfig
 from steps import all_steps
+from steps.close_nsa import CloseNSA
+from steps.wait_for_emulator_boot import WaitForEmulatorBoot
 from utils.config_utils import load_config, ensure_scripts_exist, ensure_template_exists, save_config
 from utils.emulator_utils import boot_emulator, run_adb, wait_for_shutdown, create_snapshot, delete_snapshot, request_emulator_shutdown
 from utils.script_utils import execute_script
@@ -98,6 +102,7 @@ def main():
 						help='Regenerates the configuration file (and overwrites existing ones)', default=False, action='store_true')
 	parser.add_argument('-b', '-emu', '--boot-emulator', '--emu', required=False, help='Boots the emulator', default=False, action='store_true')
 	parser.add_argument('-a', '-adb', '--run-adb', '--adb', dest='ADB_COMMAND', required=False, help='Executes a command via android debug bridge (adb)')
+	parser.add_argument('-im', '-interactive', '-interactive-mode', '--interactive', '--interactive-mode', required=False, help='Runs the scrip in interactive mode', default=False, action='store_true')
 	parser.add_argument('--disable-update-check', required=False, help='Disables update check for this single call', default=False, action='store_true')
 	parser.add_argument('-u', '-update', '--update', required=False, help='Updates the application', default=False, action='store_true')
 	args = parser.parse_args()
@@ -185,6 +190,10 @@ def main():
 		logger.info('ERROR: template_path in config does not exist. Please edit the config file and insert a valid template_path. Exiting now.')
 		sys.exit(INPUT_VALIDATION_FAILED)
 
+	run_interactive = False
+	if args.interactive:
+		run_interactive = True
+
 	start_datetime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 	logger.info(f'### Script started at {start_datetime} ###')
 
@@ -203,44 +212,112 @@ def main():
 
 		extraction_process = None
 		emulator_pid = multiprocess.Value('i', 0)
-		try:
-			extraction_process = multiprocess.Process(target=run_token_extraction,
-													  args=(app_config, all_available_steps, args.console_out, start_time, start_datetime, attempt, emulator_pid))
-			extraction_process.start()
+		if not run_interactive:
+			try:
+				extraction_process = multiprocess.Process(target=run_token_extraction,
+														  args=(app_config, all_available_steps, args.console_out, start_time, start_datetime, attempt, emulator_pid))
+				extraction_process.start()
 
-			targeted_end_time = time.time() + max(60, app_config.run_config.max_attempt_duration_seconds)
-			while time.time() < targeted_end_time and extraction_process.is_alive():
-				time.sleep(1)
+				targeted_end_time = time.time() + max(60, app_config.run_config.max_attempt_duration_seconds)
+				while time.time() < targeted_end_time and extraction_process.is_alive():
+					time.sleep(1)
 
-			if extraction_process.is_alive():
-				raise Exception(f'Extraction did not finish in time ({max(60, app_config.run_config.max_attempt_duration_seconds)} seconds), forcing restart...')
-			elif extraction_process.exitcode is not None and extraction_process.exitcode == 0:
-				sys.exit(SUCCESS)
+				if extraction_process.is_alive():
+					raise Exception(f'Extraction did not finish in time ({max(60, app_config.run_config.max_attempt_duration_seconds)} seconds), forcing restart...')
+				elif extraction_process.exitcode is not None and extraction_process.exitcode == 0:
+					sys.exit(SUCCESS)
 
-		except Exception as e:
-			logger.info(f'### Exception ###')
-			logger.info(e)
-			logger.info('')
-
-			if extraction_process is not None and extraction_process.is_alive():
-				logger.info(f'Terminating extraction process...')
-				extraction_process.terminate()
-				time.sleep(10)
-				extraction_process.kill()
-				logger.info('Process terminated.')
+			except Exception as e:
+				logger.info(f'### Exception ###')
+				logger.info(e)
 				logger.info('')
 
-			# ensure a potentially created snapshot has been deleted.
-			delete_snapshot(app_config)
-			request_emulator_shutdown(app_config)
-
-			if emulator_pid.value is not None and emulator_pid.value > 0:
-				try:
-					logger.info('Emulator process might still be alive, sending KILL signal...')
+				if extraction_process is not None and extraction_process.is_alive():
+					logger.info(f'Terminating extraction process...')
+					extraction_process.terminate()
+					time.sleep(10)
+					extraction_process.kill()
+					logger.info('Process terminated.')
 					logger.info('')
-					os.kill(emulator_pid.value, signal.SIGKILL)
-				except Exception as e2:
-					logger.info(e2)
+
+				screenshot_path = save_splanet3_screenshot(app_config)
+				log_splatnet3_screenshot_message(screenshot_path)
+
+				# ensure a potentially created snapshot has been deleted.
+				delete_snapshot(app_config)
+				request_emulator_shutdown(app_config)
+
+				if emulator_pid.value is not None and emulator_pid.value > 0:
+					try:
+						logger.info('Emulator process might still be alive, sending KILL signal...')
+						logger.info('')
+						os.kill(emulator_pid.value, signal.SIGKILL)
+					except Exception as e2:
+						logger.info(e2)
+		else:
+			logger.info('Running in interactive mode - please confirm progress by hitting the Enter key when requested.')
+			logger.info('')
+			emulator_proc = boot_emulator(app_config)
+
+			wait_for_emulator_boot = WaitForEmulatorBoot('wait_for_emulator_boot', app_config)
+			wait_for_emulator_boot.execute('wait_for_emulator_boot')
+
+			logger.info('Opening SplatNet3...')
+			subprocess.run(f'{app_config.emulator_config.adb_path} shell am start https://s.nintendo.com/av5ja-lp1/znca/game/4834290508791808',
+						   shell=True,
+						   stdout=subprocess.PIPE,
+						   stderr=subprocess.PIPE)
+			logger.info('')
+			logger.info('Opened SplatNet3. Please press enter once you see EITHER the SplatNet3 Main Menu OR an error message inside SplatNet3 (yellow title, white text, grey background). If necessary, you can also update the Nintendo Switch App.')
+			sleep(2)
+
+			input("Press the Enter key after SplatNet3 has been opened and is either displaying the main menu or an error message: ")
+
+			screenshot_path = save_splanet3_screenshot(app_config)
+
+			create_snapshot(app_config)
+
+			logger.info('All done. No further inputs will be required from here on.')
+
+			close_nsa = CloseNSA('close_nsa', app_config)
+			close_nsa.execute('close_nsa')
+
+			request_emulator_shutdown(app_config)
+			wait_for_shutdown(emulator_proc)
+
+			# extract tokens from RAM dump
+			g_token, bullet_token, session_token, user_agent, web_view_version, na_country, na_language, app_language = search_for_tokens(app_config)
+			delete_snapshot(app_config)
+
+			if g_token is not None and bullet_token is not None and session_token is not None and na_country is not None:
+				# do a webrequest to see whether they work
+				if (app_config.token_config.validate_splat3_homepage
+					and app_config.token_config.extract_g_token and app_config.token_config.validate_g_token
+					and app_config.token_config.extract_bullet_token and app_config.token_config.validate_bullet_token):
+
+					if not is_homepage_reachable(g_token, bullet_token, user_agent, web_view_version, na_country, na_language, app_language):
+						logger.info('tokens were found but are invalid, attempt did not work')
+						logger.info('')
+
+				create_target_file(app_config, g_token, bullet_token, session_token, user_agent, web_view_version, na_country, na_language, app_language)
+
+				if args.console_out:
+					print(json.dumps({
+						'g_token': g_token,
+						'bullet_token': bullet_token,
+						'session_token': session_token,
+						'user_agent': user_agent,
+						'web_view_version': web_view_version,
+						'na_country': na_country,
+						'na_language': na_language,
+						'app_language': app_language
+					}))
+
+				log_splatnet3_screenshot_message(screenshot_path)
+				sys.exit(SUCCESS)
+			else:
+				logger.info('not all tokens could be found, attempt did not work')
+				logger.info('')
 
 	ended = time.time()
 	elapsed = ended - start_time
@@ -250,6 +327,27 @@ def main():
 	logger.info('')
 	sys.exit(NOT_ALL_TOKENS_FOUND)
 
+
+def save_splanet3_screenshot(app_config: AppConfig) -> str:
+	current_time = datetime.datetime.now()
+	current_script_path = os.path.dirname(os.path.realpath(__file__))
+	screenshot_path = os.path.join(current_script_path, f'{current_time.strftime('%Y-%m-%d_%H-%M-%S')}.png')
+	logger.info(f'Creating a Screenshot of the current screen with SplatNet3 opened...')
+	subprocess.run(f'{app_config.emulator_config.adb_path} exec-out screencap -p > {screenshot_path}',
+				   shell=True,
+				   stdout=subprocess.PIPE,
+				   stderr=subprocess.PIPE)
+	logger.info(f'Screenshot saved at "{screenshot_path}"')
+
+	return screenshot_path
+
+def log_splatnet3_screenshot_message(screenshot_path):
+	logger.info('')
+	logger.info('!!! ATTENTION !!!')
+	logger.info(f'A screenshot with SplatNet3 opened was saved to "{screenshot_path}".')
+	logger.info(f'Please send this screenshot to strohkoenig so he can analyse it and understand why the automatic extraction did not work.')
+	logger.info(f'You can do so by either sending it to strohkoenig on Discord or by opening or adding to an issue on GitHub.')
+	logger.info(f'Thank you for helping with improving this project!')
 
 if __name__ == '__main__':
 	main()

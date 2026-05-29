@@ -62,7 +62,13 @@ def main():
 		sys.argv += ['--help']
 		logger.info('')
 
-	s3s_args = ' '.join(['--norefresh', config['s3s_refresh_rc']] + sys.argv[1:])
+	all_args = sys.argv[1:]
+	run_interactive_mode = False
+	if '-im' in all_args:
+		run_interactive_mode = True
+		all_args = [i for i in all_args if i != '-im']
+
+	s3s_args = ' '.join(['--norefresh', config['s3s_refresh_rc']] + all_args)
 
 	while True:
 		# 1. prepare s3s run
@@ -127,7 +133,7 @@ def main():
 			config['stu_update'] = False
 
 		# 4. run splatnet3-token-util and act according to result
-		stu_proc = subprocess.run(f'{config["python_command"]} main.py',
+		stu_proc = subprocess.run(f'{config["python_command"]} main.py{' -im' if run_interactive_mode else ''}',
 								  shell=True)
 
 		logger.info('')
