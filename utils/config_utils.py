@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 def __search_path(find_app_command, app_name):
-	find_proc = Popen(f'{find_app_command} {app_name}', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	find_proc = Popen(f'"{find_app_command}" "{app_name}"', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 	for line in io.TextIOWrapper(find_proc.stdout, encoding="utf-8"):
 		if not line:

@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 def check_for_update(app_config: AppConfig):
 	git_fetch_proc = Popen(
-		f'{app_config.update_config.git_command} fetch',
+		f'"{app_config.update_config.git_command}" fetch',
 		shell=True,
 		stdout=subprocess.PIPE,
 		stderr=subprocess.STDOUT)
@@ -31,7 +31,7 @@ def check_for_update(app_config: AppConfig):
 		logger.error('')
 
 	git_status_proc = Popen(
-		f'{app_config.update_config.git_command} status -sb',
+		f'"{app_config.update_config.git_command}" status -sb',
 		shell=True,
 		stdout=subprocess.PIPE,
 		stderr=subprocess.STDOUT)
@@ -76,7 +76,7 @@ def update(app_config: AppConfig):
 	logger.info(f'Update in progress...')
 
 	update_error_command = None
-	current_command = f'{app_config.update_config.git_command} pull'
+	current_command = f'"{app_config.update_config.git_command}" pull'
 
 	logger.info(f'')
 	logger.info(f'running command: `{current_command}`')
@@ -98,7 +98,7 @@ def update(app_config: AppConfig):
 			logger.error(line.strip())
 
 	if update_error_command is None:
-		current_command = f'{app_config.update_config.pip_command} install -r requirements.txt'
+		current_command = f'"{app_config.update_config.pip_command}" install -r requirements.txt'
 
 		logger.info(f'')
 		logger.info(f'running command: `{current_command}`')

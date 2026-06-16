@@ -104,7 +104,7 @@ class SearchAndTapCenter:
 				if not execute_immediately:
 					self.logger.info(
 						f'Searching for image from base screenshot "{parsed_args.template}" in screenshot "{parsed_args.actual}" with cutoff {parsed_args.cutoff}.')
-					subprocess.run(f'{self.app_config.emulator_config.adb_path} exec-out screencap -p > {parsed_args.actual}',
+					subprocess.run(f'"{self.app_config.emulator_config.adb_path}" exec-out screencap -p > "{parsed_args.actual}"',
 								   shell=True,
 								   stdout=subprocess.PIPE,
 								   stderr=subprocess.PIPE)

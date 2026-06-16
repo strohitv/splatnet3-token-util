@@ -67,7 +67,7 @@ class BlockWhile:
 			time.sleep(int(parsed_args.duration) / 1000.0)
 
 			self.logger.info(f'Comparing screenshot "{parsed_args.actual}" to base screenshot "{parsed_args.template}" with cutoff {parsed_args.cutoff}.')
-			subprocess.run(f'{self.app_config.emulator_config.adb_path} exec-out screencap -p > {parsed_args.actual}',
+			subprocess.run(f'"{self.app_config.emulator_config.adb_path}" exec-out screencap -p > "{parsed_args.actual}"',
 						   shell=True,
 						   stdout=subprocess.PIPE,
 						   stderr=subprocess.PIPE)

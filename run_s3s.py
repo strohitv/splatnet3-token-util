@@ -77,24 +77,24 @@ def main():
 		logger.info('###########')
 		logger.info('')
 
-		logger.info(f'Running s3s with command "{config["python_command"]} {os.path.join(config["s3s_directory"], "s3s.py")} {s3s_args}"')
+		logger.info(f'Running s3s with command `"{config["python_command"]}" {os.path.join(config["s3s_directory"], "s3s.py")} {s3s_args}`')
 		logger.info('')
 
 		if config['s3s_update']:
-			logger.info(f'1/2 Running s3s update with command "{config["git_command"]} pull"')
-			subprocess.run(f'{config["git_command"]} pull',
+			logger.info(f'1/2 Running s3s update with command `"{config["git_command"]}" pull`')
+			subprocess.run(f'"{config["git_command"]}" pull',
 						   cwd=config['s3s_directory'],
 						   shell=True)
 			logger.info('')
-			logger.info(f'2/2 Running s3s update with command "{config["pip_command"]} install -r requirements.txt"')
-			subprocess.run(f'{config["pip_command"]} install -r requirements.txt',
+			logger.info(f'2/2 Running s3s update with command `"{config["pip_command"]}" install -r requirements.txt`')
+			subprocess.run(f'"{config["pip_command"]}" install -r requirements.txt',
 						   cwd=config['s3s_directory'],
 						   shell=True)
 			logger.info('')
 			config['s3s_update'] = False
 
 		# 2. run s3s and store return code
-		s3s_proc = subprocess.run(f'{config["python_command"]} {os.path.join(config["s3s_directory"], "s3s.py")} {s3s_args}',
+		s3s_proc = subprocess.run(f'"{config["python_command"]}" "{os.path.join(config["s3s_directory"], "s3s.py")}" {s3s_args}',
 								  cwd=config['s3s_directory'],
 								  shell=True)
 
@@ -122,18 +122,18 @@ def main():
 		logger.info('')
 
 		if config['stu_update']:
-			logger.info(f'1/2 Running splatnet3-token-util update with command "{config["git_command"]} pull"')
-			subprocess.run(f'{config["git_command"]} pull',
+			logger.info(f'1/2 Running splatnet3-token-util update with command `"{config["git_command"]}" pull`')
+			subprocess.run(f'"{config["git_command"]}" pull',
 						   shell=True)
 			logger.info('')
-			logger.info(f'2/2 Running splatnet3-token-util update with command "{config["pip_command"]} install -r requirements.txt"')
-			subprocess.run(f'{config["pip_command"]} install -r requirements.txt',
+			logger.info(f'2/2 Running splatnet3-token-util update with command `"{config["pip_command"]}" install -r requirements.txt`')
+			subprocess.run(f'"{config["pip_command"]}" install -r requirements.txt',
 						   shell=True)
 			logger.info('')
 			config['stu_update'] = False
 
 		# 4. run splatnet3-token-util and act according to result
-		stu_proc = subprocess.run(f'{config["python_command"]} main.py{' -im' if run_interactive_mode else ''}',
+		stu_proc = subprocess.run(f'"{config["python_command"]}" main.py{' -im' if run_interactive_mode else ''}',
 								  shell=True)
 
 		logger.info('')

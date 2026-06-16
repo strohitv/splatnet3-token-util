@@ -36,7 +36,7 @@ class CreateScreenshot:
 		os.makedirs(os.path.dirname(parsed_args.path), exist_ok=True)
 
 		while not os.path.exists(parsed_args.path):
-			subprocess.run(f'{self.app_config.emulator_config.adb_path} exec-out screencap -p > {parsed_args.path}',
+			subprocess.run(f'"{self.app_config.emulator_config.adb_path}" exec-out screencap -p > "{parsed_args.path}"',
 						   shell=True,
 						   stdout=subprocess.PIPE,
 						   stderr=subprocess.PIPE)

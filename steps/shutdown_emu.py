@@ -42,7 +42,7 @@ class ShutdownEmulator:
 		for i in range(int(parsed_args.max_attempts)):
 			self.logger.info(f'Shutting down emulator - attempt {i + 1}/{parsed_args.max_attempts}')
 
-			subprocess.run(f'{self.app_config.emulator_config.adb_path} shell reboot -p',
+			subprocess.run(f'"{self.app_config.emulator_config.adb_path}" shell reboot -p',
 						   shell=True,
 						   stdout=subprocess.PIPE,
 						   stderr=subprocess.PIPE)
@@ -53,7 +53,7 @@ class ShutdownEmulator:
 			while not stopped and time.time() - start_time < int(parsed_args.max_wait_secs):
 				time.sleep(int(parsed_args.duration) / 1000.0)
 
-				currently_opened_app_proc = subprocess.Popen(f'{self.app_config.emulator_config.adb_path} devices',
+				currently_opened_app_proc = subprocess.Popen(f'"{self.app_config.emulator_config.adb_path}" devices',
 															 shell=True,
 															 stdout=subprocess.PIPE,
 															 stderr=subprocess.PIPE)

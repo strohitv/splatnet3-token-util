@@ -30,7 +30,7 @@ class Type:
 		parsed_args = self.parser.parse_args(only_args)
 
 		self.logger.info(f'Typing text "{parsed_args.text}".')
-		subprocess.run(f'{self.app_config.emulator_config.adb_path} shell input text "{parsed_args.text.replace(" ", "%s")}"',
+		subprocess.run(f'"{self.app_config.emulator_config.adb_path}" shell input text "{parsed_args.text.replace(" ", "%s")}"',
 					   shell=True,
 					   stdout=subprocess.PIPE,
 					   stderr=subprocess.PIPE)

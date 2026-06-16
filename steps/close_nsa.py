@@ -43,7 +43,7 @@ class CloseNSA:
 		for i in range(int(parsed_args.max_attempts)):
 			self.logger.info(f'Closing Nintendo Switch App - attempt {i + 1}/{parsed_args.max_attempts}')
 
-			subprocess.run(f'{self.app_config.emulator_config.adb_path} shell am force-stop com.nintendo.znca',
+			subprocess.run(f'"{self.app_config.emulator_config.adb_path}" shell am force-stop com.nintendo.znca',
 						   shell=True,
 						   stdout=subprocess.PIPE,
 						   stderr=subprocess.PIPE)
@@ -53,7 +53,7 @@ class CloseNSA:
 			while not closed and time.time() - start_time < int(parsed_args.max_wait_secs):
 				time.sleep(int(parsed_args.duration) / 1000.0)
 
-				nsa_closed_proc = subprocess.Popen(f'{self.app_config.emulator_config.adb_path} shell dumpsys activity -p com.nintendo.znca activities',
+				nsa_closed_proc = subprocess.Popen(f'"{self.app_config.emulator_config.adb_path}" shell dumpsys activity -p com.nintendo.znca activities',
 												   shell=True,
 												   stdout=subprocess.PIPE,
 												   stderr=subprocess.PIPE)
