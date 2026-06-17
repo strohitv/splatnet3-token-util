@@ -69,7 +69,7 @@ class OpenSplatNet3:
 		for i in range(int(parsed_args.max_attempts)):
 			self.logger.info(f'Open SplatNet3 app - attempt {i + 1}/{parsed_args.max_attempts}')
 
-			subprocess.run(f'{self.app_config.emulator_config.adb_path} shell am start https://s.nintendo.com/av5ja-lp1/znca/game/4834290508791808',
+			subprocess.run(f'"{self.app_config.emulator_config.adb_path}" shell am start https://s.nintendo.com/av5ja-lp1/znca/game/4834290508791808',
 						   shell=True,
 						   stdout=subprocess.PIPE,
 						   stderr=subprocess.PIPE)
@@ -79,7 +79,7 @@ class OpenSplatNet3:
 			while not found and time.time() - start_time < int(parsed_args.max_wait_secs):
 				time.sleep(int(parsed_args.duration) / 1000.0)
 
-				subprocess.run(f'{self.app_config.emulator_config.adb_path} exec-out screencap -p > {parsed_args.actual}',
+				subprocess.run(f'"{self.app_config.emulator_config.adb_path}" exec-out screencap -p > "{parsed_args.actual}"',
 							   shell=True,
 							   stdout=subprocess.PIPE,
 							   stderr=subprocess.PIPE)

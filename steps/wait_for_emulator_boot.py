@@ -44,7 +44,7 @@ class WaitForEmulatorBoot:
 		while not found and time.time() - start_time < int(parsed_args.max_wait_secs):
 			time.sleep(int(parsed_args.duration) / 1000.0)
 
-			emulator_boot_check_proc = subprocess.Popen(f'{self.app_config.emulator_config.adb_path} shell dumpsys activity recents',
+			emulator_boot_check_proc = subprocess.Popen(f'"{self.app_config.emulator_config.adb_path}" shell dumpsys activity recents',
 														shell=True,
 														stdout=subprocess.PIPE,
 														stderr=subprocess.PIPE)

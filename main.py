@@ -263,7 +263,7 @@ def main():
 			wait_for_emulator_boot.execute('wait_for_emulator_boot')
 
 			logger.info('Opening SplatNet3...')
-			subprocess.run(f'{app_config.emulator_config.adb_path} shell am start https://s.nintendo.com/av5ja-lp1/znca/game/4834290508791808',
+			subprocess.run(f'"{app_config.emulator_config.adb_path}" shell am start https://s.nintendo.com/av5ja-lp1/znca/game/4834290508791808',
 						   shell=True,
 						   stdout=subprocess.PIPE,
 						   stderr=subprocess.PIPE)
@@ -333,7 +333,7 @@ def save_splanet3_screenshot(app_config: AppConfig) -> str:
 	current_script_path = os.path.dirname(os.path.realpath(__file__))
 	screenshot_path = os.path.join(current_script_path, f'{current_time.strftime('%Y-%m-%d_%H-%M-%S')}.png')
 	logger.info(f'Creating a Screenshot of the current screen with SplatNet3 opened...')
-	subprocess.run(f'{app_config.emulator_config.adb_path} exec-out screencap -p > {screenshot_path}',
+	subprocess.run(f'"{app_config.emulator_config.adb_path}" exec-out screencap -p > "{screenshot_path}"',
 				   shell=True,
 				   stdout=subprocess.PIPE,
 				   stderr=subprocess.PIPE)

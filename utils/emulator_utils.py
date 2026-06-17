@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 def boot_emulator(app_config: AppConfig):
 	logger.info('Booting emulator...')
 	emulator_proc = Popen(
-		f'{app_config.emulator_config.emulator_path} {app_config.emulator_config.get_emulator_boot_args()}',
+		f'"{app_config.emulator_config.emulator_path}" {app_config.emulator_config.get_emulator_boot_args()}',
 		shell=True,
 		stdout=subprocess.PIPE,
 		stderr=subprocess.PIPE)
@@ -44,7 +44,7 @@ def boot_emulator(app_config: AppConfig):
 
 
 def get_emulator_name(app_config: AppConfig):
-	emulator_devices_proc = Popen(f'{app_config.emulator_config.adb_path} devices',
+	emulator_devices_proc = Popen(f'"{app_config.emulator_config.adb_path}" devices',
 								  shell=True,
 								  stdout=subprocess.PIPE,
 								  stderr=subprocess.PIPE)
@@ -72,7 +72,7 @@ def run_adb(app_config: AppConfig, command: str):
 	emulator_name = get_emulator_name(app_config)
 
 	# run command
-	subprocess.run(f'{app_config.emulator_config.adb_path} -s {emulator_name} {command}',
+	subprocess.run(f'"{app_config.emulator_config.adb_path}" -s "{emulator_name}" {command}',
 				   shell=True,
 				   stderr=sys.stderr,
 				   stdout=sys.stderr)
@@ -96,7 +96,7 @@ def create_snapshot(app_config: AppConfig):
 		emulator_name = get_emulator_name(app_config)
 
 		# do snapshot
-		subprocess.run(f'{app_config.emulator_config.adb_path} -s {emulator_name} emu avd snapshot save {app_config.emulator_config.snapshot_name}',
+		subprocess.run(f'"{app_config.emulator_config.adb_path}" -s "{emulator_name}" emu avd snapshot save {app_config.emulator_config.snapshot_name}',
 					   shell=True,
 					   stdout=sys.stderr,
 					   stderr=sys.stderr)
@@ -120,7 +120,7 @@ def request_emulator_shutdown(app_config: AppConfig):
 	emulator_name = get_emulator_name(app_config)
 
 	# do snapshot
-	subprocess.run(f'{app_config.emulator_config.adb_path} -s {emulator_name} emu kill',
+	subprocess.run(f'"{app_config.emulator_config.adb_path}" -s "{emulator_name}" emu kill',
 				   shell=True,
 				   stdout=sys.stderr,
 				   stderr=sys.stderr)
