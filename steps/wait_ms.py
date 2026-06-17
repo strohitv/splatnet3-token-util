@@ -21,6 +21,7 @@ class WaitMS:
 											  conflict_handler='resolve')
 		self.parser.add_argument('-h', '--help', required=False, help=argparse.SUPPRESS)
 		self.parser.add_argument('milliseconds', help='The amount of milliseconds to wait')
+		self.parser.add_argument('-silent', help='whether the wait time should be logged', default=False, action='store_true')
 
 		self.description = self.parser.format_help()
 		self.introduction = 'This command will block the execution of the script for the given amount of milliseconds.'
@@ -29,5 +30,7 @@ class WaitMS:
 		only_args = shlex.split(args)[1:]
 		parsed_args = self.parser.parse_args(only_args)
 
-		self.logger.info(f'Waiting for {parsed_args.milliseconds} milliseconds.')
+		if not parsed_args.silent:
+			self.logger.info(f'Waiting for {parsed_args.milliseconds} milliseconds.')
+
 		time.sleep(int(parsed_args.milliseconds) / 1000.0)

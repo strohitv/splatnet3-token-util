@@ -123,42 +123,6 @@ options:
 
 ```
 
-## open_splatnet3
-This command attempts to open the Nintendo Switch App and load SplatNet3 afterwards.
-
-### Usage:
-```
-usage: open_splatnet3 [--max-attempts MAX_ATTEMPTS] [--max-wait-secs MAX_WAIT_SECS] [-d DURATION] [-c COLOR]
-                      [-actual ACTUAL] [-lb LOWER_BOUND] [-ub UPPER_BOUND] [-x1 X1] [-y1 Y1] [-x2 X2] [-y2 Y2]
-
-Opens the SplatNet3 app inside the Nintendo Switch App immediately and waits until a pixel with a specific
-color is found for a given ratio.
-
-options:
-  --max-attempts MAX_ATTEMPTS     How often the step should attempt to open SplatNet3 before giving up.
-                                  Default: 3
-  --max-wait-secs MAX_WAIT_SECS   How long the step should wait for SplatNet3 to load before it considers the
-                                  attempt failed. Default: 45 seconds
-  -d, --duration DURATION         The frequency of how often this command should check whether SplatNet3 is
-                                  open. Default: 500 ms
-  -c, --color COLOR               The color which should be searched as hex color. Default: "#292E35"
-  -actual, --actual ACTUAL        The file path where the actual screenshot of the emulator should be stored.
-                                  Default: "./screenshots/actual-nsa-opened.png"
-  -lb, --lower-bound LOWER_BOUND  The lower bound of the ratio of pixels in the area which must have the given
-                                  color. Default: 0.3
-  -ub, --upper-bound UPPER_BOUND  The upper bound of the ratio of pixels in the area which must have the given
-                                  color. Default: 0.7
-  -x1, --x1 X1                    The X coordinate of the upper left corner of the area which should be
-                                  checked. Default: 0
-  -y1, --y1 Y1                    The Y coordinate of the upper left corner of the area which should be
-                                  checked. Default: 1000
-  -x2, --x2 X2                    The X coordinate of the lower right corner of the area which should be
-                                  checked. Default: 1000
-  -y2, --y2 Y2                    The Y coordinate of the lower right corner of the area which should be
-                                  checked. Default: 1500
-
-```
-
 ## press_power_button_long
 This command presses the power button for a long time, which usually opens the power menu.
 
@@ -239,6 +203,82 @@ options:
                                                  -cmd arg. If the -ei arg is provided, the order will switch
                                                  and the -cmd will be executed immediately instead of doing
                                                  one image comparison first
+
+```
+
+## search_pixels_and_tap_center
+This command scans a given region on the emulator screen and looks if that region contains a given smaller image taken from the template screenshot. If it finds it, it will tap the center of it until something happens. If it cannot find it, it will execute the provided command and restart.
+
+Example: the prime example where this step is being used is searching for the SplatNet3 app icon inside the Nintendo Switch App. It will search for it through all app icons and if it finds it, will open SplatNet3. Otherwise, SplatNet 3 is probably further back in the list, so it will scroll a bit and search again until it finds it.
+
+### Usage:
+```
+usage: search_pixels_and_tap_center [-actual ACTUAL] -x1 X1 -y1 Y1 -x2 X2 -y2 Y2 [-cmd COMMAND] [-d DURATION]
+                                    [-ca CONTINUE_AFTER] -r RED -g GREEN -b BLUE [-ei]
+
+Searches a given region on the emulator screen for pixels with a given color and taps the center.
+
+options:
+  -actual, --actual ACTUAL              The file path where the actual screenshot of the emulator should be
+                                        stored. Default: "./screenshots/screenshot.png"
+  -x1, --x1 X1                          The X coordinate of the top left corner of the region to search
+                                        through
+  -y1, --y1 Y1                          The Y coordinate of the top left corner of the region to search
+                                        through
+  -x2, --x2 X2                          The X coordinate of the bottom right corner of the region to search
+                                        through
+  -y2, --y2 Y2                          The Y coordinate of the bottom right corner of the region to search
+                                        through
+  -cmd, --command COMMAND               The command which should be executed if the requested search can not
+                                        be found. Several commands can be provided by splitting them with a
+                                        semicolon `;`. Default: "wait_ms 1 -silent"
+  -d, --duration DURATION               The frequency of how often this command should check whether the
+                                        regions match. Default: 500 ms
+  -ca, --continue_after CONTINUE_AFTER  Optional arg which lets the script continue if the execution is still
+                                        active after X seconds. Default: 10
+  -r, --red RED                         The red value of the pixel.
+  -g, --green GREEN                     The green value of the pixel.
+  -b, --blue BLUE                       The blue value of the pixel.
+  -ei, --execute_immediately            Usually, this command checks whether the given template comparison
+                                        image can be found already BEFORE executing the -cmd arg. If the -ei
+                                        arg is provided, the order will switch and the -cmd will be executed
+                                        immediately instead of doing one image comparison first
+
+```
+
+## open_splatnet3
+This command attempts to open the Nintendo Switch App and load SplatNet3 afterwards. It is also able to update the NSA app if required as well as handling the "About Sending Usage Data" popup in the app.
+
+### Usage:
+```
+usage: open_splatnet3 [--max-attempts MAX_ATTEMPTS] [--max-wait-secs MAX_WAIT_SECS] [-d DURATION] [-c COLOR]
+                      [-actual ACTUAL] [-lb LOWER_BOUND] [-ub UPPER_BOUND] [-x1 X1] [-y1 Y1] [-x2 X2] [-y2 Y2]
+
+Opens the SplatNet3 app inside the Nintendo Switch App immediately and waits until a pixel with a specific
+color is found for a given ratio.
+
+options:
+  --max-attempts MAX_ATTEMPTS     How often the step should attempt to open SplatNet3 before giving up.
+                                  Default: 3
+  --max-wait-secs MAX_WAIT_SECS   How long the step should wait for SplatNet3 to load before it considers the
+                                  attempt failed. Default: 45 seconds
+  -d, --duration DURATION         The frequency of how often this command should check whether SplatNet3 is
+                                  open. Default: 500 ms
+  -c, --color COLOR               The color which should be searched as hex color. Default: "#292E35"
+  -actual, --actual ACTUAL        The file path where the actual screenshot of the emulator should be stored.
+                                  Default: "./screenshots/actual-nsa-opened.png"
+  -lb, --lower-bound LOWER_BOUND  The lower bound of the ratio of pixels in the area which must have the given
+                                  color. Default: 0.3
+  -ub, --upper-bound UPPER_BOUND  The upper bound of the ratio of pixels in the area which must have the given
+                                  color. Default: 0.7
+  -x1, --x1 X1                    The X coordinate of the upper left corner of the area which should be
+                                  checked. Default: 0
+  -y1, --y1 Y1                    The Y coordinate of the upper left corner of the area which should be
+                                  checked. Default: 1000
+  -x2, --x2 X2                    The X coordinate of the lower right corner of the area which should be
+                                  checked. Default: 1000
+  -y2, --y2 Y2                    The Y coordinate of the lower right corner of the area which should be
+                                  checked. Default: 1500
 
 ```
 
@@ -331,12 +371,15 @@ This command will block the execution of the script for the given amount of mill
 
 ### Usage:
 ```
-usage: wait_ms milliseconds
+usage: wait_ms [-silent] milliseconds
 
 Waits for the given amount of milliseconds
 
 positional arguments:
   milliseconds  The amount of milliseconds to wait
+
+options:
+  -silent       whether the wait time should be logged
 
 ```
 
