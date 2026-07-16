@@ -47,23 +47,6 @@ class OpenSplatNet3:
 		self.parser.add_argument('-d', '--duration', required=False, default=500,
 								 help='The frequency of how often this command should check whether SplatNet3 is open. Default: 500 ms')
 
-		self.parser.add_argument('-c', '--color', required=False, default='#292E35',
-								 help='The color which should be searched as hex color. Default: "#292E35"')
-		self.parser.add_argument('-actual', '--actual', required=False, default='./screenshots/actual-nsa-opened.png',
-								 help='The file path where the actual screenshot of the emulator should be stored. Default: "./screenshots/actual-nsa-opened.png"')
-		self.parser.add_argument('-lb', '--lower-bound', required=False, default=0.3,
-								 help='The lower bound of the ratio of pixels in the area which must have the given color. Default: 0.3')
-		self.parser.add_argument('-ub', '--upper-bound', required=False, default=0.7,
-								 help='The upper bound of the ratio of pixels in the area which must have the given color. Default: 0.7')
-		self.parser.add_argument('-x1', '--x1', required=False, default=0,
-								 help='The X coordinate of the upper left corner of the area which should be checked. Default: 0')
-		self.parser.add_argument('-y1', '--y1', required=False, default=1000,
-								 help='The Y coordinate of the upper left corner of the area which should be checked. Default: 1000')
-		self.parser.add_argument('-x2', '--x2', required=False, default=1000,
-								 help='The X coordinate of the lower right corner of the area which should be checked. Default: 1000')
-		self.parser.add_argument('-y2', '--y2', required=False, default=1500,
-								 help='The Y coordinate of the lower right corner of the area which should be checked. Default: 1500')
-
 		self.description = self.parser.format_help()
 		self.introduction = 'This command attempts to open the Nintendo Switch App and load SplatNet3 afterwards. It is also able to update the NSA app if required as well as handling the "About Sending Usage Data" popup in the app.'
 
@@ -72,15 +55,6 @@ class OpenSplatNet3:
 		parsed_args = self.parser.parse_args(only_args)
 
 		found = False
-
-		unprefixed_hex = parsed_args.color.replace('#', '')
-		expected_r = int(unprefixed_hex[0:2], 16)
-		expected_g = int(unprefixed_hex[2:4], 16)
-		expected_b = int(unprefixed_hex[4:6], 16)
-
-		bounding_box_pixels = (int(parsed_args.x2) - int(parsed_args.x1)) * (int(parsed_args.y2) - int(parsed_args.y1))
-		lower_bound = bounding_box_pixels * float(parsed_args.lower_bound)
-		upper_bound = bounding_box_pixels * float(parsed_args.upper_bound)
 
 		for i in range(int(parsed_args.max_attempts)):
 			self.logger.info(f'Open SplatNet3 app - attempt {i + 1}/{parsed_args.max_attempts}')
@@ -100,24 +74,20 @@ class OpenSplatNet3:
 					f'{self.search_pixels_and_tap_center_step.command_name} -x1 30 -y1 1930 -x2 580 -y2 2130 -r 2 -g 102 -b 216 -actual "./screenshots/actual_data_usage_popup.png" -ca 2',
 					self.all_steps)
 
-				subprocess.run(f'"{self.app_config.emulator_config.adb_path}" exec-out screencap -p > "{parsed_args.actual}"',
+				# read from XML dump
+				subprocess.run(f'"{self.app_config.emulator_config.adb_path}" shell uiautomator dump',
 							   shell=True,
 							   stdout=subprocess.PIPE,
 							   stderr=subprocess.PIPE)
 
-				full_screenshot = Image.open(parsed_args.actual)
-				self.run_update_loop_if_necessary(full_screenshot)
-				cropped_screenshot = full_screenshot.crop((int(parsed_args.x1), int(parsed_args.y1), int(parsed_args.x2), int(parsed_args.y2)))
+				subprocess.run(f'"{self.app_config.emulator_config.adb_path}" pull /sdcard/window_dump.xml ui_controls_dump.xml',
+							   shell=True,
+							   stdout=subprocess.PIPE,
+							   stderr=subprocess.PIPE)
 
-				all_pixels = cropped_screenshot.convert("RGBA").getdata()
-				total_found = 0
-
-				pixel: Tuple[int, int, int, int]
-				for pixel in all_pixels:
-					if pixel[0] == expected_r and pixel[1] == expected_g and pixel[2] == expected_b:
-						total_found += 1
-
-				found = lower_bound <= total_found <= upper_bound
+				with open('ui_controls_dump.xml', 'r') as f:
+					dump = f.read()
+					found = 'android.webkit.WebView' in dump and 'android.widget.Button' in dump
 
 				if self.app_config.debug:
 					self.logger.info(f'Result of the pixel search: found = {found}')

@@ -3,6 +3,8 @@
 /run-and-upload-to-server.sh
 /stats.csv
 /cron-log.log
+/ui_controls_dump.xml
+/window_dump_*.xml
 
 /config*
 /screenshots/**/actual*
